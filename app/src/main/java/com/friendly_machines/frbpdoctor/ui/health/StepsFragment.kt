@@ -9,8 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.service.big.HeatDataBlock
-import com.friendly_machines.frbpdoctor.service.big.StepsDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
 
 class StepsFragment : Fragment() {
 

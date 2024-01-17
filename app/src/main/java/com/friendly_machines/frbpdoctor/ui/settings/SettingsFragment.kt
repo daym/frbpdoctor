@@ -17,7 +17,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
-import com.friendly_machines.frbpdoctor.MainActivity
+import com.friendly_machines.frbpdoctor.ui.home.MainActivity
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.polidea.rxandroidble3.scan.ScanResult

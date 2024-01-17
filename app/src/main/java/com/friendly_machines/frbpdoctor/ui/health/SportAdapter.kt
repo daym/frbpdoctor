@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.service.big.SportDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
 
 class SportAdapter(private val data: List<SportDataBlock>) : RecyclerView.Adapter<SportViewHolder>() {
 

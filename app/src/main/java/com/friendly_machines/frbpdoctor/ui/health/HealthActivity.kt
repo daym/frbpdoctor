@@ -15,8 +15,9 @@ import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
 import com.friendly_machines.frbpdoctor.logger.Logger
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationRawResponse
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicatorListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -27,7 +28,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 
-class HealthActivity : AppCompatActivity(), WatchCommunicationService.WatchCommunicationServiceListener {
+class HealthActivity : AppCompatActivity(), WatchCommunicatorListener {
     companion object {
         const val TAG: String = "HealthActivity"
     }
@@ -134,31 +135,31 @@ class HealthActivity : AppCompatActivity(), WatchCommunicationService.WatchCommu
 //    }
 
     private val bigBuffers = HashMap<Short, ByteArrayOutputStream>()
-    private fun onBigWatchResponse(response: WatchCommunicationService.WatchResponse) {
+    private fun onBigWatchResponse(response: WatchResponse) {
         Logger.log("-> big decodedxx: $response")
         when (response) {
-            is WatchCommunicationService.WatchResponse.SleepData -> {
+            is WatchResponse.SleepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is SleepFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchCommunicationService.WatchResponse.HeatData -> {
+            is WatchResponse.HeatData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is HeatFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchCommunicationService.WatchResponse.StepData -> {
+            is WatchResponse.StepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is StepsFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchCommunicationService.WatchResponse.BpData -> {
+            is WatchResponse.BpData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is BloodPressureFragment) {
                         fragment.setData(response.data)
@@ -171,17 +172,17 @@ class HealthActivity : AppCompatActivity(), WatchCommunicationService.WatchCommu
         }
     }
 
-    override fun onWatchResponse(response: WatchCommunicationService.WatchResponse) {
+    override fun onWatchResponse(response: WatchResponse) {
     }
 
-    override fun onBigWatchRawResponse(rawResponse: WatchCommunicationRawResponse) {
+    override fun onBigWatchRawResponse(rawResponse: com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchCommunicationRawResponse) {
         val command = rawResponse.command
         // FIXME make sure the sn are consecutive
         if (rawResponse.arguments.isEmpty()) { // we are done
             val buffer = bigBuffers.get(command)
             buffer?.let {
                 bigBuffers.put(command, ByteArrayOutputStream())
-                val response = WatchCommunicationService.WatchResponse.parse(
+                val response = WatchResponse.parse(
                     rawResponse.command, ByteBuffer.wrap(buffer.toByteArray()).order(
                         ByteOrder.BIG_ENDIAN
                     )
@@ -196,5 +197,8 @@ class HealthActivity : AppCompatActivity(), WatchCommunicationService.WatchCommu
             }
             buffer!!.write(rawResponse.arguments)
         }
+    }
+
+    override fun onMtuResponse(mtu: Int) {
     }
 }

@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.service.big.SleepDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepDataBlock
 
 class SleepFragment : Fragment() {
 

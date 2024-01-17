@@ -36,7 +36,7 @@
         tools:layout="@layout/activity_health" />
     <activity
         android:id="@+id/weatherActivity"
-        android:name="com.friendly_machines.frbpdoctor.WeatherActivity"
+        android:name="com.friendly_machines.frbpdoctor.ui.weather.WeatherActivity"
         android:label="activity_weather"
         tools:layout="@layout/activity_weather" />
 

@@ -4,9 +4,9 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.service.big.SleepDataBlock
-import com.friendly_machines.frbpdoctor.service.big.SportDataBlock
-import com.friendly_machines.frbpdoctor.service.big.StepsDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
 
 class SportViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val startTimestampTextView: TextView = itemView.findViewById(R.id.startTimestampTextView)
