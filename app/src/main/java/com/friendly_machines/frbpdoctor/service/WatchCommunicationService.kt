@@ -7,6 +7,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
@@ -236,6 +237,11 @@ class WatchCommunicationService : Service(), WatchListener {
         queueAll(
             WatchDeviceInfoCommand((mtu - 7).toShort())
         )
+    }
+
+    override fun onException(exception: Throwable) {
+        super.onException(exception)
+        Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
     }
 }
 
