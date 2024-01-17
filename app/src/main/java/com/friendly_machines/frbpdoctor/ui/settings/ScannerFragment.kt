@@ -25,7 +25,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 /**
  * A fragment representing a list of Items.
  */
-class ScannerFragment(private val resultListener: ScannerResultListener) : /* ListFragment */ DialogFragment(), MyScannerRecyclerViewAdapter.OnItemClickListener {
+class ScannerFragment(private val resultListener: ScannerResultListener) : /* ListFragment */ DialogFragment(), MyScannerRecyclerViewAdapter.ItemClickListener {
     private lateinit var adapter: MyScannerRecyclerViewAdapter
     private lateinit var scanResults: MutableList<ScanResult>
     private var columnCount = 1

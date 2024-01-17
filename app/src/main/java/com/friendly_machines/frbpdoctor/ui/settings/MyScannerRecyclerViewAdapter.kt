@@ -13,10 +13,10 @@ import com.polidea.rxandroidble3.scan.ScanResult
  */
 class MyScannerRecyclerViewAdapter(
     private val values: List<ScanResult>,
-    private val onItemClickListener: OnItemClickListener
+    private val onItemClickListener: ItemClickListener
 
 ) : RecyclerView.Adapter<MyScannerRecyclerViewAdapter.ViewHolder>() {
-    interface OnItemClickListener {
+    interface ItemClickListener {
         fun onItemClick(position: Int)
     }
 
