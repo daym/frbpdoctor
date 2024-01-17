@@ -10,12 +10,7 @@ object Logger {
 
     fun log(message: String) {
         if (logTextView != null) {
-            logTextView!!.append(
-                """
-    $message
-    
-    """.trimIndent()
-            )
+            logTextView!!.append("\n$message")
         }
     }
 }
