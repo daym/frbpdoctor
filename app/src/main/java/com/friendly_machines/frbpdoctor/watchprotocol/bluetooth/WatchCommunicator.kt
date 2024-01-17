@@ -72,26 +72,26 @@ class WatchCommunicator {
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ data -> onNotificationReceived(characteristicUuid, data) }, { throwable ->
                     run {
                         Log.e(TAG, "Notification error: $throwable")
-                        notifyListenerOfException(throwable)
+                        notifyListenersOfException(throwable)
                     }
                 })
 
             bleDisposables.add(disposable)
         } catch (e: BleCharacteristicNotFoundException) {
             Log.e(TAG, "Characteristic not found: $characteristicUuid")
-            notifyListenerOfException(e)
+            notifyListenersOfException(e)
             throw e;
         } catch (e: BleConflictingNotificationAlreadySetException) {
             Log.e(
                 TAG, "Conflicting notification already set for characteristic: $characteristicUuid"
             )
-            notifyListenerOfException(e)
+            notifyListenersOfException(e)
             throw e;
         } catch (e: BleGattException) {
             Log.e(TAG, "Gatt error: $e")/*if (e.type == BleGattOperationType.NOTIFICATION) {
                 Log.e(TAG, "Notification setup error for characteristic: $characteristicUuid")
             }*/
-            notifyListenerOfException(e)
+            notifyListenersOfException(e)
             throw e;
         }
     }
@@ -190,7 +190,7 @@ class WatchCommunicator {
             // note: big: messageLengthRaw - 17 is the total payload len
         } else {
             Log.e(TAG, "watch protocol buffering not implemented")
-            notifyListenerOfException(RuntimeException("watch protocol buffering not implemented"))
+            notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
         }
         if (notificationCharacteristic == characteristicUuid) {
             val result = decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
@@ -243,7 +243,7 @@ class WatchCommunicator {
                 Log.e(
                     TAG, "Write characteristic error: $throwable"
                 )
-                notifyListenerOfException(throwable)
+                notifyListenersOfException(throwable)
             })
 
             packetIndex += 1
@@ -303,7 +303,7 @@ class WatchCommunicator {
                 Log.e(
                     TAG, "Write characteristic error: $throwable"
                 )
-                notifyListenerOfException(throwable)
+                notifyListenersOfException(throwable)
             })
 
             packetIndex += 1
@@ -339,7 +339,7 @@ class WatchCommunicator {
                         }, { throwable ->
                             run {
                                 Log.e(TAG, "MTU request failed: $throwable")
-                                notifyListenerOfException(throwable)
+                                notifyListenersOfException(throwable)
                             }
                         })
 
@@ -348,7 +348,7 @@ class WatchCommunicator {
                 }, { throwable ->
                     run {
                         Log.e(TAG, "Connection error: $throwable")
-                        notifyListenerOfException(throwable)
+                        notifyListenersOfException(throwable)
                     }
                 })
         )
@@ -383,7 +383,7 @@ class WatchCommunicator {
         return this
     }
 
-    private fun notifyListenerOfException(exception: Throwable) {
+    private fun notifyListenersOfException(exception: Throwable) {
         this.listeners.forEach {
             it.onException(exception)
         }
