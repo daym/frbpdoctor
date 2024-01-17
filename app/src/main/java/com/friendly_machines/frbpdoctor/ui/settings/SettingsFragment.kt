@@ -265,21 +265,21 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val data = scanResult.scanRecord.manufacturerSpecificData
         val k = data.keyAt(0) // 2257
         val key = data.valueAt(0).copyOfRange(0, 16)
-        val keydigest = MessageDigest.getInstance("MD5").digest(key)
+        val keyDigest = MessageDigest.getInstance("MD5").digest(key)
         val sharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(requireContext())
         // Assumption: We never want the user to be able to edit keydigest.
-        // FIXME update KEY_WATCH_KEYDIGEST in GUI
+        // FIXME update KEY_WATCH_KEY_DIGEST in GUI
         sharedPreferences.edit()
             .putString(
                 AppSettings.KEY_WATCH_KEY_DIGEST,
-                Base64.encodeToString(keydigest, Base64.DEFAULT)
+                Base64.encodeToString(keyDigest, Base64.DEFAULT)
             ).apply()
         // Assumption: unbind() was already done before scanning. Note: It's possible that scanning doesn't find anything when we are already connected.
         // Should be Long, but Android is weird.
         val userIdString = sharedPreferences.getString(AppSettings.KEY_USER_ID, "")
         // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-        if (userIdString != null && !userIdString.isEmpty() && userIdString.toLong() != 0L) {
+        if (!userIdString.isNullOrEmpty() && userIdString.toLong() != 0L) {
             val userId = userIdString.toLong()
             val serviceConnection = object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
