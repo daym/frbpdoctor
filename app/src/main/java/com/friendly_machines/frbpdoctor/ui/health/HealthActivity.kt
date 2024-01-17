@@ -177,7 +177,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
         val command = rawResponse.command
-        // FIXME make sure the serial are consecutive
+        // FIXME make sure the sequenceNumber are consecutive
         if (rawResponse.arguments.isEmpty()) { // we are done
             val buffer = bigBuffers[command]
             buffer?.let {
