@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.InvalidAlgorithmParameterException
@@ -35,6 +36,7 @@ import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
@@ -176,39 +178,34 @@ class WatchCommunicator {
 
     private var sendingSequenceNumber = AtomicInteger(1) // verified; our first sn after the reset packet needs to be with sn > 0
 
+    //private var receivingBuffers = ConcurrentHashMap<Int, Pair<Int, ByteArrayOutputStream>>() // packet_0_serial -> (current_serial, buffer)
     private fun onNotificationReceived(characteristicUuid: UUID, input: ByteArray) {
         Log.d(TAG, "Notification received: ${characteristicUuid}: ${input.contentToString()}")
         Logger.log("Notification received: ${characteristicUuid}: ${input.contentToString()}")
         val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-        val packetIndexRaw = decodeVariableLengthInteger(buf)
-
-        // skip packetIndex field
-        buf.position(packetIndexRaw.second)
-        val packetIndex = packetIndexRaw.first
-        if (packetIndex == 0) { // first packet has a total length
-            val position = buf.position()
-            val messageLengthRaw = decodeVariableLengthInteger(buf) // total length of the message, not just the packet
-            val messageLengthRawLength = messageLengthRaw.second // how much space the number itself takes
-            buf.position(messageLengthRawLength.toInt() + position)
+        val packetIndex = decodeVariableLengthInteger(buf)
+        if (packetIndex == 0) {
+            val messageLength = decodeVariableLengthInteger(buf)
+            //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
+            // TODO: Collect together enough packets to have messageLength
+            assert(messageLength <= buf.array().size - buf.position()) // FIXME check
             val protocolVersion = buf.get() / 16 // rest is reserved
             assert(protocolVersion == 4)
-            Log.e(TAG, "watch protocol version $protocolVersion")
+            Log.i(TAG, "watch protocol version $protocolVersion")
             // note: big: messageLengthRaw - 17 is the total payload len
         } else {
             Log.e(TAG, "watch protocol buffering not implemented")
+            notifyListenerOfException(RuntimeException("watch protocol buffering not implemented"))
         }
-        // TODO wrap.position(((Number) s).intValue()); (resume)
         if (notificationCharacteristic == characteristicUuid) {
             val result = decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
             if (result.command.toInt() == 0) { // resets sequence numbers
                 sendingSequenceNumber.set(1) // verified.
-                // Note: sn == 0, ack_sn == 1--8
+                // Note: serial == 0, ackSerial == 1--8
             }
 
             val response = WatchResponse.parse(
-                result.command, ByteBuffer.wrap(result.arguments).order(
-                    ByteOrder.BIG_ENDIAN
-                )
+                result.command, ByteBuffer.wrap(result.arguments)
             )
             Logger.log("-> decoded: $response")
             listeners.forEach {

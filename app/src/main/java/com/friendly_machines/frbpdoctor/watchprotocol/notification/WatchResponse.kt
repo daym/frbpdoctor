@@ -8,6 +8,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepData
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 sealed class WatchResponse {
     data class DeviceInfo(val romVersion: Int, val soc: Int, val protocolVersion: Short) : WatchResponse() {
@@ -393,6 +394,7 @@ sealed class WatchResponse {
     companion object {
         @OptIn(ExperimentalUnsignedTypes::class)
         fun parse(code: Short, buf: ByteBuffer): WatchResponse {
+            buf.order(ByteOrder.BIG_ENDIAN)
             return when (code) {
                 0.toShort() -> DeviceInfo.parse(buf)
                 17.toShort() -> Bind.parse(buf)
