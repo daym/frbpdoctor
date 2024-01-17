@@ -7,6 +7,13 @@ import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeBigMessage
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeMessage
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeVariableLengthInteger
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeInternal3
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeMessage
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodePacket
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeVariableLengthInteger
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.writingPortCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
@@ -48,148 +55,6 @@ class WatchCommunicator {
     companion object {
         const val TAG: String = "WatchCommunicator"
         val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
-        fun encodeWatchString(input: String): ByteArray {
-            val inputChars = input.toCharArray()
-            val buf = ByteBuffer.allocate(inputChars.size * 2).order(ByteOrder.BIG_ENDIAN)
-            inputChars.forEach {
-                buf.putChar(it)
-            }
-            return buf.array()
-        }
-        // decode var length integer; result: (decoded value, length of raw data)
-        private fun decodeVariableLengthInteger(buf: ByteBuffer): Pair<Int, Int> {
-            var result = 0
-            var basis = 1
-            for (i in 0 until 4) {
-                val chunk = buf.get().toInt()
-                result += (chunk and 0x7F) * basis
-                basis *= 0x80
-                if ((chunk and 0x80) == 0) { // EOF
-                    return Pair(result, i + 1)
-                }
-            }
-            return Pair(result, 4)
-        }
-
-        private fun encodeVariableLengthInteger(input: Int): ByteArray { // protobuf and/or MIDI
-            var input = input
-            val buf = ByteBuffer.allocate(
-                if (input < 0x80) 1
-                else if (input < 0x4000) 2
-                else if (input < 0x20_0000) 3
-                else 4
-            ) // less than 7, 14, 21 bits of payloads need differing output length
-            do {
-                var chunk = input % 0x80 // take lowest 7 bits
-                input /= 128 // shift by 7 bits
-                if (input > 0) { // still more bits left
-                    chunk = chunk or 0x80 // set top bit as a "continue" flag
-                }
-                buf.put(chunk.toByte())
-            } while (input > 0)
-            return buf.array()
-        }
-        /**
-         * If packetIndex == 0, it's the first packet. Otherwise, packetIndex > 0 is requires.
-         * totalMessageLen is only used if packetIndex == 0
-         */
-        private fun encodePacket(
-            packetIndex: Int,
-            packetBody: ByteArray,
-            totalMessageLength: Int,
-        ): ByteArray {
-            val rawPacketIndex = encodeVariableLengthInteger(packetIndex)
-            return if (packetIndex == 0) { // first chunk
-                val rawTotalMessageLength = encodeVariableLengthInteger(totalMessageLength)
-                val buf = ByteBuffer.allocate(rawPacketIndex.size + rawTotalMessageLength.size + 1 + packetBody.size).order(ByteOrder.BIG_ENDIAN)
-                buf.put(rawPacketIndex)
-                buf.put(rawTotalMessageLength)
-                buf.put((4 * 16).toByte()) // FIXME 1
-                buf.put(packetBody)
-                buf.array()
-            } else {
-                val buf = ByteBuffer.allocate(rawPacketIndex.size + packetBody.size).order(ByteOrder.BIG_ENDIAN)
-                buf.put(rawPacketIndex)
-                buf.put(packetBody)
-                buf.array()
-            }
-        }
-        // TODO: check
-        private fun encodeInternal3(
-            body: ByteArray, sendingSequenceNumber: Int, type: Byte
-        ): ByteArray {
-            val buf = ByteBuffer.allocate(4 + 1 + 2 + 2 + body.size).order(ByteOrder.BIG_ENDIAN)
-            buf.putInt(sendingSequenceNumber)
-            buf.put(type)
-            buf.putShort(0) // junk
-            buf.putShort(body.size.toShort())
-            buf.put(body)
-
-            // Put CRC
-
-            val buf2 = ByteBuffer.allocate(buf.limit() + 2).order(ByteOrder.BIG_ENDIAN)
-            buf2.put(buf.array())
-            buf2.putShort(Crc16.crc16(buf.array()))
-            return buf2.array()
-        }
-        /** Encode the given body into a watch message body */
-        private fun encodeMessage(
-            body: ByteArray, sendingSequenceNumber: Int, command: Short
-        ): ByteArray {
-            var buffer = ByteBuffer.allocate(4 + 4 + 2 + 2 + body.size).order(ByteOrder.BIG_ENDIAN)
-            buffer.putInt(sendingSequenceNumber)
-            buffer.putInt(0) // junk
-            buffer.putShort(command)
-            buffer.putShort(body.size.toShort())
-            buffer.put(body)
-            val rawBuffer0 = buffer.array()
-            val crc = Crc16.crc16(rawBuffer0)
-            buffer = ByteBuffer.allocate(buffer.limit() + 2)
-            buffer.put(rawBuffer0)
-            buffer.putShort(crc)
-            return buffer.array()
-        }
-        private fun decodeMessage(buf: ByteBuffer): WatchRawResponse {
-            buf.order(ByteOrder.BIG_ENDIAN)
-            val serialNumber = buf.int // generated by watch
-            val ackedSerialNumber = buf.int // That's the serial number of the package that we had sent to the watch
-            val command = buf.short
-            val length = buf.short.toInt()
-            if (buf.hasRemaining()) {
-                val rawContents = ByteArray(length)
-                buf.get(rawContents)
-                val lengthUntilCrcField = buf.position()
-                buf.rewind()
-                val everythingButCrc = ByteArray(lengthUntilCrcField)
-                buf.get(everythingButCrc)
-                val oldCrc = buf.short
-                val newCrc = Crc16.crc16(everythingButCrc)
-                if (oldCrc == newCrc) {
-                    Log.i(TAG, "decode crc ok")
-                } else {
-                    Log.e(TAG, "decode crc mistake")
-                }
-                return WatchRawResponse(
-                    serialNumber, ackedSerialNumber, command, rawContents
-                )
-            }
-            // FIXME log here, or throw exception?
-            return WatchRawResponse(
-                serialNumber, ackedSerialNumber, command, ByteArray(0)
-            )
-        }
-        private fun decodeBigMessage(buf: ByteBuffer): WatchRawResponse {
-            val sn = buf.int // sn generated by watch
-            buf.get() // TODO
-            val command = buf.short
-            val length = buf.short.toInt()
-            val result = ByteArray(length)
-            buf.get(result)
-            // padding
-            //val r = buf.remaining()
-            //Log.e(TAG, "remaining $r")
-            return WatchRawResponse(sn, sn, command, result)
-        }
     }
 
     private fun setupSender(commandQueue: PublishSubject<WatchCommand>) {
