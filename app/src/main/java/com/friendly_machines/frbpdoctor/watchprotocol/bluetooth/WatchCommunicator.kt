@@ -306,7 +306,6 @@ class WatchCommunicator {
         //val r = buf.remaining()
         //Log.e(TAG, "remaining $r")
         return WatchCommunicationRawResponse(sn, sn, command, result)
-        //return result
     }
 
     /**
