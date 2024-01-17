@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">FrBpDoctor</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string-array name="sex_options">
+        <item>Female</item>
+        <item>Male</item>
+    </string-array>
+
+    <string-array name="sex_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string name="userWeight">weight</string>
+    <string name="userHeight">height</string>
+    <string name="userBirthday">birthday</string>
+    <string name="userSex">sex</string>
+    <string name="userId">userId</string>
+
+    <string name="not_set">not set</string>
+    <string name="fragment_messages">Messages</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fragment_weather">Weather</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_weather">Weather</string>
+    <string name="title_health">Health</string>
+    <string name="fragment_health">Health</string>
+    <string name="clock">Clock</string>
+    <string name="SetAlarm">Set Alarm...</string>
+    <string name="title_activity_log">Log</string>
+    <string name="settings_activity_title">Settings</string>
+    <string name="blood_pressure_title">Blood Pressure</string>
+    <string name="steps_title">Steps</string>
+    <string name="heat_title">Heat</string>
+    <string name="sleep_title">Sleep</string>
+    <string name="title_activity_health">HealthActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="notification_listener_service">Notification listener</string>
+    <string name="watch_communication_service">Watch communication</string>
+
+</resources>

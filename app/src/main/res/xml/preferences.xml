@@ -1,0 +1,55 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        android:key="userId"
+        android:title="User ID"
+        android:summary="Enter your User ID"
+        android:inputType="number"
+        android:digits="0123456789"
+        />
+
+    <com.friendly_machines.frbpdoctor.ui.settings.RxBleDevicePreference
+        android:key="watchMacAddress"
+        android:title="Watch"
+        android:dialogTitle="Select your watch" />
+
+    <!-- TODO remove -->
+    <EditTextPreference
+        android:key="watchKeyDigest"
+        android:title="Watch Key Digest"
+        android:summary="Key digest used for communication with the watch"
+        />
+
+    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+        android:key="userWeight"
+        android:title="Weight"
+        android:summary="Enter your weight"
+        android:inputType="number"
+        app:unit="kg" />
+
+    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+        android:key="userHeight"
+        android:title="Height"
+        android:summary="Enter your height"
+        android:inputType="number"
+        app:unit="cm"/>
+
+    <ListPreference
+        android:key="userSex"
+        android:title="Sex"
+        android:summary="Select your sex"
+        android:dialogTitle="Select your sex"
+        android:entries="@array/sex_options"
+        android:entryValues="@array/sex_values"/>
+
+    <com.friendly_machines.frbpdoctor.ui.settings.DatePreference
+        android:title="Birthday"
+        android:key="userBirthday"
+        android:summary="Select your birthday" />
+
+    <Preference
+        android:key="clear_preferences"
+        android:title="Clear Preferences and unbind watch"
+        android:summary="Delete all preferences in the app and unbind watch"/>
+
+</PreferenceScreen>

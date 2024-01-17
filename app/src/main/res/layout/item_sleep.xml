@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/startTimestampTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date: dd/mm/yyyy"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/endTimestampTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date: dd/mm/yyyy"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/flagTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp" />
+
+</LinearLayout>

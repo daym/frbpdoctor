@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="MeasurementTextPreference">
+        <attr name="unit" format="string"/>
+    </declare-styleable>
+</resources>
