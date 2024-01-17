@@ -10,7 +10,7 @@ interface WatchListener {
     fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
 
     }
-    /** Called as soon as our SetMtu request got a responds (which we send as soon as we have connected) */
+    /** Called as soon as our SetMtu request got a response (which we send as soon as we have connected) */
     fun onMtuResponse(mtu: Int) {
 
     }
