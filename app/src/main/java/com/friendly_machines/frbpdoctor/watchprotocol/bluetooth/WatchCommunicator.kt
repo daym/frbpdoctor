@@ -284,9 +284,6 @@ class WatchCommunicator {
             }
 
         } else if (bigNotificationCharacteristic == characteristicUuid) {
-            //val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-            // FIXME more stuff ServiceLoader.load(SomeInterface.class)
-            // FIXME would have to assemble the chunks first.
             val result = decodeBigMessage(buf)
 
             listeners.forEach {
