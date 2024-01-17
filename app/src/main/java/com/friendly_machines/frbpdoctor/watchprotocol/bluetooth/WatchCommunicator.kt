@@ -1,9 +1,7 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
 import android.util.Log
-import android.util.Pair
 import com.friendly_machines.frbpdoctor.logger.Logger
-import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
@@ -13,10 +11,8 @@ import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteris
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeInternal3
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeMessage
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodePacket
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeVariableLengthInteger
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.writingPortCharacteristic
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
@@ -27,8 +23,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import io.reactivex.rxjava3.subjects.PublishSubject
-import java.io.ByteArrayOutputStream
+import io.reactivex.rxjava3.subjects.Subject
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.InvalidAlgorithmParameterException
@@ -36,7 +31,6 @@ import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
@@ -59,7 +53,7 @@ class WatchCommunicator {
         val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
     }
 
-    private fun setupSender(commandQueue: PublishSubject<WatchCommand>) {
+    private fun setupSender(commandQueue: Subject<WatchCommand>) {
         // TODO .onBackpressureBuffer().flatMap(bytesAndFilter -> {}, 1/*serialized communication*/)
         bleDisposables.add(commandQueue.subscribe({
             sendAll(it)
@@ -316,7 +310,7 @@ class WatchCommunicator {
     }
 
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
-    fun start(bleDevice: RxBleDevice, commandQueue: PublishSubject<WatchCommand>) {
+    fun start(bleDevice: RxBleDevice, commandQueue: Subject<WatchCommand>) {
         assert(!this.connecting)
         this.connecting = true
         bleDisposables.clear()

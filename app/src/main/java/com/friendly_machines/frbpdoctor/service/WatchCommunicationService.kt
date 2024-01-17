@@ -64,7 +64,7 @@ class WatchCommunicationService : Service(), WatchListener {
         communicator.setKeyDigest(keyDigest)
     }
 
-    private val commandQueue = PublishSubject.create<WatchCommand>()
+    private val commandQueue = PublishSubject.create<WatchCommand>().toSerialized()
 
     private fun enqueueCommand(
         command: WatchCommand,
