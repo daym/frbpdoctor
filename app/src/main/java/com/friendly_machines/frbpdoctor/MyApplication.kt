@@ -3,8 +3,6 @@ package com.friendly_machines.frbpdoctor
 import android.app.Application
 import android.content.Intent
 import android.provider.Settings
-import androidx.core.app.NotificationManagerCompat
-import com.friendly_machines.frbpdoctor.service.NotificationListener
 import com.polidea.rxandroidble3.LogConstants
 import com.polidea.rxandroidble3.LogOptions
 import com.polidea.rxandroidble3.RxBleClient

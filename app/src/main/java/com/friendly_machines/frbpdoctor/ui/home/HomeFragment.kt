@@ -5,17 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.friendly_machines.frbpdoctor.databinding.FragmentHomeBinding
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.view.ViewTreeObserver
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import com.friendly_machines.frbpdoctor.R
+import com.friendly_machines.frbpdoctor.databinding.FragmentHomeBinding
 import java.io.IOException
 import java.io.InputStream
 

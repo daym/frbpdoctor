@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.HeatDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
 
 class HeatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val dayTimestampTextView: TextView = itemView.findViewById(R.id.dayTimestampTextView)

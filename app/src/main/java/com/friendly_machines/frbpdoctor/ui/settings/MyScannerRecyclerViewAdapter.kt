@@ -1,11 +1,10 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
+import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.databinding.FragmentScannerBinding
 import com.polidea.rxandroidble3.scan.ScanResult
 
