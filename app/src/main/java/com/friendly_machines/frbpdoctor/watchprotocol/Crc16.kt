@@ -47,9 +47,9 @@ object Crc16 {
     )
 
     fun crc16(bytes: ByteArray): Short {
-        var crc = 0xFFFF // 0000;
+        var crc: Int = 0xFFFF // 0000
         for (b in bytes) {
-            crc = crc ushr 8 xor table[crc xor b.toInt() and 0xff]
+            crc = (crc ushr 8) xor table[(crc xor b.toInt()) and 0xff]
         }
         return crc.toShort()
     }
