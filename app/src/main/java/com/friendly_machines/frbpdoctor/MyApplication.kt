@@ -20,7 +20,7 @@ class MyApplication : Application() {
         // TODO remember forever when rejected
         // Direct the user to the settings where he can enable the notification listener
         val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  // Add this flag
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         //}
     }
@@ -40,5 +40,4 @@ class MyApplication : Application() {
         tryEnableNotifications()
         // See NotificationListener for tryEnableNotifications()
     }
-
 }
