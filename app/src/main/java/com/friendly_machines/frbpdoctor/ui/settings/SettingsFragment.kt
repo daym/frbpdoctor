@@ -77,7 +77,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 //                true
 //            }
 //        }
-        initSummary(getPreferenceScreen());
+        initSummary(getPreferenceScreen())
 
         val clearPreferencesPreference = findPreference<Preference>("clear_preferences")
         clearPreferencesPreference?.setOnPreferenceClickListener {
@@ -102,8 +102,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             }
             val context = this.requireContext()
             val serviceIntent = Intent(context, WatchCommunicationService::class.java)
-            if (context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-            } else {
+            if (!context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
                 Log.e(MainActivity.TAG, "Could not bind to WatchCommunicationService")
             }
             true
@@ -112,27 +111,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
         if (preference is RxBleDevicePreference) {
-//            requireActivity().getSupportFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.fragment_container, scannerFragment) // R.id.fragment_container is the container view id in your layout
-//                .addToBackStack(null) // Optional, adds the transaction to the back stack
-//                .commit();
-
-
             val scannerFragment = ScannerFragment(this)
-            scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment");
-
-
-//            val f: DialogFragment
-//            f = DatePreferenceDialogFragment.newInstance(preference.getKey())
-//            f.setTargetFragment(this, 0)
-//            f.show(fragmentManager!!, null)
-
+            scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
         } else if (preference is DatePreference) {
             val f: DialogFragment
             f = DatePreferenceDialogFragment.newInstance(preference.getKey())
-            f.setTargetFragment(this, 0)
-            f.show(fragmentManager!!, null)
+            f.setTargetFragment(this, 0) // TODO
+            f.show(parentFragmentManager, null)
         } else {
             super.onDisplayPreferenceDialog(preference)
         }
@@ -166,7 +151,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
      */
     private fun initSummary(p: Preference) {
         if (p is PreferenceGroup) {
-            val pGrp: PreferenceGroup = p as PreferenceGroup
+            val pGrp: PreferenceGroup = p
             for (i in 0 until pGrp.preferenceCount) {
                 initSummary(pGrp.getPreference(i))
             }
@@ -209,7 +194,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 //                val watchMacAddressPreference = findPreference<Preference>("watchMacAddress")
 //                watchMacAddressPreference?.summary = macAddress
 //            }
-            if (key!! == AppSettings.KEY_USER_HEIGHT || key!! == AppSettings.KEY_USER_WEIGHT || key!! == AppSettings.KEY_USER_SEX || key!! == AppSettings.KEY_USER_BIRTHDAY) {
+            if (key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY) {
                 // TODO wind down the amount of stuff per second
                 val serviceConnection = object : ServiceConnection {
                     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -217,20 +202,20 @@ class SettingsFragment : PreferenceFragmentCompat(),
                             service as WatchCommunicationService.WatchCommunicationServiceBinder
 
                         val weight =
-                            sharedPreferences!!.getInt(AppSettings.KEY_USER_WEIGHT, 0).toByte()
+                            sharedPreferences.getInt(AppSettings.KEY_USER_WEIGHT, 0).toByte()
                         val height =
-                            sharedPreferences!!.getInt(AppSettings.KEY_USER_HEIGHT, 0).toByte()
+                            sharedPreferences.getInt(AppSettings.KEY_USER_HEIGHT, 0).toByte()
                         val birthday =
-                            sharedPreferences!!.getString(AppSettings.KEY_USER_BIRTHDAY, "")
+                            sharedPreferences.getString(AppSettings.KEY_USER_BIRTHDAY, "")
                         if (birthday != null) {
                             val sexString =
-                                sharedPreferences!!.getString(AppSettings.KEY_USER_SEX, "")
+                                sharedPreferences.getString(AppSettings.KEY_USER_SEX, "")
                             if (sexString != "" && !sexString!!.isEmpty()) {
                                 val sex = sexString.toInt().toByte()
 
                                 val age = calculateYearsSinceDate(birthday)
-                                assert(age < 256);
-                                assert(age > 0);
+                                assert(age < 256)
+                                assert(age > 0)
                                 if (weight > 0 && height > 0 && sex > 0) {
                                     binder.setProfile(
                                         height,
