@@ -291,7 +291,7 @@ class WatchCommunicator {
 
             listeners.forEach {
                 when (result.command) {
-                    else -> it.onBigWatchRawResponse(result)
+                    else -> it.onBigWatchRawResponse(rawResponse = result)
                 }
             }
         }
