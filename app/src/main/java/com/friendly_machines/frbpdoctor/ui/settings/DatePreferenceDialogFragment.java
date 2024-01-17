@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
 
+import androidx.preference.PreferenceDialogFragmentCompat;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import androidx.preference.PreferenceDialogFragmentCompat;
 
 public class DatePreferenceDialogFragment extends PreferenceDialogFragmentCompat {
 
