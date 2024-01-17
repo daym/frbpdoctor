@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import com.friendly_machines.frbpdoctor.R
@@ -64,9 +63,6 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
