@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
+import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
@@ -33,7 +34,6 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetProfileCom
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetTimeCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetWeatherCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchUnbindCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -68,7 +68,7 @@ class WatchCommunicationService : Service(), WatchListener {
     // TODO: commandQueue.onComplete on connection loss??
     private val commandQueue = PublishSubject.create<WatchCommand>()
 
-    private fun queueAll(
+    private fun enqueueCommand(
         command: WatchCommand,
     ) {
         commandQueue.onNext(command)
@@ -141,14 +141,14 @@ class WatchCommunicationService : Service(), WatchListener {
                 )
             }
 
-            queueAll(WatchSetProfileCommand(height, weight, sex, age))
+            enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
         }
 
         fun setWeather(
             weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, title: String
-        ) = queueAll(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(title)))
+        ) = enqueueCommand(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(title)))
 
-        fun setMessage(type: MessageType, time: Int, title: String, content: String) = queueAll(
+        fun setMessage(type: MessageType, time: Int, title: String, content: String) = enqueueCommand(
             WatchSetMessageCommand(
                 type.code, time, encodeWatchString(title), encodeWatchString(content)
             )
@@ -158,35 +158,35 @@ class WatchCommunicationService : Service(), WatchListener {
             val currentTimeInSeconds = System.currentTimeMillis() / 1000
             val instance: Calendar = Calendar.getInstance()
             val timezoneInSeconds = (instance.get(Calendar.DST_OFFSET) + instance.get(Calendar.ZONE_OFFSET)) / 1000
-            queueAll(
+            enqueueCommand(
                 WatchSetTimeCommand(
                     currentTimeInSeconds.toInt(), timezoneInSeconds
                 )
             )
         }
 
-        fun getBatteryState() = queueAll(WatchGetBatteryStateCommand())
-        fun getAlarm() = queueAll(WatchGetAlarmCommand())
+        fun getBatteryState() = enqueueCommand(WatchGetBatteryStateCommand())
+        fun getAlarm() = enqueueCommand(WatchGetAlarmCommand())
 
         fun setAlarm(
             action: Byte, // 0
             id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray
-        ) = queueAll(
+        ) = enqueueCommand(
             WatchSetAlarmCommand(action, id, open, hour, min, title, repeats),
         )
 
-        fun bindWatch(userId: Long, key: ByteArray) = queueAll(
+        fun bindWatch(userId: Long, key: ByteArray) = enqueueCommand(
             WatchBindCommand(userId, key)
         )
 
-        fun unbindWatch() = queueAll(WatchUnbindCommand())
-        fun getDeviceConfig() = queueAll(WatchGetDeviceConfigCommand())
-        fun getBpData() = queueAll(WatchGetBpDataCommand())
-        fun getSleepData() = queueAll(WatchGetSleepDataCommand())
-        fun getStepData() = queueAll(WatchGetStepDataCommand())
-        fun getHeatData() = queueAll(WatchGetHeatDataCommand())
-        fun getWatchFace() = queueAll(WatchGetWatchFaceCommand())
-        fun getSportData() = queueAll(WatchGetSportDataCommand())
+        fun unbindWatch() = enqueueCommand(WatchUnbindCommand())
+        fun getDeviceConfig() = enqueueCommand(WatchGetDeviceConfigCommand())
+        fun getBpData() = enqueueCommand(WatchGetBpDataCommand())
+        fun getSleepData() = enqueueCommand(WatchGetSleepDataCommand())
+        fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
+        fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
+        fun getWatchFace() = enqueueCommand(WatchGetWatchFaceCommand())
+        fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
 
         fun addListener(that: WatchListener): WatchCommunicationService {
             return this@WatchCommunicationService.addListener(that)
@@ -234,13 +234,14 @@ class WatchCommunicationService : Service(), WatchListener {
     }
 
     override fun onMtuResponse(mtu: Int) {
-        queueAll(
+        enqueueCommand(
             WatchDeviceInfoCommand((mtu - 7).toShort())
         )
     }
 
     override fun onException(exception: Throwable) {
         super.onException(exception)
+        Logger.log("Error: $exception")
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
     }
 }
