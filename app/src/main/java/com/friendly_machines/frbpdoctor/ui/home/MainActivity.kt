@@ -180,4 +180,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onMtuResponse(mtu: Int) {
     }
+
+    override fun onException(exception: Throwable) {
+    }
 }

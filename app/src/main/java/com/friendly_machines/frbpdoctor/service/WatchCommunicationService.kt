@@ -241,5 +241,8 @@ class WatchCommunicationService : Service(), WatchListener {
         )
     }
 
+    override fun onException(exception: Throwable) {
+    }
+
 }
 

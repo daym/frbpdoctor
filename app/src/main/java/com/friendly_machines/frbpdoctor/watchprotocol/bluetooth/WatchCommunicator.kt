@@ -83,17 +83,20 @@ class WatchCommunicator {
             bleDisposables.add(disposable)
         } catch (e: BleCharacteristicNotFoundException) {
             Log.e(TAG, "Characteristic not found: $characteristicUuid")
-            stopSelf()
+            notifyListenerOfException(e)
+            throw e;
         } catch (e: BleConflictingNotificationAlreadySetException) {
             Log.e(
                 TAG, "Conflicting notification already set for characteristic: $characteristicUuid"
             )
-            stopSelf()
+            notifyListenerOfException(e)
+            throw e;
         } catch (e: BleGattException) {
             Log.e(TAG, "Gatt error: $e")/*if (e.type == BleGattOperationType.NOTIFICATION) {
                 Log.e(TAG, "Notification setup error for characteristic: $characteristicUuid")
             }*/
-            stopSelf()
+            notifyListenerOfException(e)
+            throw e;
         }
     }
 
@@ -355,7 +358,7 @@ class WatchCommunicator {
                 Log.e(
                     TAG, "Write characteristic error: $throwable"
                 )
-                stopSelf()
+                notifyListenerOfException(throwable)
             })
 
             packetIndex += 1
@@ -451,7 +454,7 @@ class WatchCommunicator {
                 Log.e(
                     TAG, "Write characteristic error: $throwable"
                 )
-                stopSelf()
+                notifyListenerOfException(throwable)
             })
 
             packetIndex += 1
@@ -487,7 +490,7 @@ class WatchCommunicator {
                         }, { throwable ->
                             run {
                                 Log.e(TAG, "MTU request failed: $throwable")
-                                stopSelf()
+                                notifyListenerOfException(throwable)
                             }
                         })
 
@@ -496,7 +499,7 @@ class WatchCommunicator {
                 }, { throwable ->
                     run {
                         Log.e(TAG, "Connection error: $throwable")
-                        stopSelf()
+                        notifyListenerOfException(throwable)
                     }
                 })
         )
@@ -522,11 +525,6 @@ class WatchCommunicator {
         bleDisposables.clear()
     }
 
-    private fun stopSelf() {
-        // FIXME
-        TODO("Not yet implemented")
-    }
-
     fun removeListener(listener: WatchListener) {
         this.listeners.remove(listener)
     }
@@ -534,5 +532,11 @@ class WatchCommunicator {
     fun addListener(listener: WatchListener): WatchCommunicator {
         this.listeners.add(listener)
         return this
+    }
+
+    private fun notifyListenerOfException(exception: Throwable) {
+        this.listeners.forEach {
+            it.onException(exception)
+        }
     }
 }

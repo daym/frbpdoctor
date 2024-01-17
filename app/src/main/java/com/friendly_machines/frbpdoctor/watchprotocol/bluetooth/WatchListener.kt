@@ -7,4 +7,5 @@ interface WatchListener {
     fun onWatchResponse(response: WatchResponse)
     fun onBigWatchRawResponse(rawResponse: WatchRawResponse)
     fun onMtuResponse(mtu: Int)
+    fun onException(exception: Throwable)
 }
