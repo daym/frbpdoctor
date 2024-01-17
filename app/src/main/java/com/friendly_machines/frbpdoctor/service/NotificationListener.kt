@@ -39,8 +39,8 @@ class NotificationListener : NotificationListenerService() {
                 if (notification.visibility != Notification.VISIBILITY_SECRET) {
                     binder.setMessage(
                         when (notification.category) {
-                            Notification.CATEGORY_CALL -> MessageType.CallNew
-                            Notification.CATEGORY_MISSED_CALL -> MessageType.MissCall
+                            Notification.CATEGORY_CALL -> MessageType.NewCall
+                            Notification.CATEGORY_MISSED_CALL -> MessageType.MissedCall
                             Notification.CATEGORY_NAVIGATION -> MessageType.QQ
                             Notification.CATEGORY_ALARM -> MessageType.QQ
                             Notification.CATEGORY_REMINDER -> MessageType.QQ
