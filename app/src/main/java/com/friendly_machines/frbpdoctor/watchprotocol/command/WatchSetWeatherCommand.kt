@@ -3,7 +3,7 @@ package com.friendly_machines.frbpdoctor.watchprotocol.command
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class SetWeatherCommand(
+class WatchSetWeatherCommand(
     weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, title: ByteArray
 ) : WatchCommand(
     44, run {

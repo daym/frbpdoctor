@@ -15,23 +15,23 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator.Companion.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
-import com.friendly_machines.frbpdoctor.watchprotocol.command.BindCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.DeviceInfoCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetAlarmCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetBatteryStateCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetBpDataCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetDeviceConfigCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetHeatDataCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetSleepDataCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetSportDataCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetStepDataCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.GetWatchFaceCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.SetAlarmCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.SetMessageCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.SetProfileCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.SetTimeCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.SetWeatherCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.UnbindCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchBindCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchDeviceInfoCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetAlarmCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetBatteryStateCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetBpDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetDeviceConfigCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetHeatDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSleepDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSportDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetStepDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetWatchFaceCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetAlarmCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetMessageCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetProfileCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetTimeCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetWeatherCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchUnbindCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
@@ -140,15 +140,15 @@ class WatchCommunicationService : Service(), WatchListener {
                 )
             }
 
-            queueAll(SetProfileCommand(height, weight, sex, age))
+            queueAll(WatchSetProfileCommand(height, weight, sex, age))
         }
 
         fun setWeather(
             weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, title: String
-        ) = queueAll(SetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(title)))
+        ) = queueAll(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(title)))
 
         fun setMessage(type: MessageType, time: Int, title: String, content: String) = queueAll(
-            SetMessageCommand(
+            WatchSetMessageCommand(
                 type.code, time, encodeWatchString(title), encodeWatchString(content)
             )
         )
@@ -158,34 +158,34 @@ class WatchCommunicationService : Service(), WatchListener {
             val instance: Calendar = Calendar.getInstance()
             val timezoneInSeconds = (instance.get(Calendar.DST_OFFSET) + instance.get(Calendar.ZONE_OFFSET)) / 1000
             queueAll(
-                SetTimeCommand(
+                WatchSetTimeCommand(
                     currentTimeInSeconds.toInt(), timezoneInSeconds
                 )
             )
         }
 
-        fun getBatteryState() = queueAll(GetBatteryStateCommand())
-        fun getAlarm() = queueAll(GetAlarmCommand())
+        fun getBatteryState() = queueAll(WatchGetBatteryStateCommand())
+        fun getAlarm() = queueAll(WatchGetAlarmCommand())
 
         fun setAlarm(
             action: Byte, // 0
             id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray
         ) = queueAll(
-            SetAlarmCommand(action, id, open, hour, min, title, repeats),
+            WatchSetAlarmCommand(action, id, open, hour, min, title, repeats),
         )
 
         fun bindWatch(userId: Long, key: ByteArray) = queueAll(
-            BindCommand(userId, key)
+            WatchBindCommand(userId, key)
         )
 
-        fun unbindWatch() = queueAll(UnbindCommand())
-        fun getDeviceConfig() = queueAll(GetDeviceConfigCommand())
-        fun getBpData() = queueAll(GetBpDataCommand())
-        fun getSleepData() = queueAll(GetSleepDataCommand())
-        fun getStepData() = queueAll(GetStepDataCommand())
-        fun getHeatData() = queueAll(GetHeatDataCommand())
-        fun getWatchFace() = queueAll(GetWatchFaceCommand())
-        fun getSportData() = queueAll(GetSportDataCommand())
+        fun unbindWatch() = queueAll(WatchUnbindCommand())
+        fun getDeviceConfig() = queueAll(WatchGetDeviceConfigCommand())
+        fun getBpData() = queueAll(WatchGetBpDataCommand())
+        fun getSleepData() = queueAll(WatchGetSleepDataCommand())
+        fun getStepData() = queueAll(WatchGetStepDataCommand())
+        fun getHeatData() = queueAll(WatchGetHeatDataCommand())
+        fun getWatchFace() = queueAll(WatchGetWatchFaceCommand())
+        fun getSportData() = queueAll(WatchGetSportDataCommand())
 
         fun addListener(that: WatchListener): WatchCommunicationService {
             return this@WatchCommunicationService.addListener(that)
@@ -237,7 +237,7 @@ class WatchCommunicationService : Service(), WatchListener {
 
     override fun onMtuResponse(mtu: Int) {
         queueAll(
-            DeviceInfoCommand((mtu - 7).toShort())
+            WatchDeviceInfoCommand((mtu - 7).toShort())
         )
     }
 

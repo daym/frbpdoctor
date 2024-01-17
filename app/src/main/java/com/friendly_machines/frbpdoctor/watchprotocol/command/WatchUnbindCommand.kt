@@ -1,2 +1,3 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
-class GetAlarmCommand : WatchCommand(56, ByteArray(0)) // (big)
+
+class WatchUnbindCommand : WatchCommand(18, ByteArray(0))

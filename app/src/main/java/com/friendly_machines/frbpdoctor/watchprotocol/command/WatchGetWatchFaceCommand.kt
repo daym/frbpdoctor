@@ -1,3 +1,3 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class UnbindCommand : WatchCommand(18, ByteArray(0))
+class WatchGetWatchFaceCommand : WatchCommand(46, ByteArray(0))

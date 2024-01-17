@@ -3,7 +3,7 @@ package com.friendly_machines.frbpdoctor.watchprotocol.command
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class SetAlarmCommand(
+class WatchSetAlarmCommand(
     action: Byte, id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray
 ) : WatchCommand(
     55, run {
