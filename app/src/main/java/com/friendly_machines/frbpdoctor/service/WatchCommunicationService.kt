@@ -13,9 +13,9 @@ import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator.Companion.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchBindCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchDeviceInfoCommand
@@ -45,7 +45,6 @@ class WatchCommunicationService : Service(), WatchListener {
         const val TAG: String = "WatchCommunicationService"
     }
 
-    //private var listeners = HashSet<WatchCommunicationServiceListener>()
     private val communicator = WatchCommunicator()
 
     private fun showSetMandatorySettingsDialog() {
@@ -65,7 +64,6 @@ class WatchCommunicationService : Service(), WatchListener {
         communicator.setKeyDigest(keyDigest)
     }
 
-    // TODO: commandQueue.onComplete on connection loss??
     private val commandQueue = PublishSubject.create<WatchCommand>()
 
     private fun enqueueCommand(
