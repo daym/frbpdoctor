@@ -14,7 +14,7 @@ import com.friendly_machines.frbpdoctor.R
  * Saves a string value.
  */
 class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference(context!!, attrs) {
-    private var mDateValue: String? = null
+    private var dateValue: String? = null
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
         return a.getString(index)
     }
@@ -33,10 +33,10 @@ class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference
      * @param text string representation of the date to save.
      */
     var date: String?
-        get() = mDateValue
+        get() = dateValue
         set(text) {
             val wasBlocking = shouldDisableDependents()
-            mDateValue = text
+            dateValue = text
             persistString(text)
             val isBlocking = shouldDisableDependents()
             if (isBlocking != wasBlocking) {

@@ -138,7 +138,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         // No need to set up preference summaries for checkbox preferences because
         // they can be set up in xml using summaryOff and summary On
         if (p is DatePreference) {
-            p.setSummaryProvider(DatePreference.SimpleSummaryProvider.getInstance())
+            p.setSummaryProvider(DatePreference.SimpleSummaryProvider.instance)
         } else if (p is EditTextPreference) {
             p.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
         }
@@ -260,7 +260,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val device = scanResult.bleDevice
         val watchMacAddressPreference =
             findPreference<Preference>("watchMacAddress") as RxBleDevicePreference
-        watchMacAddressPreference.device = device
+        watchMacAddressPreference.setDevice2(device)
 
         val data = scanResult.scanRecord.manufacturerSpecificData
         val k = data.keyAt(0) // 2257
