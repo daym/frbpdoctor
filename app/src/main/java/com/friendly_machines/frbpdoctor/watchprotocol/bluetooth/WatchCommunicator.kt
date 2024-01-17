@@ -273,13 +273,14 @@ class WatchCommunicator {
         val ivParameterSpec = IvParameterSpec(iv)
         val cipherText = try {
             val instance = Cipher.getInstance("AES/CBC/NoPadding")
-            instance.init(1, SecretKeySpec(keyDigest, "AES"), ivParameterSpec)
+            instance.init(Cipher.ENCRYPT_MODE, SecretKeySpec(keyDigest, "AES"), ivParameterSpec)
             instance.doFinal(paddedPlainText)
         } catch (unused: Exception) {
             Log.e(TAG, "encryption error")
             ByteArray(0)
         }
-        return ByteBuffer.allocate(1 + iv.size + cipherText.size).order(ByteOrder.BIG_ENDIAN).put(1.toByte()/*encryption mode*/).put(iv).put(cipherText).array()
+        val encryptionMode = 1.toByte()
+        return ByteBuffer.allocate(1 + iv.size + cipherText.size).order(ByteOrder.BIG_ENDIAN).put(encryptionMode).put(iv).put(cipherText).array()
     }
 
     /** Take the given client message and send it, if necessary splitting it into different bluetooth packets */
