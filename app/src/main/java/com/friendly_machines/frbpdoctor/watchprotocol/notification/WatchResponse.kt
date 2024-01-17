@@ -18,7 +18,7 @@ sealed class WatchResponse {
                 val soc = buf.int
                 val protocolVersion = buf.short // this might be the protocol version (4.2)
                 // It has a lot of other crap, too. The next byte is maybe a "bound" flag
-                return DeviceInfo(romVersion, soc, protocolVersion)
+                return DeviceInfo(romVersion = romVersion, soc = soc, protocolVersion = protocolVersion)
             }
         }
     }
@@ -213,7 +213,7 @@ sealed class WatchResponse {
             fun parse(buf: ByteBuffer): GetBatteryState {
                 val id: Byte = buf.get()
                 val voltage: Short = buf.short
-                return GetBatteryState(id, voltage)
+                return GetBatteryState(id = id, voltage = voltage)
             }
         }
     }
@@ -224,7 +224,7 @@ sealed class WatchResponse {
             fun parse(buf: ByteBuffer): SyncTime {
                 val timestamp: Int = buf.int
                 val timezone: Int = buf.int
-                return SyncTime(timestamp, timezone)
+                return SyncTime(timestamp = timestamp, timezone = timezone)
             }
         }
     }
@@ -235,7 +235,7 @@ sealed class WatchResponse {
         companion object {
             fun parse(buf: ByteBuffer): SetWeather {
                 val status: Byte = buf.get()
-                return SetWeather(status)
+                return SetWeather(status = status)
             }
         }
     }
@@ -288,7 +288,7 @@ sealed class WatchResponse {
         companion object {
             fun parse(buf: ByteBuffer): SetWatchFace {
                 val status: Byte = buf.get()
-                return SetWatchFace(status)
+                return SetWatchFace(status = status)
             }
         }
     }
@@ -341,7 +341,7 @@ sealed class WatchResponse {
                 val successCount: Byte = buf.get()
                 val b = ByteArray(buf.remaining())
                 buf.get(b)
-                return GetAlarm(successCount, b)
+                return GetAlarm(successCount = successCount, data = b)
             }
         }
     }

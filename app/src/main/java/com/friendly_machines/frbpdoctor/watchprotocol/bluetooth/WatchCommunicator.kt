@@ -2,8 +2,8 @@ package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
 import android.util.Log
 import android.util.Pair
-import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
 import com.friendly_machines.frbpdoctor.logger.Logger
+import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.Companion.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.Companion.bigWritingPortCharacteristic

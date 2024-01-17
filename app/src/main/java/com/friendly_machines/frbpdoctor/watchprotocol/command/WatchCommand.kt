@@ -1,5 +1,4 @@
-package com.friendly_machines.frbpdoctor.watchprotocol
-
+package com.friendly_machines.frbpdoctor.watchprotocol.command
 open class WatchCommand(val code: Short, val arguments: ByteArray) {
     // TODO 1 OTA_REQUEST
     // TODO 2 OTA_INFO

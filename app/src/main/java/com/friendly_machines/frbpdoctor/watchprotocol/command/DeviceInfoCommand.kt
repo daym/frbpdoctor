@@ -1,6 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-import com.friendly_machines.frbpdoctor.watchprotocol.WatchCommand
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
