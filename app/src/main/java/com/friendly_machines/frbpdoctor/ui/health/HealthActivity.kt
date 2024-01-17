@@ -61,11 +61,11 @@ class HealthActivity : AppCompatActivity(), WatchListener {
                     handler.postDelayed(this, 10000 /* ms */)
                 }
             }
-            handler.postDelayed(periodicTask, 10000 /* ms */);
+            handler.postDelayed(periodicTask, 10000 /* ms */)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            handler.removeCallbacksAndMessages(null);
+            handler.removeCallbacksAndMessages(null)
             disconnector!!.removeListener(this@HealthActivity)
         }
     }
@@ -76,7 +76,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
         super.onStart()
         val serviceIntent = Intent(this, WatchCommunicationService::class.java)
         if (bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-            shouldUnbindService = true;
+            shouldUnbindService = true
         } else {
             Log.e(TAG, "Could not bind to WatchCommunicationService")
         }
@@ -84,16 +84,16 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     }
 
     override fun onStop() {
-        handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacksAndMessages(null)
         if (shouldUnbindService) {
             unbindService(serviceConnection)
-            shouldUnbindService = false;
+            shouldUnbindService = false
         }
         super.onStop()
     }
 
     override fun onDestroy() {
-        handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacksAndMessages(null)
 
         super.onDestroy()
     }
@@ -112,11 +112,11 @@ class HealthActivity : AppCompatActivity(), WatchListener {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
-        val hvpa = HealthViewPagerAdapter(this)
-        binding.viewPager.adapter = hvpa
+        val adapter = HealthViewPagerAdapter(this)
+        binding.viewPager.adapter = adapter
         TabLayoutMediator(
             binding.tabs, binding.viewPager
-        ) { tab: TabLayout.Tab, position: Int -> tab.text = hvpa.getTabTitle(position) }.attach()
+        ) { tab: TabLayout.Tab, position: Int -> tab.text = adapter.getTabTitle(position) }.attach()
 
         val fab: FloatingActionButton = binding.fab
 
@@ -125,8 +125,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
                 .setAction("Action", null).show()
         }
 
-        handler = Handler(Looper.getMainLooper());
-
+        handler = Handler(Looper.getMainLooper())
     }
 
     // FIXME up
@@ -137,7 +136,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     private val bigBuffers = HashMap<Short, ByteArrayOutputStream>()
     private fun onBigWatchResponse(response: WatchResponse) {
-        Logger.log("-> big decodedxx: $response")
+        Logger.log("-> big decoded: $response")
         when (response) {
             is WatchResponse.SleepData -> {
                 for (fragment in supportFragmentManager.fragments) {
@@ -180,9 +179,9 @@ class HealthActivity : AppCompatActivity(), WatchListener {
         val command = rawResponse.command
         // FIXME make sure the sn are consecutive
         if (rawResponse.arguments.isEmpty()) { // we are done
-            val buffer = bigBuffers.get(command)
+            val buffer = bigBuffers[command]
             buffer?.let {
-                bigBuffers.put(command, ByteArrayOutputStream())
+                bigBuffers[command] = ByteArrayOutputStream()
                 val response = WatchResponse.parse(
                     rawResponse.command, ByteBuffer.wrap(buffer.toByteArray()).order(
                         ByteOrder.BIG_ENDIAN
@@ -191,12 +190,12 @@ class HealthActivity : AppCompatActivity(), WatchListener {
                 onBigWatchResponse(response)
             }
         } else {
-            var buffer = bigBuffers.get(command)
+            var buffer = bigBuffers[command]
             if (buffer == null) {
                 buffer = ByteArrayOutputStream()
-                bigBuffers.put(command, buffer)
+                bigBuffers[command] = buffer
             }
-            buffer!!.write(rawResponse.arguments)
+            buffer.write(rawResponse.arguments)
         }
     }
 
