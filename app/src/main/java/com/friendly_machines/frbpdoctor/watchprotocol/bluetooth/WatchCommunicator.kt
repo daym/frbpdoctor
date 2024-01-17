@@ -72,6 +72,7 @@ class WatchCommunicator {
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ data -> onNotificationReceived(characteristicUuid, data) }, { throwable ->
                     run {
                         Log.e(TAG, "Notification error: $throwable")
+                        notifyListenerOfException(throwable)
                     }
                 })
 
