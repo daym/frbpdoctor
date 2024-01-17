@@ -60,7 +60,7 @@ class NotificationListener : NotificationListenerService() {
                             Notification.CATEGORY_TRANSPORT -> MessageType.QQ
                             //Notification.CATEGORY_SYSTEM -> reserved
                             else -> MessageType.Messenger
-                        }, time.toInt(), title!!, text!!
+                        }, time.toInt(), title, text
                     )
                 }
             }
@@ -71,8 +71,7 @@ class NotificationListener : NotificationListenerService() {
             }
         }
         val serviceIntent = Intent(this, WatchCommunicationService::class.java)
-        if (bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-        } else {
+        if (!bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
             Log.e(TAG, "Could not bind to WatchCommunicationService")
         }
     }
