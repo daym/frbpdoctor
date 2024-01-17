@@ -10,8 +10,8 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
-import com.friendly_machines.frbpdoctor.watchprotocol.WatchCommand
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator.Companion.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicatorListener
