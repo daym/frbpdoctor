@@ -24,6 +24,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
+import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.InvalidAlgorithmParameterException
@@ -193,7 +194,15 @@ class WatchCommunicator {
             notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
         }
         if (notificationCharacteristic == characteristicUuid) {
-            val result = decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
+            val result = try {
+                decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
+            } catch (e: WatchMessageDecodingException) {
+                notifyListenersOfException(e)
+                return;
+            } catch (e: BufferUnderflowException) {
+                notifyListenersOfException(e)
+                return;
+            }
             if (result.command.toInt() == 0) { // resets sequence numbers
                 sendingSequenceNumber.set(1) // verified.
                 // Note: sequenceNumber == 0, ackedSequenceNumber == 1--8
@@ -209,7 +218,15 @@ class WatchCommunicator {
                 }
             }
         } else if (bigNotificationCharacteristic == characteristicUuid) {
-            val result = decodeBigMessage(ByteBuffer.wrap(decryptMessage(buf)))
+            val result = try {
+                decodeBigMessage(ByteBuffer.wrap(decryptMessage(buf)))
+            } catch (e: WatchMessageDecodingException) {
+                notifyListenersOfException(e)
+                return;
+            } catch (e: BufferUnderflowException) {
+                notifyListenersOfException(e)
+                return;
+            }
             listeners.forEach {
                 when (result.command) {
                     else -> it.onBigWatchRawResponse(rawResponse = result)
