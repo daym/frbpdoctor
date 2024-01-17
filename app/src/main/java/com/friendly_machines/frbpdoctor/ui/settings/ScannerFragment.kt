@@ -31,7 +31,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
     private var columnCount = 1
 
     interface ScannerResultListener {
-        fun onScanningUserSelectedDevice(device: ScanResult)
+        fun onScanningUserSelectedDevice(scanResult: ScanResult)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +70,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
     }
 
     companion object {
-        const val SCAN_RESULT_KEY = "scanResult"
+        const val TAG = "ScannerFragment"
 
         // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
@@ -87,7 +87,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
 
     override fun onItemClick(position: Int) {
         val scanResult = scanResults[position]
-        resultListener?.onScanningUserSelectedDevice(scanResult)
+        resultListener.onScanningUserSelectedDevice(scanResult)
         dismiss()  // Close the dialog
     }
 
@@ -104,7 +104,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
 //    }
 
     private val REQUEST_PERMISSION_BLE_CONNECT = 102
-    internal fun requestConnectionPermission(client: RxBleClient) =
+    private fun requestConnectionPermission(client: RxBleClient) =
         ActivityCompat.requestPermissions(
             requireActivity(),
             /*
@@ -118,6 +118,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
     private fun isConnectionPermissionGranted(requestCode: Int, grantResults: IntArray) =
         requestCode == REQUEST_PERMISSION_BLE_CONNECT && grantResults[0] == PackageManager.PERMISSION_GRANTED
 
+    @Deprecated("Deprecated in Android")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -130,9 +131,8 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
     }
 
     private fun scan() {
-        val TAG_BT = "Bluetooth"
-        var rxBleClient = RxBleClient.create(requireContext())
-        var scanFilter = ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString("0000fe51-0000-1000-8000-00805f9b34fb")).build()
+        val rxBleClient = RxBleClient.create(requireContext())
+        val scanFilter = ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString("0000fe51-0000-1000-8000-00805f9b34fb")).build()
 
         var scanSubscription = rxBleClient.scanBleDevices(
             ScanSettings.Builder()
@@ -142,20 +142,20 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
         )
             .subscribe(object : Observer<ScanResult> {
                 override fun onSubscribe(d: Disposable) {
-                    Log.d(TAG_BT, "on subscribe")
+                    Log.d(TAG, "on subscribe")
                 }
 
                 override fun onError(e: Throwable) {
-                    Log.d(TAG_BT, "Scan onError", e)
+                    Log.d(TAG, "Scan onError", e)
                 }
 
                 override fun onComplete() {
-                    Log.d(TAG_BT, "on complete")
+                    Log.d(TAG, "on complete")
                 }
 
                 override fun onNext(scanResult: ScanResult) {
                     val device: RxBleDevice = scanResult.bleDevice
-                    Log.d(TAG_BT, "Scan - " + device.name)
+                    Log.d(TAG, "Scan - " + device.name)
                     val f = scanResults.find { it.bleDevice == device }
                     if (f == null) {
                         scanResults.add(scanResult)
