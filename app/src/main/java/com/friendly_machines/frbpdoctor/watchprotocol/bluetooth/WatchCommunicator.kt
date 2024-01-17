@@ -459,7 +459,7 @@ class WatchCommunicator {
     }
 
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
-    fun connect(bleDevice: RxBleDevice, commandQueue: PublishSubject<WatchCommand>) {
+    fun start(bleDevice: RxBleDevice, commandQueue: PublishSubject<WatchCommand>) {
         assert(!this.connecting)
         this.connecting = true
         bleDisposables.clear()

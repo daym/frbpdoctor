@@ -95,7 +95,7 @@ class WatchCommunicationService : Service(), WatchListener {
                     this.setKeyDigest(keyDigest)
                     val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
                     val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
-                    communicator.connect(bleDevice, commandQueue)
+                    communicator.start(bleDevice, commandQueue)
                 } else {
                     // Maybe later
                     Log.e(TAG, "KeyDigest was null")
