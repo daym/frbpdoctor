@@ -199,9 +199,6 @@ class HealthActivity : AppCompatActivity(), WatchListener {
         }
     }
 
-    override fun onMtuResponse(mtu: Int) {
-    }
-
     override fun onException(exception: Throwable) {
     }
 }

@@ -232,17 +232,10 @@ class WatchCommunicationService : Service(), WatchListener {
         }
     }
 
-    override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
-    }
-
     override fun onMtuResponse(mtu: Int) {
         queueAll(
             WatchDeviceInfoCommand((mtu - 7).toShort())
         )
     }
-
-    override fun onException(exception: Throwable) {
-    }
-
 }
 

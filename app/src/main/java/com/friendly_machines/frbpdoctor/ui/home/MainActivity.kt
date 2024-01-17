@@ -178,9 +178,6 @@ class MainActivity : AppCompatActivity(),
         Logger.log(response.toString())
     }
 
-    override fun onMtuResponse(mtu: Int) {
-    }
-
     override fun onException(exception: Throwable) {
     }
 }
