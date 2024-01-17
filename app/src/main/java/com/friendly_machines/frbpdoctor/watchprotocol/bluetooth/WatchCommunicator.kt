@@ -140,7 +140,7 @@ class WatchCommunicator {
 //        val contents: ByteArray = decryptMessage(wrap)
 //        // OK from here
 //        val buf = ByteBuffer.wrap(contents).order(ByteOrder.BIG_ENDIAN)
-//        val sn = buf.int
+//        val serial = buf.int
 //        buf.get()
 //        val command = buf.short
 //        val length = buf.short.toInt()
@@ -161,17 +161,17 @@ class WatchCommunicator {
 //                Log.e(TAG, "decode3 crc mistake")
 //            }
 //            return WatchRawResponse(
-//                sn, sn, command, bArr6
+//                serial, serial, command, bArr6
 //            )
 //        }
 //        return WatchRawResponse(
-//            sn, sn, command, ByteArray(0)
+//            serial, serial, command, ByteArray(0)
 //        )
 //    }
 
     private var listeners = HashSet<WatchListener>()
 
-    private var sendingSequenceNumber = AtomicInteger(1) // verified; our first sn after the reset packet needs to be with sn > 0
+    private var sendingSequenceNumber = AtomicInteger(1) // verified; our first serial after the reset packet needs to be with sendingSequenceNumber > 0
 
     //private var receivingBuffers = ConcurrentHashMap<Int, Pair<Int, ByteArrayOutputStream>>() // packet_0_serial -> (current_serial, buffer)
     private fun onNotificationReceived(characteristicUuid: UUID, input: ByteArray) {
