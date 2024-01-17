@@ -16,7 +16,8 @@ import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
 import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicatorListener
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -28,7 +29,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 
-class HealthActivity : AppCompatActivity(), WatchCommunicatorListener {
+class HealthActivity : AppCompatActivity(), WatchListener {
     companion object {
         const val TAG: String = "HealthActivity"
     }
@@ -175,7 +176,7 @@ class HealthActivity : AppCompatActivity(), WatchCommunicatorListener {
     override fun onWatchResponse(response: WatchResponse) {
     }
 
-    override fun onBigWatchRawResponse(rawResponse: com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchCommunicationRawResponse) {
+    override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
         val command = rawResponse.command
         // FIXME make sure the sn are consecutive
         if (rawResponse.arguments.isEmpty()) { // we are done

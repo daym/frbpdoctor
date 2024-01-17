@@ -2,14 +2,14 @@ package com.friendly_machines.frbpdoctor.watchprotocol.notification;
 
 import androidx.annotation.NonNull;
 
-public class WatchCommunicationRawResponse {
+public class WatchRawResponse {
     int serial;
     int ackSerial;
 
     public short command;
     public byte[] arguments;
 
-    public WatchCommunicationRawResponse(int serial, int ackSerial, short command, byte[] arguments) {
+    public WatchRawResponse(int serial, int ackSerial, short command, byte[] arguments) {
         this.serial = serial;
         this.ackSerial = ackSerial;
         this.command = command;

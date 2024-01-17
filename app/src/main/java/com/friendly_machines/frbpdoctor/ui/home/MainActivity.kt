@@ -21,14 +21,14 @@ import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
 import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicatorListener
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchCommunicationRawResponse
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity(),
-    WatchCommunicatorListener {
+    WatchListener {
     private lateinit var handler: Handler
     private lateinit var binding: ActivityMainBinding
     companion object {
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    override fun onBigWatchRawResponse(response: WatchCommunicationRawResponse) {
+    override fun onBigWatchRawResponse(response: WatchRawResponse) {
         // FIXME handle alarm maybe
         Logger.log(response.toString())
     }

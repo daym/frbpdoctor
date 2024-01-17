@@ -14,7 +14,7 @@ import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator.Companion.encodeWatchString
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicatorListener
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.command.BindCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.DeviceInfoCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.GetAlarmCommand
@@ -32,13 +32,14 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.SetProfileCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.SetTimeCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.SetWeatherCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.UnbindCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.Calendar
 import kotlin.system.exitProcess
 
-class WatchCommunicationService : Service(), WatchCommunicatorListener {
+class WatchCommunicationService : Service(), WatchListener {
     companion object {
         const val TAG: String = "WatchCommunicationService"
     }
@@ -186,11 +187,11 @@ class WatchCommunicationService : Service(), WatchCommunicatorListener {
         fun getWatchFace() = queueAll(GetWatchFaceCommand())
         fun getSportData() = queueAll(GetSportDataCommand())
 
-        fun addListener(that: WatchCommunicatorListener): WatchCommunicationService {
+        fun addListener(that: WatchListener): WatchCommunicationService {
             return this@WatchCommunicationService.addListener(that)
         }
 
-        fun removeListener(that: WatchCommunicatorListener) {
+        fun removeListener(that: WatchListener) {
             return this@WatchCommunicationService.removeListener(that)
         }
     }
@@ -212,11 +213,11 @@ class WatchCommunicationService : Service(), WatchCommunicatorListener {
 
     // TODO what if we are restarted: will the listener be restored?!
 
-    fun removeListener(listener: WatchCommunicatorListener) {
+    fun removeListener(listener: WatchListener) {
         communicator.removeListener(listener)
     }
 
-    private fun addListener(listener: WatchCommunicatorListener): WatchCommunicationService {
+    private fun addListener(listener: WatchListener): WatchCommunicationService {
         communicator.addListener(listener)
         return this
     }
@@ -231,7 +232,7 @@ class WatchCommunicationService : Service(), WatchCommunicatorListener {
         }
     }
 
-    override fun onBigWatchRawResponse(response: com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchCommunicationRawResponse) {
+    override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
     }
 
     override fun onMtuResponse(mtu: Int) {
