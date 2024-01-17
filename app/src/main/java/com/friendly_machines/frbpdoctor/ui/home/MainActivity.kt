@@ -35,10 +35,6 @@ class MainActivity : AppCompatActivity(),
         const val TAG: String = "MainActivity"
     }
 
-//    private fun showToast(message: String) {
-//        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-//    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
