@@ -16,7 +16,6 @@ import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
-import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
@@ -145,7 +144,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
 
     override fun onBigWatchRawResponse(response: WatchRawResponse) {
         // FIXME handle alarm maybe
-        Logger.log(response.toString())
+        Log.i(TAG, response.toString())
     }
 
     override fun onException(exception: Throwable) {

@@ -4,13 +4,13 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
-import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
@@ -111,7 +111,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     private val bigBuffers = HashMap<Short, ByteArrayOutputStream>()
     private fun onBigWatchResponse(response: WatchResponse) {
-        Logger.log("-> big decoded: $response")
+        Log.i(TAG, "-> big decoded: $response")
         when (response) {
             is WatchResponse.SleepData -> {
                 for (fragment in supportFragmentManager.fragments) {

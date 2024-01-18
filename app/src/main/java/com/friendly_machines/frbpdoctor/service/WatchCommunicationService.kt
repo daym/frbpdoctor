@@ -5,13 +5,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.IBinder
-import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
-import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
@@ -227,7 +225,7 @@ class WatchCommunicationService : Service(), WatchListener {
 
     override fun onException(exception: Throwable) {
         super.onException(exception)
-        Logger.log("Error: $exception")
+        Log.e(TAG, "Error: $exception")
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
     }
 }

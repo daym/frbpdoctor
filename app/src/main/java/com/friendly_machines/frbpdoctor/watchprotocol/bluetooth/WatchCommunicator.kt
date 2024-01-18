@@ -1,7 +1,6 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
 import android.util.Log
-import com.friendly_machines.frbpdoctor.logger.Logger
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
@@ -177,7 +176,6 @@ class WatchCommunicator {
     //private var receivingBuffers = ConcurrentHashMap<Int, Pair<Int, ByteArrayOutputStream>>() // packet_0_serial -> (current_serial, buffer)
     private fun onNotificationReceived(characteristicUuid: UUID, input: ByteArray) {
         Log.d(TAG, "Notification received: ${characteristicUuid}: ${input.contentToString()}")
-        Logger.log("Notification received: ${characteristicUuid}: ${input.contentToString()}")
         val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
         val packetIndex = decodeVariableLengthInteger(buf)
         if (packetIndex == 0) {
@@ -211,7 +209,7 @@ class WatchCommunicator {
             val response = WatchResponse.parse(
                 result.command, ByteBuffer.wrap(result.arguments)
             )
-            Logger.log("-> decoded: $response")
+            Log.i(TAG, "-> decoded: $response")
             listeners.forEach {
                 when (result.command) {
                     else -> it.onWatchResponse(response)
@@ -241,7 +239,7 @@ class WatchCommunicator {
         body: ByteArray /* command body */, connection: RxBleConnection
     ) {
         val rawMessage = encodeInternal3(body, sendingSequenceNumber, type)
-        Logger.log("gonna write to watch (big) ${rawMessage.contentToString()}")
+        Log.d(TAG, "gonna write to watch (big) ${rawMessage.contentToString()}")
         val encryptedMessage = encryptMessage(rawMessage)
         val totalMessageSize = encryptedMessage.size
         val buf = ByteBuffer.wrap(encryptedMessage).order(ByteOrder.BIG_ENDIAN)
@@ -299,7 +297,7 @@ class WatchCommunicator {
         body: ByteArray, /* command body */
     ) {
         val contents = encodeMessage(body, sendingSequenceNumber, command)
-        Logger.log("gonna write to watch (small) ${contents.contentToString()}")
+        Log.d(TAG, "gonna write to watch (small) ${contents.contentToString()}")
         val totalMessage = encryptMessage(contents)
         val totalMessageSize = totalMessage.size
         val buf = ByteBuffer.wrap(totalMessage).order(ByteOrder.BIG_ENDIAN)
