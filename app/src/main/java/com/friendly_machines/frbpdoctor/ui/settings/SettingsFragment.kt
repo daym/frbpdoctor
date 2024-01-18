@@ -28,9 +28,7 @@ import java.util.Locale
 
 // FIXME Android has an actual "Settings Fragment" in the menu
 
-class SettingsFragment : PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener,
-    ScannerFragment.ScannerResultListener {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, ScannerFragment.ScannerResultListener {
     companion object {
         const val TAG: String = "SettingsFragment"
     }
@@ -41,8 +39,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     private fun clearAllPreferences() {
-        val sharedPreferences: SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         AppSettings.clear(sharedPreferences)
 
@@ -122,8 +119,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             super.onDisplayPreferenceDialog(preference)
         }
         if (preference.key == "watchMacAddress") {
-            val sharedPreferences: SharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val macAddress = AppSettings.getMacAddress(sharedPreferences)
             preference.summary = macAddress
         }
@@ -171,8 +167,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 time = selectedDate
             }
 
-            val yearsDifference =
-                currentCalendar.get(Calendar.YEAR) - selectedCalendar.get(Calendar.YEAR)
+            val yearsDifference = currentCalendar.get(Calendar.YEAR) - selectedCalendar.get(Calendar.YEAR)
 
             // Check if the birthday has occurred this year
             if (currentCalendar.get(Calendar.DAY_OF_YEAR) < selectedCalendar.get(Calendar.DAY_OF_YEAR)) {
@@ -198,27 +193,16 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 // TODO wind down the amount of stuff per second
                 val serviceConnection = object : ServiceConnection {
                     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                        val binder =
-                            service as WatchCommunicationService.WatchCommunicationServiceBinder
+                        val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
 
-                        val weight = AppSettings.getWeight(sharedPreferences)
-                        val height = AppSettings.getHeight(sharedPreferences)
-                        AppSettings.getBirthday(sharedPreferences)?.let {
-                            val birthday = it
-                            AppSettings.getSex(sharedPreferences)?.let {
-                                val sex = it
-                                val age = calculateYearsSinceDate(birthday)
-                                assert(age < 256)
-                                assert(age > 0)
-                                if (weight > 0 && height > 0 && sex > 0) {
-                                    binder.setProfile(
-                                        height,
-                                        weight,
-                                        sex,
-                                        age.toByte()
-                                    )
-                                }
-                            }
+                        AppSettings.getProfileSettings(sharedPreferences)?.let {
+                            val profile = it
+                            val age = calculateYearsSinceDate(profile.birthdayString)
+                            assert(age < 256)
+                            assert(age > 0)
+                            binder.setProfile(
+                                profile.height, profile.weight, profile.sex, age.toByte()
+                            )
                         }
                     }
 
@@ -229,9 +213,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
                 val serviceIntent = Intent(requireContext(), WatchCommunicationService::class.java)
                 requireActivity().bindService(
-                    serviceIntent,
-                    serviceConnection,
-                    Context.BIND_AUTO_CREATE
+                    serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE
                 )
                 //!!
 
@@ -252,21 +234,21 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onScanningUserSelectedDevice(scanResult: ScanResult) {
         val device = scanResult.bleDevice
-        val watchMacAddressPreference =
-            findPreference<Preference>("watchMacAddress") as RxBleDevicePreference
+        val watchMacAddressPreference = findPreference<Preference>("watchMacAddress") as RxBleDevicePreference
         watchMacAddressPreference.setDevice2(device)
 
         val data = scanResult.scanRecord.manufacturerSpecificData
         val k = data.keyAt(0) // 2257
         val key = data.valueAt(0).copyOfRange(0, 16)
         val keyDigest = MessageDigest.getInstance("MD5").digest(key)
-        val sharedPreferences: SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         // Assumption: We never want the user to be able to edit keydigest.
         AppSettings.setKeyDigest(sharedPreferences, keyDigest)
         // Assumption: unbind() was already done before scanning. Note: It's possible that scanning doesn't find anything when we are already connected.
         // Should be Long, but Android is weird.
         AppSettings.getUserId(sharedPreferences)?.let {
+            // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
+
             val userId = it
             val serviceConnection = object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -280,6 +262,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     val activity = requireActivity()
                     activity.unbindService(this)
                 }
+
                 override fun onServiceDisconnected(name: ComponentName?) {
                 }
             }

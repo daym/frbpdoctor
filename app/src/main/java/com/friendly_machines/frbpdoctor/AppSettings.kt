@@ -83,4 +83,19 @@ object AppSettings {
             null
         }
     }
+
+    data class Profile(val height: Byte, val weight: Byte, val birthdayString: String, val sex: Byte)
+
+    fun getProfileSettings(sharedPreferences: SharedPreferences): Profile? {
+        val weight = AppSettings.getWeight(sharedPreferences)
+        val height = AppSettings.getHeight(sharedPreferences)
+        AppSettings.getBirthday(sharedPreferences)?.let {
+            val birthday = it
+            AppSettings.getSex(sharedPreferences)?.let {
+                val sex = it
+                return Profile(height = height, weight = weight, birthdayString = birthday, sex = sex)
+            }
+        }
+        return null
+    }
 }
