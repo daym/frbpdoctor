@@ -167,7 +167,7 @@ class WatchCommunicationService : Service(), WatchListener {
         fun unbindWatch() = enqueueCommand(WatchUnbindCommand())
         fun getDeviceConfig() = enqueueCommand(WatchGetDeviceConfigCommand())
         fun getBpData() = enqueueCommand(WatchGetBpDataCommand())
-        fun getSleepData() = enqueueCommand(WatchGetSleepDataCommand())
+        fun getSleepData(startTime: Int, endTime: Int) = enqueueCommand(WatchGetSleepDataCommand(startTime, endTime))
         fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
         fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
         fun getWatchFace() = enqueueCommand(WatchGetWatchFaceCommand())

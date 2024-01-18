@@ -43,13 +43,13 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     override fun onStart() {
         super.onStart()
         this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-            binder.getBpData()
-            binder.getSleepData()
-            binder.getStepData()
-            binder.getHeatData()
-            binder.getSportData()
-            // TODO WatchCommand.CurrentStep
-            // TODO WatchCommand.CurrentHeat
+            binder.getBpData() // ok
+            //binder.getSleepData() // no.
+            binder.getStepData() // ok
+            binder.getHeatData() // ok
+            binder.getSportData() // ok
+            // TODO WatchCommand.CurrentStep probably history
+            // TODO WatchCommand.CurrentHeat probably history
         }
     }
 
