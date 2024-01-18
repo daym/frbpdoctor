@@ -35,7 +35,7 @@ object WatchCommunicationServiceClientShorthand {
     }
 
     /**
-     * Connects to the WatchCommunicationService, add listener, start a periodic task that keeps calling callback every periodInMs ms.
+     * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms.
      * Return a handle that can be passed to unbindService.
      */
     fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: WatchListener, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit): ServiceConnection? {
@@ -47,26 +47,23 @@ object WatchCommunicationServiceClientShorthand {
                 val periodicTask: Runnable = object : Runnable {
                     override fun run() {
                         callback(binder)
-
                         handler.postDelayed(this, periodInMs /* ms */)
                     }
                 }
                 handler.postDelayed(periodicTask, periodInMs /* ms */)
             }
-
             override fun onServiceDisconnected(name: ComponentName?) {
                 handler.removeCallbacksAndMessages(null)
                 disconnector!!.removeListener(listener)
             }
         }
-
         val serviceIntent = Intent(context, WatchCommunicationService::class.java)
         if (!context.bindService(
                 serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE
             )) {
             Log.e(TAG, "Could not bind to WatchCommunicationService")
-            return serviceConnection
+            return null
         }
-        return null
+        return serviceConnection
     }
 }
