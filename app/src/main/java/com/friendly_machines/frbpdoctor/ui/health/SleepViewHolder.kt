@@ -14,6 +14,6 @@ class SleepViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: SleepDataBlock) {
         startTimestampTextView.text = "${item.startTimestamp}"
         endTimestampTextView.text = "${item.endTimestamp}"
-        flagTextView.text = item.flag.toString()
+        flagTextView.text = item.quality.toString()
     }
 }
