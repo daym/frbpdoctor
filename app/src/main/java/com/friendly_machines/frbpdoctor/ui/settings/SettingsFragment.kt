@@ -35,37 +35,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     }
 
-    internal fun bindExecOneCommandUnbind(expectedResponse: WatchResponse, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit) {
-        val context = this.requireContext()
-        WatchCommunicationServiceClientShorthand.bind(context) { serviceConnection, binder ->
-            val disconnector = binder.addListener(object : WatchListener {
-                override fun onWatchResponse(response: WatchResponse) {
-                    if (response == expectedResponse) {
-                        context.unbindService(serviceConnection)
-                        Log.i(TAG, "Everything OK with $response")
-                        return
-                    }
-                    if (response.javaClass == expectedResponse.javaClass) {
-                        Log.e(TAG, "Unexpected response $response")
-                        context.unbindService(serviceConnection)
-                    } else {
-                        // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
-                    }
-                }
-            })
-            callback(binder)
-            disconnector
-        }
-    }
-
     private fun unbindWatch() {
-        bindExecOneCommandUnbind(WatchResponse.Unbind(0)) {
+        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Unbind(0)) {
             it.unbindWatch()
         }
     }
 
     private fun bindWatch(userId: Long, key: ByteArray) {
-        bindExecOneCommandUnbind(WatchResponse.Bind(0)) {
+        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Bind(0)) {
             it.unbindWatch()
             it.bindWatch(userId, key)
         }
@@ -75,7 +52,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val age = calculateYearsSinceDate(profile.birthdayString)
         assert(age < 256)
         assert(age > 0)
-        bindExecOneCommandUnbind(WatchResponse.SetProfile(0)) {
+        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetProfile(0)) {
             it.setProfile(profile.height, profile.weight, profile.sex, age.toByte())
         }
     }

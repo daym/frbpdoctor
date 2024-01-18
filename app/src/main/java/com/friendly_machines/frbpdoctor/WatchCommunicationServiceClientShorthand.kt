@@ -8,7 +8,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
+import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 
 object WatchCommunicationServiceClientShorthand {
     private const val TAG = "WatchCommunicationServiceClientShorthand"
@@ -40,6 +42,34 @@ object WatchCommunicationServiceClientShorthand {
             return null
         }
         return serviceConnection
+    }
+
+    /**
+     * Bind to the watch communication service, send the given command, and wait until expectedResponse comes back.
+     * Then unbind from the watch communication service again.
+     *
+     * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
+     */
+    fun bindExecOneCommandUnbind(context: Context, expectedResponse: WatchResponse, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit) {
+        WatchCommunicationServiceClientShorthand.bind(context) { serviceConnection, binder ->
+            val disconnector = binder.addListener(object : WatchListener {
+                override fun onWatchResponse(response: WatchResponse) {
+                    if (response == expectedResponse) {
+                        context.unbindService(serviceConnection)
+                        Log.d(SettingsFragment.TAG, "Command finished successfully with response $response")
+                        return
+                    }
+                    if (response.javaClass == expectedResponse.javaClass) {
+                        Log.e(SettingsFragment.TAG, "Command ended in unexpected response $response")
+                        context.unbindService(serviceConnection)
+                    } else {
+                        // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
+                    }
+                }
+            })
+            callback(binder)
+            disconnector
+        }
     }
 
     /**

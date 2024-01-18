@@ -4,6 +4,7 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
@@ -21,19 +22,7 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         Log.i(TAG, "Notification Posted: " + sbn.packageName)
-        WatchCommunicationServiceClientShorthand.bind(this) { serviceConnection, binder ->
-            val disconnector = binder.addListener(object : WatchListener {
-                override fun onWatchResponse(response: WatchResponse) {
-                    when (response) {
-                        is WatchResponse.SetMessage -> {
-                            this@NotificationListener.unbindService(serviceConnection)
-                        }
-                        else -> {
-
-                        }
-                    }
-                }
-            })
+        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
             val notification = sbn.notification
             val time = notification.`when`
             var title = notification.extras.getString(Notification.EXTRA_TITLE)
@@ -71,11 +60,10 @@ class NotificationListener : NotificationListenerService() {
                     }, time.toInt(), title, text
                 )
             }
-            disconnector
         }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.i(TAG, "Notification Removed: " + sbn.packageName)
+        Log.d(TAG, "Notification Removed: " + sbn.packageName)
     }
 }
