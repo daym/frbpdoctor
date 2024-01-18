@@ -21,8 +21,6 @@ object AppSettings {
             val userId = userIdString.toLong()
             return userId
         }
-        // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-
         return null
     }
 
@@ -61,14 +59,17 @@ object AppSettings {
         }
     }
 
+    /** Note: If weight is not set, return 0 */
     fun getWeight(sharedPreferences: SharedPreferences): Byte {
         return sharedPreferences.getInt(AppSettings.KEY_USER_WEIGHT, 0).toByte()
     }
 
+    /** Note: If height is not set, return 0 */
     fun getHeight(sharedPreferences: SharedPreferences): Byte {
         return sharedPreferences.getInt(KEY_USER_HEIGHT, 0).toByte()
     }
 
+    /** Note: If birthday is not set, return "" */
     fun getBirthday(sharedPreferences: SharedPreferences): String? {
         return sharedPreferences.getString(KEY_USER_BIRTHDAY, "")
     }
@@ -76,10 +77,10 @@ object AppSettings {
     fun getSex(sharedPreferences: SharedPreferences): Byte? {
         val sexString =
             sharedPreferences.getString(AppSettings.KEY_USER_SEX, "")
-        if (!sexString.isNullOrEmpty()) {
-            return sexString.toInt().toByte()
+        return if (!sexString.isNullOrEmpty()) {
+            sexString.toInt().toByte()
         } else {
-            return null
+            null
         }
     }
 }
