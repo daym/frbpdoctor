@@ -1,15 +1,10 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.IBinder
-import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
@@ -20,7 +15,8 @@ import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
-import com.friendly_machines.frbpdoctor.ui.home.MainActivity
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.scan.ScanResult
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
@@ -39,15 +35,58 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     }
 
-    private fun clearAllPreferences() {
-        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        AppSettings.clear(sharedPreferences)
-        WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
-            //binder.addListener(bluetoothServiceListener) to check whether it worked
-            binder.unbindWatch() // no reaction
+    internal fun bindExecOneCommandUnbind(expectedResponse: WatchResponse, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit) {
+        val context = this.requireContext()
+        WatchCommunicationServiceClientShorthand.bind(context) { serviceConnection, binder ->
+            val disconnector = binder.addListener(object : WatchListener {
+                override fun onWatchResponse(response: WatchResponse) {
+                    if (response == expectedResponse) {
+                        context.unbindService(serviceConnection)
+                        Log.i(TAG, "Everything OK with $response")
+                        return
+                    }
+                    if (response.javaClass == expectedResponse.javaClass) {
+                        Log.e(TAG, "Unexpected response $response")
+                        context.unbindService(serviceConnection)
+                    } else {
+                        // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
+                    }
+                }
+            })
+            callback(binder)
+            disconnector
         }
+    }
 
+    private fun unbindWatch() {
+        bindExecOneCommandUnbind(WatchResponse.Unbind(0)) {
+            it.unbindWatch()
+        }
+    }
+
+    private fun bindWatch(userId: Long, key: ByteArray) {
+        bindExecOneCommandUnbind(WatchResponse.Bind(0)) {
+            it.unbindWatch()
+            it.bindWatch(userId, key)
+        }
+    }
+
+    private fun setProfile(profile: AppSettings.Profile) {
+        val age = calculateYearsSinceDate(profile.birthdayString)
+        assert(age < 256)
+        assert(age > 0)
+        bindExecOneCommandUnbind(WatchResponse.SetProfile(0)) {
+            it.setProfile(profile.height, profile.weight, profile.sex, age.toByte())
+        }
+    }
+
+    private fun clearAllPreferences() {
+        unbindWatch()
+
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        AppSettings.clear(sharedPreferences)
+
+        Toast.makeText(requireContext(), "Settings cleared", Toast.LENGTH_LONG).show()
         // Since the settings gui doesn't update, close it so the user doesn't see the wrong values.
         activity?.finish()
     }
@@ -63,7 +102,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 //                true
 //            }
 //        }
-        initSummary(getPreferenceScreen())
+        initSummary(preferenceScreen)
 
         val clearPreferencesPreference = findPreference<Preference>("clear_preferences")
         clearPreferencesPreference?.setOnPreferenceClickListener {
@@ -74,11 +113,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
         val watchMacAddressPreference = findPreference<Preference>("watchMacAddress")
         watchMacAddressPreference?.setOnPreferenceClickListener {
-            // unbind watch
-
-            WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
-                binder.unbindWatch()
-            }
+            unbindWatch()
             true
         }
     }
@@ -150,12 +185,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             if (currentCalendar.get(Calendar.DAY_OF_YEAR) < selectedCalendar.get(Calendar.DAY_OF_YEAR)) {
                 return yearsDifference - 1
             }
-
             return yearsDifference
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return 0
     }
 
@@ -167,16 +200,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 //                watchMacAddressPreference?.summary = macAddress
 //            }
             if (key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY) {
-                // TODO wind down the amount of stuff per second
-                WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
-                    AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
-                        val age = calculateYearsSinceDate(profile.birthdayString)
-                        assert(age < 256)
-                        assert(age > 0)
-                        binder.setProfile(
-                            profile.height, profile.weight, profile.sex, age.toByte()
-                        )
-                    }
+                AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
+                    // TODO wind down the amount of stuff per second
+                    setProfile(profile)
                 }
             }
         }
@@ -202,19 +228,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val key = data.valueAt(0).copyOfRange(0, 16)
         val keyDigest = MessageDigest.getInstance("MD5").digest(key)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        // Assumption: We never want the user to be able to edit keydigest.
+        // Assumption: We never want the user to be able to edit keyDigest.
         AppSettings.setKeyDigest(sharedPreferences, keyDigest)
-        // Assumption: unbind() was already done before scanning. Note: It's possible that scanning doesn't find anything when we are already connected.
-        // Should be Long, but Android is weird.
+        // Note: It's possible that scanning doesn't find anything when we are already connected.
         AppSettings.getUserId(sharedPreferences)?.let { userId ->
             // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-            WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
-                binder.bindWatch(userId, key)
-
-                // FIXME wait until the command was processed.
-                //val activity = requireActivity()
-                //activity.unbindService(this@SettingsFragment)
-            }
+            bindWatch(userId, key)
         }
     }
 
