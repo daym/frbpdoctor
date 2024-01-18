@@ -11,6 +11,7 @@ import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.BLE_L2CAP_ATT_HEADER_SIZE
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeWatchString
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
@@ -219,7 +220,7 @@ class WatchCommunicationService : Service(), WatchListener {
 
     override fun onMtuResponse(mtu: Int) {
         enqueueCommand(
-            WatchDeviceInfoCommand((mtu - 7).toShort())
+            WatchDeviceInfoCommand((mtu - BLE_L2CAP_ATT_HEADER_SIZE).toShort())
         )
     }
 

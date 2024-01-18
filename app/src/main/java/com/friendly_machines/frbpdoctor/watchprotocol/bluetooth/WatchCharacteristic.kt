@@ -52,30 +52,33 @@ object WatchCharacteristic {
         } while (input > 0)
         return buf.array()
     }
-    /**
-     * If packetIndex == 0, it's the first packet. Otherwise, packetIndex > 0 is requires.
-     * totalMessageLen is only used if packetIndex == 0
-     */
-    fun encodePacket(
+    fun encodeFirstPacket(
         packetIndex: Int,
         packetBody: ByteArray,
         totalMessageLength: Int,
     ): ByteArray {
+        assert(packetIndex == 0)
         val rawPacketIndex = encodeVariableLengthInteger(packetIndex)
-        return if (packetIndex == 0) { // first chunk
-            val rawTotalMessageLength = encodeVariableLengthInteger(totalMessageLength)
-            val buf = ByteBuffer.allocate(rawPacketIndex.size + rawTotalMessageLength.size + 1 + packetBody.size).order(ByteOrder.BIG_ENDIAN)
-            buf.put(rawPacketIndex)
-            buf.put(rawTotalMessageLength)
-            buf.put((4 * 16).toByte()) // FIXME 1
-            buf.put(packetBody)
-            buf.array()
-        } else {
-            val buf = ByteBuffer.allocate(rawPacketIndex.size + packetBody.size).order(ByteOrder.BIG_ENDIAN)
-            buf.put(rawPacketIndex)
-            buf.put(packetBody)
-            buf.array()
-        }
+        val rawTotalMessageLength = encodeVariableLengthInteger(totalMessageLength)
+        val buf = ByteBuffer.allocate(rawPacketIndex.size + rawTotalMessageLength.size + 1 + packetBody.size).order(ByteOrder.BIG_ENDIAN)
+        buf.put(rawPacketIndex)
+        buf.put(rawTotalMessageLength)
+        buf.put((4 * 16).toByte()) // FIXME 1
+        buf.put(packetBody)
+        return buf.array()
+    }
+    /**
+     * packetIndex > 0 is required.
+     */
+    fun encodeMiddlePacket(
+        packetIndex: Int,
+        packetBody: ByteArray,
+    ): ByteArray {
+        val rawPacketIndex = encodeVariableLengthInteger(packetIndex)
+        val buf = ByteBuffer.allocate(rawPacketIndex.size + packetBody.size).order(ByteOrder.BIG_ENDIAN)
+        buf.put(rawPacketIndex)
+        buf.put(packetBody)
+        return buf.array()
     }
     // TODO: check
     fun encodeInternal3(
@@ -129,9 +132,9 @@ object WatchCharacteristic {
             val oldCrc = buf.short
             val newCrc = Crc16.crc16(everythingButCrc)
             if (oldCrc == newCrc) {
-                Log.i(WatchCommunicator.TAG, "decode crc ok")
+                Log.d(WatchCommunicator.TAG, "CRC of decoded message was OK")
             } else {
-                Log.e(WatchCommunicator.TAG, "decode crc mistake")
+                Log.e(WatchCommunicator.TAG, "CRC of decoded message was incorrect")
                 throw WatchMessageDecodingException("CRC is incorrect (expected crc $oldCrc, calculated crc $newCrc, command $command, sequenceNumber $sequenceNumber, ackedSequenceNumber $ackedSequenceNumber, length $length)")
             }
             return WatchRawResponse(

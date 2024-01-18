@@ -219,13 +219,13 @@ sealed class WatchResponse {
         }
     }
 
-    data class SyncTime(val timestamp: Int, val timezone: Int) : // verified
+    data class SetTime(val timestamp: Int, val timezone: Int) : // verified
         WatchResponse() {
         companion object {
-            fun parse(buf: ByteBuffer): SyncTime {
+            fun parse(buf: ByteBuffer): SetTime {
                 val timestamp: Int = buf.int
                 val timezone: Int = buf.int
-                return SyncTime(timestamp = timestamp, timezone = timezone)
+                return SetTime(timestamp = timestamp, timezone = timezone)
             }
         }
     }
@@ -405,7 +405,7 @@ sealed class WatchResponse {
                 29.toShort() -> SportData.parse(buf)
                 30.toShort() -> BpData.parse(buf)
                 42.toShort() -> GetBatteryState.parse(buf)
-                43.toShort() -> SyncTime.parse(buf)
+                43.toShort() -> SetTime.parse(buf)
                 44.toShort() -> SetWeather.parse(buf)
                 45.toShort() -> GetDeviceConfig.parse(buf)
                 46.toShort() -> GetWatchFace.parse(buf)

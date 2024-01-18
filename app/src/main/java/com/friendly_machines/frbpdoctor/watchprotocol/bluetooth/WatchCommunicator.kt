@@ -7,9 +7,10 @@ import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteris
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeBigMessage
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeMessage
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeVariableLengthInteger
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeFirstPacket
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeInternal3
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeMessage
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodePacket
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeMiddlePacket
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.writingPortCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
@@ -39,10 +40,27 @@ import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * We only ever see the Data Channel Payload. The Preamble, Access Address, Data Channel PDU header and BLE CRC are done by RxAndroidBle internally and do not count to the MTU.
+ *
+ * For Bluetooth LE, the Data Channel Payload hos these parts:
+ *   1. Logical Link Control and Adaption Protocol (L2CAP) Header (4 B): Length (2 B) and channel ID (2 B)
+ *   2. Attribute Protocol (ATT) Header (3 B): Opcode (1 B) and attribute handle (2 B)
+ *   3. The actual ATT payload (up to 244 B)
+ */
+private const val B = 1
+private const val BLE_L2CAP_HEADER_SIZE: Int = 4*B
+// ATT_MTU counts starting from here.
+private const val BLE_ATT_HEADER_SIZE: Int = 3*B
+internal const val BLE_L2CAP_ATT_HEADER_SIZE: Int = BLE_L2CAP_HEADER_SIZE + BLE_ATT_HEADER_SIZE
+
+// Our packets usually have this maximal overhead--except for the first packet (which has 6 B). TODO nicer?
+private const val ENCODED_PACKET_MAJORITY_HEADER_SIZE: Int = 4*B
+
 class WatchCommunicator {
     private var bleDisposables = CompositeDisposable()
-    private var mtu: Int = 23 // FIXME default mtu is maybe even 20 or so
-    private var maxPayloadSize: Int = 23 - 7 - 4
+    private var mtu: Int = 23
+    private var maxPacketPayloadSize: Int = 23 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE
 
     private var connecting: Boolean = false
     private lateinit var keyDigest: ByteArray
@@ -80,19 +98,19 @@ class WatchCommunicator {
         } catch (e: BleCharacteristicNotFoundException) {
             Log.e(TAG, "Characteristic not found: $characteristicUuid")
             notifyListenersOfException(e)
-            throw e;
+            throw e
         } catch (e: BleConflictingNotificationAlreadySetException) {
             Log.e(
                 TAG, "Conflicting notification already set for characteristic: $characteristicUuid"
             )
             notifyListenersOfException(e)
-            throw e;
+            throw e
         } catch (e: BleGattException) {
             Log.e(TAG, "Gatt error: $e")/*if (e.type == BleGattOperationType.NOTIFICATION) {
                 Log.e(TAG, "Notification setup error for characteristic: $characteristicUuid")
             }*/
             notifyListenersOfException(e)
-            throw e;
+            throw e
         }
     }
 
@@ -181,14 +199,14 @@ class WatchCommunicator {
         if (packetIndex == 0) {
             val messageLength = decodeVariableLengthInteger(buf)
             //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
-            // TODO: Collect together enough packets to have messageLength
-            assert(messageLength <= buf.array().size - buf.position()) // FIXME check
             val protocolVersion = buf.get() / 16 // rest is reserved
+            Log.i(TAG, "Watch protocol version is $protocolVersion")
             assert(protocolVersion == 4)
-            Log.i(TAG, "watch protocol version $protocolVersion")
+            // TODO: Collect together enough packets to have messageLength
+            assert(messageLength == buf.array().size - buf.position())
             // note: big: messageLengthRaw - 17 is the total payload len
         } else {
-            Log.e(TAG, "watch protocol buffering not implemented")
+            Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
             notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
         }
         if (notificationCharacteristic == characteristicUuid) {
@@ -196,10 +214,10 @@ class WatchCommunicator {
                 decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
             } catch (e: WatchMessageDecodingException) {
                 notifyListenersOfException(e)
-                return;
+                return
             } catch (e: BufferUnderflowException) {
                 notifyListenersOfException(e)
-                return;
+                return
             }
             if (result.command.toInt() == 0) { // resets sequence numbers
                 sendingSequenceNumber.set(1) // verified.
@@ -209,7 +227,7 @@ class WatchCommunicator {
             val response = WatchResponse.parse(
                 result.command, ByteBuffer.wrap(result.arguments)
             )
-            Log.i(TAG, "-> decoded: $response")
+            Log.d(TAG, "-> decoded: $response")
             listeners.forEach {
                 when (result.command) {
                     else -> it.onWatchResponse(response)
@@ -220,10 +238,10 @@ class WatchCommunicator {
                 decodeBigMessage(ByteBuffer.wrap(decryptMessage(buf)))
             } catch (e: WatchMessageDecodingException) {
                 notifyListenersOfException(e)
-                return;
+                return
             } catch (e: BufferUnderflowException) {
                 notifyListenersOfException(e)
-                return;
+                return
             }
             listeners.forEach {
                 when (result.command) {
@@ -244,12 +262,11 @@ class WatchCommunicator {
         val totalMessageSize = encryptedMessage.size
         val buf = ByteBuffer.wrap(encryptedMessage).order(ByteOrder.BIG_ENDIAN)
         var packetIndex = 0
-        while (buf.hasRemaining()) {
-            val chunkSize = buf.remaining().coerceAtMost(maxPayloadSize)
+        run {
+            val chunkSize = buf.remaining().coerceAtMost(maxPacketPayloadSize)
             val packetPayload = ByteArray(chunkSize)
             buf.get(packetPayload)
-            assert(packetIndex == 0)
-            val chunk = encodePacket(packetIndex, packetPayload, totalMessageSize)
+            val chunk = encodeFirstPacket(packetIndex, packetPayload, totalMessageSize)
             bleDisposables.add(connection.writeCharacteristic(bigWritingPortCharacteristic, chunk).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
                 Log.d(
                     TAG, "Write characteristic successful"
@@ -261,7 +278,24 @@ class WatchCommunicator {
                 notifyListenersOfException(throwable)
             })
 
+        }
+        while (buf.hasRemaining()) {
             packetIndex += 1
+            val chunkSize = buf.remaining().coerceAtMost(maxPacketPayloadSize)
+            val packetPayload = ByteArray(chunkSize)
+            buf.get(packetPayload)
+            assert(packetIndex == 0) // FIXME
+            val chunk = encodeMiddlePacket(packetIndex, packetPayload)
+            bleDisposables.add(connection.writeCharacteristic(bigWritingPortCharacteristic, chunk).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
+                Log.d(
+                    TAG, "Write characteristic successful"
+                )
+            }) { throwable: Throwable ->
+                Log.e(
+                    TAG, "Write characteristic error: $throwable"
+                )
+                notifyListenersOfException(throwable)
+            })
         }
     }
 
@@ -282,9 +316,9 @@ class WatchCommunicator {
             val instance = Cipher.getInstance("AES/CBC/NoPadding")
             instance.init(Cipher.ENCRYPT_MODE, SecretKeySpec(keyDigest, "AES"), ivParameterSpec)
             instance.doFinal(paddedPlainText)
-        } catch (unused: Exception) {
+        } catch (e: Exception) {
             Log.e(TAG, "encryption error")
-            ByteArray(0)
+            throw WatchMessageEncodingException("encryption error", e)
         }
         val encryptionMode = 1.toByte()
         return ByteBuffer.allocate(1 + iv.size + cipherText.size).order(ByteOrder.BIG_ENDIAN).put(encryptionMode).put(iv).put(cipherText).array()
@@ -302,12 +336,11 @@ class WatchCommunicator {
         val totalMessageSize = totalMessage.size
         val buf = ByteBuffer.wrap(totalMessage).order(ByteOrder.BIG_ENDIAN)
         var packetIndex = 0
-        while (buf.hasRemaining()) {
-            val chunkSize = buf.remaining().coerceAtMost(maxPayloadSize)
+        run {
+            val chunkSize = buf.remaining().coerceAtMost(maxPacketPayloadSize)
             val chunk = ByteArray(chunkSize)
             buf.get(chunk)
-            assert(packetIndex == 0)
-            val rawPacket = encodePacket(packetIndex, chunk, totalMessageSize)
+            val rawPacket = encodeFirstPacket(packetIndex, chunk, totalMessageSize)
             bleDisposables.add(connection!!.writeCharacteristic(
                 writingPortCharacteristic, rawPacket
             ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
@@ -320,8 +353,26 @@ class WatchCommunicator {
                 )
                 notifyListenersOfException(throwable)
             })
-
+        }
+        while (buf.hasRemaining()) {
             packetIndex += 1
+            val chunkSize = buf.remaining().coerceAtMost(maxPacketPayloadSize)
+            val chunk = ByteArray(chunkSize)
+            buf.get(chunk)
+            assert(packetIndex == 0) // FIXME
+            val rawPacket = encodeMiddlePacket(packetIndex, chunk)
+            bleDisposables.add(connection!!.writeCharacteristic(
+                writingPortCharacteristic, rawPacket
+            ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
+                Log.d(
+                    TAG, "Write characteristic successful"
+                )
+            }) { throwable: Throwable ->
+                Log.e(
+                    TAG, "Write characteristic error: $throwable"
+                )
+                notifyListenersOfException(throwable)
+            })
         }
     }
 
@@ -345,7 +396,7 @@ class WatchCommunicator {
                             run {
                                 // mtu: 251
                                 this.mtu = mtu
-                                this.maxPayloadSize = ((mtu - 7) - 4).coerceAtMost(240)
+                                this.maxPacketPayloadSize = (mtu - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE).coerceAtMost(251 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE)
 
                                 listeners.forEach {
                                     it.onMtuResponse(mtu)
