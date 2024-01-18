@@ -111,7 +111,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     private val bigBuffers = HashMap<Short, ByteArrayOutputStream>()
     private fun onBigWatchResponse(response: WatchResponse) {
-        Log.i(TAG, "-> big decoded: $response")
+        Log.d(TAG, "-> big decoded: $response")
         when (response) {
             is WatchResponse.SleepData -> {
                 for (fragment in supportFragmentManager.fragments) {
