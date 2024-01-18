@@ -10,6 +10,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
 
 
     override fun onWatchResponse(response: WatchResponse) {
-        Log.d("FrBpDoctor", response.toString())
+        Log.d(TAG, response.toString())
         when (response) {
             is WatchResponse.DeviceInfo -> {
 
@@ -136,6 +137,10 @@ class MainActivity : AppCompatActivity(), WatchListener {
                 response.voltage
             }
 
+            is WatchResponse.NotificationFromWatch -> {
+                Toast.makeText(this, "Got notification from watch: ${response.eventCode}", Toast.LENGTH_LONG).show()
+            }
+
             else -> {
                 // ignore
             }
@@ -144,7 +149,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
 
     override fun onBigWatchRawResponse(response: WatchRawResponse) {
         // FIXME handle alarm maybe
-        //Log.d(TAG, "MainActivity: big watch raw response ${response.toString()}")
+        Log.d(TAG, "MainActivity: big watch raw response ${response.toString()}")
     }
 
     override fun onException(exception: Throwable) {

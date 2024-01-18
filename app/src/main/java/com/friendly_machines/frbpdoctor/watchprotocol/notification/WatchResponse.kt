@@ -293,7 +293,19 @@ sealed class WatchResponse {
             }
         }
     }
-    // TODO 52 CMD_MSG_WATCH_TO_APP
+
+    // This one can happen without us sending a command! So it's not really a response.
+    data class NotificationFromWatch(val eventCode: Byte) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): NotificationFromWatch {
+                val eventCode: Byte = buf.get()
+                // TODO: status==0 user wants to answer phone call
+                // TODO: status==1 user reconfigured watch (for example language)
+                return NotificationFromWatch(eventCode = eventCode)
+            }
+        }
+
+    }
 
     data class SetProfile(val status: Byte) : // verified
         WatchResponse() {
@@ -410,6 +422,7 @@ sealed class WatchResponse {
                 45.toShort() -> GetDeviceConfig.parse(buf)
                 46.toShort() -> GetWatchFace.parse(buf)
                 47.toShort() -> SetWatchFace.parse(buf)
+                52.toShort() -> NotificationFromWatch.parse(buf)
                 53.toShort() -> SetProfile.parse(buf)
                 55.toShort() -> SetAlarm.parse(buf)
                 56.toShort() -> GetAlarm.parse(buf)
