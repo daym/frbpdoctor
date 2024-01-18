@@ -15,7 +15,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 object WatchCommunicationServiceClientShorthand {
     private const val TAG = "WatchCommunicationServiceClientShorthand"
     /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
-    fun bind(context: Context, callback: (ServiceConnection, WatchCommunicationService.WatchCommunicationServiceBinder) -> WatchCommunicationService): ServiceConnection? {
+    private fun bind(context: Context, callback: (ServiceConnection, WatchCommunicationService.WatchCommunicationServiceBinder) -> WatchCommunicationService): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
             private var disconnector: WatchCommunicationService? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -51,7 +51,7 @@ object WatchCommunicationServiceClientShorthand {
      * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
      */
     fun bindExecOneCommandUnbind(context: Context, expectedResponse: WatchResponse, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit) {
-        WatchCommunicationServiceClientShorthand.bind(context) { serviceConnection, binder ->
+        bind(context) { serviceConnection, binder ->
             val disconnector = binder.addListener(object : WatchListener {
                 override fun onWatchResponse(response: WatchResponse) {
                     if (response == expectedResponse) {
