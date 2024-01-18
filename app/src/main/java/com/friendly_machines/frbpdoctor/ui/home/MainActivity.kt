@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity(), WatchListener {
         return when (item.itemId) {
             R.id.action_settings -> {
                 val settingsIntent = Intent(this, SettingsActivity::class.java)
+                // close all other activities.
+                settingsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(settingsIntent)
                 // Make sure to close the MainActivity so that the WatchCommunicationService can die. That's important so that the connection to the bluetooth watch is closed so that we can actually find the watch when scanning, and so that we can connect to a new watch if necessary.
                 finish()
