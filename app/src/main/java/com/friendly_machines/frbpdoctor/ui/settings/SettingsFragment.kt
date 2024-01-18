@@ -195,8 +195,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                         val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
 
-                        AppSettings.getProfileSettings(sharedPreferences)?.let {
-                            val profile = it
+                        AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
                             val age = calculateYearsSinceDate(profile.birthdayString)
                             assert(age < 256)
                             assert(age > 0)
