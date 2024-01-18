@@ -2,13 +2,10 @@ package com.friendly_machines.frbpdoctor.ui.home
 
 //import io.reactivex.android.schedulers.AndroidSchedulers
 
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
@@ -17,9 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
+import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
 import com.friendly_machines.frbpdoctor.logger.Logger
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
@@ -27,10 +24,10 @@ import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
-class MainActivity : AppCompatActivity(),
-    WatchListener {
+class MainActivity : AppCompatActivity(), WatchListener {
     private lateinit var handler: Handler
     private lateinit var binding: ActivityMainBinding
+
     companion object {
         const val TAG: String = "MainActivity"
     }
@@ -56,9 +53,9 @@ class MainActivity : AppCompatActivity(),
 
         handler.removeCallbacksAndMessages(null)
         // Just to make sure
-        if (shouldUnbindService) {
-            unbindService(serviceConnection)
-            shouldUnbindService = false
+        serviceConnection?.let {
+            unbindService(it)
+            serviceConnection = null
         }
     }
 
@@ -86,48 +83,24 @@ class MainActivity : AppCompatActivity(),
         // TODO
     }
 
-    private val serviceConnection = object : ServiceConnection {
-        private var disconnector: WatchCommunicationService? = null
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-            disconnector = binder.addListener(this@MainActivity)
-            val periodicTask: Runnable = object : Runnable {
-                override fun run() {
-                    binder.setTime()
-                    binder.getBatteryState()
-                    binder.getWatchFace() // ok but response is weird
-                    binder.getAlarm() // big
-                    handler.postDelayed(this, 1000 /* ms */)
-                }
-            }
-            handler.postDelayed(periodicTask, 1000 /* ms */)
-            // FIXME setAlarm WatchCommand.SetAlarm(0, 1, 1, 2, 3, 1, ByteArray(0)), // OK, status=0, doesn't actually add the alarm.
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            handler.removeCallbacksAndMessages(null)
-            disconnector!!.removeListener(this@MainActivity)
-        }
-    }
-
-    private var shouldUnbindService = false
+    private var serviceConnection: ServiceConnection? = null
 
     override fun onStart() {
         super.onStart()
-        val serviceIntent = Intent(this, WatchCommunicationService::class.java)
-        if (bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-            shouldUnbindService = true
-        } else {
-            Log.e(TAG, "Could not bind to WatchCommunicationService")
+        this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
+            binder.setTime()
+            binder.getBatteryState()
+            binder.getWatchFace() // ok but response is weird
+            binder.getAlarm() // big
         }
         // nope. startService(serviceIntent)
     }
 
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
-        if (shouldUnbindService) {
-            unbindService(serviceConnection)
-            shouldUnbindService = false
+        serviceConnection?.let {
+            unbindService(it)
+            serviceConnection = null
         }
         super.onStop()
     }

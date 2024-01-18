@@ -18,6 +18,7 @@ import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.R
+import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.ui.home.MainActivity
 import com.polidea.rxandroidble3.scan.ScanResult
@@ -42,22 +43,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         AppSettings.clear(sharedPreferences)
-
-        val serviceConnection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-                binder.unbindWatch() // no reaction
-                //watchCommunicationService.setListener(bluetoothServiceListener) to check whether it worked
-            }
-
-            override fun onServiceDisconnected(name: ComponentName?) {
-                // Handle service disconnection
-
-            }
+        WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
+            //binder.addListener(bluetoothServiceListener) to check whether it worked
+            binder.unbindWatch() // no reaction
         }
-
-        val serviceIntent = Intent(requireContext(), WatchCommunicationService::class.java)
-        requireActivity().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         // Since the settings gui doesn't update, close it so the user doesn't see the wrong values.
         activity?.finish()
@@ -87,20 +76,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         watchMacAddressPreference?.setOnPreferenceClickListener {
             // unbind watch
 
-            val serviceConnection = object : ServiceConnection {
-                //private var disconnector: WatchCommunicationService? = null
-                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                    val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-                    binder.unbindWatch()
-                }
-
-                override fun onServiceDisconnected(name: ComponentName?) {
-                }
-            }
-            val context = this.requireContext()
-            val serviceIntent = Intent(context, WatchCommunicationService::class.java)
-            if (!context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-                Log.e(MainActivity.TAG, "Could not bind to WatchCommunicationService")
+            WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
+                binder.unbindWatch()
             }
             true
         }
@@ -191,35 +168,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 //            }
             if (key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY) {
                 // TODO wind down the amount of stuff per second
-                val serviceConnection = object : ServiceConnection {
-                    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                        val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-
-                        AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
-                            val age = calculateYearsSinceDate(profile.birthdayString)
-                            assert(age < 256)
-                            assert(age > 0)
-                            binder.setProfile(
-                                profile.height, profile.weight, profile.sex, age.toByte()
-                            )
-                        }
-                    }
-
-                    override fun onServiceDisconnected(name: ComponentName?) {
-                        // TODO
+                WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
+                    AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
+                        val age = calculateYearsSinceDate(profile.birthdayString)
+                        assert(age < 256)
+                        assert(age > 0)
+                        binder.setProfile(
+                            profile.height, profile.weight, profile.sex, age.toByte()
+                        )
                     }
                 }
-
-                val serviceIntent = Intent(requireContext(), WatchCommunicationService::class.java)
-                requireActivity().bindService(
-                    serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE
-                )
-                //!!
-
             }
         }
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -245,36 +206,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         AppSettings.setKeyDigest(sharedPreferences, keyDigest)
         // Assumption: unbind() was already done before scanning. Note: It's possible that scanning doesn't find anything when we are already connected.
         // Should be Long, but Android is weird.
-        AppSettings.getUserId(sharedPreferences)?.let {
+        AppSettings.getUserId(sharedPreferences)?.let { userId ->
             // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
+            WatchCommunicationServiceClientShorthand.bind(requireContext()) { binder ->
+                binder.bindWatch(userId, key)
 
-            val userId = it
-            val serviceConnection = object : ServiceConnection {
-                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                    val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-                    // Race condition: This will be reached before the service is completely up (i.e. before connection is set)! Then it will try to do connection!!writeCharacteristic and that will fail.
-                    binder.bindWatch(userId, key)
-
-                    // TODO maybe binder.getDeviceConfig() but after response or something
-
-                    // FIXME wait until the command was processed.
-                    val activity = requireActivity()
-                    activity.unbindService(this)
-                }
-
-                override fun onServiceDisconnected(name: ComponentName?) {
-                }
-            }
-
-            // FIXME: We changed who we connect to--so restart the service so that it reconnects.
-
-            // useless requireContext().stopService(serviceIntent)
-            // useless requireContext().startService(serviceIntent)
-            val activity = requireActivity()
-            // activity.unbindService(serviceConnection) // TODO does this block?
-            val serviceIntent = Intent(requireContext(), WatchCommunicationService::class.java)
-            if (!activity.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)) {
-                Log.e(TAG, "Could not bind to WatchCommunicationService")
+                // FIXME wait until the command was processed.
+                //val activity = requireActivity()
+                //activity.unbindService(this@SettingsFragment)
             }
         }
     }
