@@ -7,7 +7,6 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
-import com.friendly_machines.frbpdoctor.service.NotificationListener
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 
@@ -35,7 +34,11 @@ object WatchCommunicationServiceClientShorthand {
         return true
     }
 
-    fun bindPeriodic(handler: Handler, periodMs: Long, context: Context, listener: WatchListener, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit): ServiceConnection? {
+    /**
+     * Connects to the WatchCommunicationService, add listener, start a periodic task that keeps calling callback every periodInMs ms.
+     * Return a handle that can be passed to unbindService.
+     */
+    fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: WatchListener, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
             private var disconnector: WatchCommunicationService? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -45,10 +48,10 @@ object WatchCommunicationServiceClientShorthand {
                     override fun run() {
                         callback(binder)
 
-                        handler.postDelayed(this, periodMs /* ms */)
+                        handler.postDelayed(this, periodInMs /* ms */)
                     }
                 }
-                handler.postDelayed(periodicTask, periodMs /* ms */)
+                handler.postDelayed(periodicTask, periodInMs /* ms */)
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
