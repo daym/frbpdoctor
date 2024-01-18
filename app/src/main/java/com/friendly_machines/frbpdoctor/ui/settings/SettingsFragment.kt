@@ -44,7 +44,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val sharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        sharedPreferences.edit().clear().apply()
+        AppSettings.clear(sharedPreferences)
 
         val serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -124,7 +124,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         if (preference.key == "watchMacAddress") {
             val sharedPreferences: SharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val macAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")
+            val macAddress = AppSettings.getMacAddress(sharedPreferences)
             preference.summary = macAddress
         }
     }
@@ -201,18 +201,12 @@ class SettingsFragment : PreferenceFragmentCompat(),
                         val binder =
                             service as WatchCommunicationService.WatchCommunicationServiceBinder
 
-                        val weight =
-                            sharedPreferences.getInt(AppSettings.KEY_USER_WEIGHT, 0).toByte()
-                        val height =
-                            sharedPreferences.getInt(AppSettings.KEY_USER_HEIGHT, 0).toByte()
-                        val birthday =
-                            sharedPreferences.getString(AppSettings.KEY_USER_BIRTHDAY, "")
-                        if (birthday != null) {
-                            val sexString =
-                                sharedPreferences.getString(AppSettings.KEY_USER_SEX, "")
-                            if (sexString != "" && !sexString!!.isEmpty()) {
-                                val sex = sexString.toInt().toByte()
-
+                        val weight = AppSettings.getWeight(sharedPreferences)
+                        val height = AppSettings.getHeight(sharedPreferences)
+                        AppSettings.getBirthday(sharedPreferences)?.let {
+                            val birthday = it
+                            AppSettings.getSex(sharedPreferences)?.let {
+                                val sex = it
                                 val age = calculateYearsSinceDate(birthday)
                                 assert(age < 256)
                                 assert(age > 0)
@@ -269,18 +263,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val sharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(requireContext())
         // Assumption: We never want the user to be able to edit keydigest.
-        // FIXME update KEY_WATCH_KEY_DIGEST in GUI
-        sharedPreferences.edit()
-            .putString(
-                AppSettings.KEY_WATCH_KEY_DIGEST,
-                Base64.encodeToString(keyDigest, Base64.DEFAULT)
-            ).apply()
+        AppSettings.setKeyDigest(sharedPreferences, keyDigest)
         // Assumption: unbind() was already done before scanning. Note: It's possible that scanning doesn't find anything when we are already connected.
         // Should be Long, but Android is weird.
-        val userIdString = sharedPreferences.getString(AppSettings.KEY_USER_ID, "")
-        // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-        if (!userIdString.isNullOrEmpty() && userIdString.toLong() != 0L) {
-            val userId = userIdString.toLong()
+        AppSettings.getUserId(sharedPreferences)?.let {
+            val userId = it
             val serviceConnection = object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                     val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder

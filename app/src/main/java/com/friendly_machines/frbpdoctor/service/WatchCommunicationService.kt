@@ -55,9 +55,7 @@ class WatchCommunicationService : Service(), WatchListener {
 
     private fun areMandatorySettingsSet(): Boolean {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        return AppSettings.MANDATORY_SETTINGS.all { key ->
-            sharedPreferences.contains(key)
-        }
+        return AppSettings.areMandatorySettingsSet(sharedPreferences)
     }
 
     private fun setKeyDigest(keyDigest: ByteArray) {
@@ -87,10 +85,8 @@ class WatchCommunicationService : Service(), WatchListener {
                 showSetMandatorySettingsDialog()
             } else {
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-                val byteArrayString = sharedPreferences.getString(AppSettings.KEY_WATCH_KEY_DIGEST, null)
-                if (byteArrayString != null) {
-                    val keyDigest = Base64.decode(byteArrayString, Base64.DEFAULT)
+                val keyDigest = AppSettings.getKeyDigest(sharedPreferences)
+                if (keyDigest != null) {
                     this.setKeyDigest(keyDigest)
                     val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
                     val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
@@ -128,17 +124,9 @@ class WatchCommunicationService : Service(), WatchListener {
 //        }
         fun setProfile(height: Byte, weight: Byte, sex: Byte, age: Byte) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@WatchCommunicationService)
-
-            val keyDigestBase64 = sharedPreferences.getString(AppSettings.KEY_WATCH_KEY_DIGEST, null)
-            if (keyDigestBase64 != null) {
-                // TODO: This is a workaround to a dumb ordering bug, and in an ideal world it would be unnecessary
-                setKeyDigest(
-                    Base64.decode(
-                        keyDigestBase64, Base64.DEFAULT
-                    )
-                )
+            AppSettings.getKeyDigest(sharedPreferences)?.let {
+                setKeyDigest(it)
             }
-
             enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
         }
 
