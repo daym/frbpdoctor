@@ -12,15 +12,23 @@ import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 
 object WatchCommunicationServiceClientShorthand {
     private const val TAG = "WatchCommunicationServiceClientShorthand"
-    fun bind(context: Context, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit): Boolean {
+    /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
+    fun bind(context: Context, callback: (ServiceConnection, WatchCommunicationService.WatchCommunicationServiceBinder) -> WatchCommunicationService): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
+            private var disconnector: WatchCommunicationService? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 val binder = service as WatchCommunicationService.WatchCommunicationServiceBinder
-                callback(binder)
+                callback(this, binder).let {
+                    assert(this.disconnector == null)
+                    this.disconnector = it
+                }
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
                 //cleanup()
+                disconnector?.let {
+                    it.removeListener(it)
+                }
             }
         }
 
@@ -29,13 +37,13 @@ object WatchCommunicationServiceClientShorthand {
             serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE
         )) {
             Log.e(TAG, "Could not bind to WatchCommunicationService")
-            return false
+            return null
         }
-        return true
+        return serviceConnection
     }
 
     /**
-     * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms.
+     * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms. Uses up handler.
      * Return a handle that can be passed to unbindService.
      */
     fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: WatchListener, callback: (WatchCommunicationService.WatchCommunicationServiceBinder) -> Unit): ServiceConnection? {

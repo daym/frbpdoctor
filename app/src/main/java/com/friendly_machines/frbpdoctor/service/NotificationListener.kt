@@ -1,17 +1,15 @@
 package com.friendly_machines.frbpdoctor.service
 
 import android.app.Notification
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 
+// TODO service dependency on WatchCommunicationService
 class NotificationListener : NotificationListenerService() {
     companion object {
         private const val TAG = "NotificationListener"
@@ -23,7 +21,19 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         Log.i(TAG, "Notification Posted: " + sbn.packageName)
-        WatchCommunicationServiceClientShorthand.bind(this) { binder ->
+        WatchCommunicationServiceClientShorthand.bind(this) { serviceConnection, binder ->
+            val disconnector = binder.addListener(object : WatchListener {
+                override fun onWatchResponse(response: WatchResponse) {
+                    when (response) {
+                        is WatchResponse.SetMessage -> {
+                            this@NotificationListener.unbindService(serviceConnection)
+                        }
+                        else -> {
+
+                        }
+                    }
+                }
+            })
             val notification = sbn.notification
             val time = notification.`when`
             var title = notification.extras.getString(Notification.EXTRA_TITLE)
@@ -61,6 +71,7 @@ class NotificationListener : NotificationListenerService() {
                     }, time.toInt(), title, text
                 )
             }
+            disconnector
         }
     }
 

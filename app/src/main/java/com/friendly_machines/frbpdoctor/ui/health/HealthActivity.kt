@@ -64,6 +64,11 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
+        // Just to make sure
+        serviceConnection?.let {
+            unbindService(it)
+            serviceConnection = null
+        }
 
         super.onDestroy()
     }

@@ -49,14 +49,13 @@ class MainActivity : AppCompatActivity(), WatchListener {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-
         handler.removeCallbacksAndMessages(null)
         // Just to make sure
         serviceConnection?.let {
             unbindService(it)
             serviceConnection = null
         }
+        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
