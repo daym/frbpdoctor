@@ -117,7 +117,9 @@ class WatchCommunicator {
     private fun decryptMessage(wrap: ByteBuffer): ByteArray {
         val encryptionMode = wrap.get() // if != 0, encrypted; usually: 1
         val contents: ByteArray = if (encryptionMode.toInt() != 0) {
-            assert(encryptionMode.toInt() == 1)
+            if (encryptionMode.toInt() != 1) {
+                throw WatchMessageDecodingException("decryptMessage error: unknown encryptionMode")
+            }
             val rawIv = ByteArray(16)
             wrap.get(rawIv)
             val ivParameterSpec = IvParameterSpec(rawIv)
@@ -130,18 +132,18 @@ class WatchCommunicator {
                 instance.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec)
                 instance.doFinal(rawContents)
             } catch (e: NoSuchAlgorithmException) {
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             } catch (e: NoSuchPaddingException) {
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             } catch (e: InvalidAlgorithmParameterException) {
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             } catch (e: IllegalBlockSizeException) {
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             } catch (e: BadPaddingException) {
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             } catch (e: InvalidKeyException) {
                 Log.e(TAG, e.toString())
-                throw RuntimeException(e)
+                throw WatchMessageDecodingException("decryptMessage error", e)
             }
         } else {
             val remaining = wrap.remaining()
@@ -152,40 +154,6 @@ class WatchCommunicator {
         }
         return contents
     }
-
-//    private fun decode3(wrap: ByteBuffer): WatchRawResponse {
-//        // FIXME check
-//        val contents: ByteArray = decryptMessage(wrap)
-//        // OK from here
-//        val buf = ByteBuffer.wrap(contents).order(ByteOrder.BIG_ENDIAN)
-//        val sequenceNumber = buf.int
-//        buf.get()
-//        val command = buf.short
-//        val length = buf.short.toInt()
-//        // Note: length == 0: "we are done"
-//        // FIXME RAW_BP_DATA is special
-//        if (buf.hasRemaining()) {
-//            val bArr6 = ByteArray(length) // contents
-//            buf.get(bArr6)
-//            val oldCrc = buf.short
-//            buf.rewind()
-//            val bufBeforeCrc = ByteArray(length + 12) // I have no idea
-//            buf.get(bufBeforeCrc)
-//            val newCrc = Crc16.crc16(bufBeforeCrc)
-//
-//            if (oldCrc == newCrc) {
-//                Log.i(TAG, "decode3 crc ok")
-//            } else {
-//                Log.e(TAG, "decode3 crc mistake")
-//            }
-//            return WatchRawResponse(
-//                sequenceNumber, sequenceNumber, command, bArr6
-//            )
-//        }
-//        return WatchRawResponse(
-//            sequenceNumber, sequenceNumber, command, ByteArray(0)
-//        )
-//    }
 
     private var listeners = HashSet<WatchListener>()
 
@@ -431,7 +399,7 @@ class WatchCommunicator {
         val sendingSequenceNumber = this.sendingSequenceNumber.getAndAdd(1)
         sendInternal(
             sendingSequenceNumber,
-            command.code,
+            command.operation.code,
             command.arguments,
         )
     }
