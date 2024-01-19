@@ -123,6 +123,14 @@ sealed class WatchResponse {
         }
     }
 
+    data class GetSleepData(val dummy: Byte): WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): GetSleepData {
+                // There seem to be 10 B, all 0.
+                return GetSleepData(1.toByte())
+            }
+        }
+    }
     data class GetHeatData(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -409,7 +417,6 @@ sealed class WatchResponse {
                 buf.get(b)
                 return Unknown(code, b)
             }
-            // TODO GetSleepData never appears; OtaSendBig we don't know the response.
             return when (operation) {
                 WatchOperation.DeviceInfo -> DeviceInfo.parse(buf)
                 WatchOperation.OtaGetFirmwareVersion -> OtaGetFirmwareVersion.parse(buf)
@@ -420,6 +427,7 @@ sealed class WatchResponse {
                 WatchOperation.Bind -> Bind.parse(buf)
                 WatchOperation.Unbind -> Unbind.parse(buf)
                 WatchOperation.GetStepData -> GetStepData.parse(buf)
+                WatchOperation.GetSleepData -> GetSleepData.parse(buf)
                 WatchOperation.GetHeatData -> GetHeatData.parse(buf)
                 WatchOperation.CurrentHeat -> CurrentHeat.parse(buf)
                 WatchOperation.GetSportData -> GetSportData.parse(buf)
