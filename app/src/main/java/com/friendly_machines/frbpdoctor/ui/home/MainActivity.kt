@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
             binder.setTime()
             binder.getBatteryState()
             binder.getWatchFace() // ok but response is weird
-            binder.getAlarm() // big
         }
         // nope. startService(serviceIntent)
     }
@@ -124,12 +123,11 @@ class MainActivity : AppCompatActivity(), WatchListener {
                 response.content
             }
 
-            is WatchResponse.GetAlarm -> { // (big)
+            is WatchResponse.GetAlarm -> { // also has a big response, but that's not this one
                 val alarmTimeButton = supportFragmentManager.findFragmentById(R.id.alarmTimeButton)
                 val alarmTimePicker = supportFragmentManager.findFragmentById(R.id.alarmTimePicker)
 
-                response.successCount
-                response.data
+                response.count
             }
 
             is WatchResponse.GetBatteryState -> {
@@ -149,7 +147,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
 
     override fun onBigWatchRawResponse(response: WatchRawResponse) {
         // FIXME handle alarm maybe
-        Log.d(TAG, "MainActivity: big watch raw response ${response.toString()}")
+        Log.d(TAG, "MainActivity: big watch raw response ${response}")
     }
 
     override fun onException(exception: Throwable) {
