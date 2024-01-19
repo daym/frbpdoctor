@@ -45,12 +45,15 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     override fun onStart() {
         super.onStart()
         this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-            binder.getAlarm() // big; TODO move to MainActivity
-            binder.getBpData() // ok
-            binder.getSleepData(1701730800, 1702162800) // no.
-            binder.getStepData() // ok
-            binder.getHeatData() // ok
-            binder.getSportData() // ok
+            // TODO don't have magic numbers
+            when (binding.viewPager.currentItem) {
+                0 -> binder.getBpData()
+                1 -> binder.getStepData()
+                2 -> binder.getHeatData()
+                3 -> binder.getSleepData(1701730800, 1702162800)
+                4 -> binder.getAlarm()
+            }
+
             // TODO WatchCommand.CurrentStep probably history
             // TODO WatchCommand.CurrentHeat probably history
         }
