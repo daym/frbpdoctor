@@ -4,22 +4,25 @@
     android:layout_height="match_parent">
     <TextView
         android:id="@+id/startTimestampTextView"
-        android:layout_width="match_parent"
+        android:layout_width="10dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Date: dd/mm/yyyy"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/endTimestampTextView"
-        android:layout_width="match_parent"
+        android:layout_width="10dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Date: dd/mm/yyyy"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/flagTextView"
-        android:layout_width="match_parent"
+        android:layout_width="10dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="16sp" />
 
 </LinearLayout>
