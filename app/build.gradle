@@ -53,13 +53,6 @@ dependencies {
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     // (see https://github.com/ReactiveX/RxJava/releases for latest 3.x.x version)
     implementation 'io.reactivex.rxjava3:rxjava:3.1.5'
-    //implementation 'com.jakewharton.rx3:replaying-share:3.0.0'
-    // Optional:
-    //implementation 'com.jakewharton.rx3:replaying-share-kotlin:3.0.0'
-
-
-    // Duplicate class com.google.common.util.concurrent.ListenableFuture found in modules guava-24.0-jre (com.google.guava:guava:24.0-jre) and listenablefuture-1.0 (com.google.guava:listenablefuture:1.0)
-    ///implementation 'com.google.guava:guava:24.0-jre'
 
     implementation 'org.msgpack:msgpack-core:0.9.6'
     implementation 'com.polidea.rxandroidble3:rxandroidble:1.17.2'
