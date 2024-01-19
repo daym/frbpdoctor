@@ -1,12 +1,9 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.notification
 
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.BpDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchMessageDecodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.CurrentHeatDataBlock
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.CurrentStepDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.HeatDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -24,11 +21,58 @@ sealed class WatchResponse {
         }
     }
 
-    // TODO 1 OTA_REQUEST
-    // TODO 2 OTA_INFO
-    // TODO 3 OTA_FILE_OFFSET
-    // TODO 4 OTA_SEND_START
-    // TODO 5 OTA_SEND_FINISH
+    data class OtaGetFirmwareVersion(val soc: Int, val firmwareVersion: Int) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): OtaGetFirmwareVersion {
+                val soc = buf.int
+                val firmwareVersion = buf.int
+                return OtaGetFirmwareVersion(soc = soc, firmwareVersion = firmwareVersion)
+            }
+        }
+    }
+    data class OtaSendInfo(val flag: Byte, val romVersion: Int, val maxSize: Short): WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): OtaSendInfo {
+                val flag: Byte = buf.get()
+
+                // TODO The following not for fonts.
+
+                val romVersion = buf.int
+                val maxSize = buf.short
+                return OtaSendInfo(flag = flag, romVersion = romVersion, maxSize = maxSize)
+            }
+        }
+    }
+    data class OtaNegotiateFileOffset(val type: Byte, val offset: Int) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): OtaNegotiateFileOffset {
+                val type: Byte = buf.get()
+                val offset = buf.int
+                return OtaNegotiateFileOffset(type = type, offset = offset)
+            }
+        }
+    }
+
+    data class OtaSendStart(val type: Byte) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): OtaSendStart {
+                val type: Byte = buf.get()
+                // TODO more stuff, maybe.
+                return OtaSendStart(type = type)
+            }
+        }
+    }
+
+    data class OtaSendFinish(val type: Byte, val state: Short) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): OtaSendFinish {
+                val type: Byte = buf.get()
+                val state = buf.short // 1 ok
+                return OtaSendFinish(type = type, state = state)
+            }
+        }
+    }
+
     // TODO 0x1004 OTA_SEND_BIG (big)
 
     data class Bind(val status: Byte) : // verified
@@ -53,89 +97,54 @@ sealed class WatchResponse {
         }
     }
 
-    data class StepData(val data: Array<StepsDataBlock>) : WatchResponse() {
+    data class GetStepData(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as StepData
+            other as GetStepData
 
-            if (!data.contentEquals(other.data)) return false
+            if (count != other.count) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            return data.contentHashCode()
+            return count
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): StepData {
-                // step data (big)
-                val arr = ArrayList<StepsDataBlock>()
-                while (buf.hasRemaining()) {
-                    val item = StepsDataBlock.parse(buf)
-                    arr.add(item)
-                }
-                return StepData(arr.toTypedArray())
+            fun parse(buf: ByteBuffer): GetStepData {
+                val count = buf.int
+//                val b = ByteArray(buf.remaining()) // [0]
+//                buf.get(b)
+                return GetStepData(count = count)
             }
         }
     }
 
-    data class SleepData(val data: Array<SleepDataBlock>) : WatchResponse() {
+    data class GetHeatData(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as SleepData
+            other as GetHeatData
 
-            if (!data.contentEquals(other.data)) return false
+            if (count != other.count) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            return data.contentHashCode()
+            return count
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): SleepData {
-                // sleep data (big)
-                val arr = ArrayList<SleepDataBlock>()
-                while (buf.hasRemaining()) {
-                    val item = SleepDataBlock.parse(buf)
-                    arr.add(item)
-                }
-                return SleepData(arr.toTypedArray())
-            }
-        }
-    }
-
-    data class HeatData(val data: Array<HeatDataBlock>) : WatchResponse() {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as HeatData
-
-            if (!data.contentEquals(other.data)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return data.contentHashCode()
-        }
-
-        companion object {
-            fun parse(buf: ByteBuffer): HeatData {
-                // heat data (big)
-                val arr = ArrayList<HeatDataBlock>()
-                while (buf.hasRemaining()) {
-                    val item = HeatDataBlock.parse(buf)
-                    arr.add(item)
-                }
-                return HeatData(arr.toTypedArray())
+            fun parse(buf: ByteBuffer): GetHeatData {
+                val count = buf.int
+//                val b = ByteArray(buf.remaining()) // [0]
+//                buf.get(b)
+                return GetHeatData(count = count)
             }
         }
     }
@@ -150,61 +159,54 @@ sealed class WatchResponse {
         }
     }
 
-    data class SportData(val data: Array<SportDataBlock>) : WatchResponse() {
+    data class GetBpData(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as SportData
+            other as GetBpData
 
-            if (!data.contentEquals(other.data)) return false
+            if (count != other.count) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            return data.contentHashCode()
+            return count
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): SportData {
-                // sport data (big)
-                val arr = ArrayList<SportDataBlock>()
-                while (buf.hasRemaining()) {
-                    val item = SportDataBlock.parse(buf)
-                    arr.add(item)
-                }
-                return SportData(arr.toTypedArray())
-
+            fun parse(buf: ByteBuffer): GetBpData {
+                val count = buf.int
+//                val b = ByteArray(buf.remaining()) // [0]
+//                buf.get(b)
+                return GetBpData(count = count)
             }
         }
     }
 
-    data class BpData(val data: Array<BpDataBlock>) : WatchResponse() {
+    data class GetSportData(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as BpData
+            other as GetSportData
 
-            if (!data.contentEquals(other.data)) return false
+            if (count != other.count) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            return data.contentHashCode()
+            return count
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): BpData {
-                // bp data (big)
-                val arr = ArrayList<BpDataBlock>()
-                while (buf.hasRemaining()) {
-                    val item = BpDataBlock.parse(buf)
-                    arr.add(item)
-                }
-                return BpData(arr.toTypedArray())
+            fun parse(buf: ByteBuffer): GetSportData {
+                val count = buf.int
+//                val b = ByteArray(buf.remaining()) // [0]
+//                buf.get(b)
+                return GetSportData(count = count)
             }
         }
     }
@@ -329,32 +331,28 @@ sealed class WatchResponse {
         }
     }
 
-    data class GetAlarm(val successCount: Byte, val data: ByteArray) : WatchResponse() { // verified
+    data class GetAlarm(val count: Int) : WatchResponse() { // verified
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
             other as GetAlarm
 
-            if (successCount != other.successCount) return false
-            if (!data.contentEquals(other.data)) return false
+            if (count != other.count) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = successCount.toInt()
-            result = 31 * result + data.contentHashCode()
-            return result
+            return count
         }
 
         companion object {
             fun parse(buf: ByteBuffer): GetAlarm {
-                // (big)
-                val successCount: Byte = buf.get()
-                val b = ByteArray(buf.remaining())
-                buf.get(b)
-                return GetAlarm(successCount = successCount, data = b)
+                val count = buf.int
+//                val b = ByteArray(buf.remaining()) // [0]
+//                buf.get(b)
+                return GetAlarm(count = count)
             }
         }
     }
@@ -381,8 +379,6 @@ sealed class WatchResponse {
         }
     }
 
-    // TODO 67 RAW_BP_DATA
-
     data class Unknown(val code: Short, val arguments: ByteArray) : WatchResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -404,34 +400,46 @@ sealed class WatchResponse {
     }
 
     companion object {
-        @OptIn(ExperimentalUnsignedTypes::class)
         fun parse(code: Short, buf: ByteBuffer): WatchResponse {
             buf.order(ByteOrder.BIG_ENDIAN)
-            return when (code) {
-                0.toShort() -> DeviceInfo.parse(buf)
-                17.toShort() -> Bind.parse(buf)
-                18.toShort() -> Unbind.parse(buf)
-                23.toShort() -> StepData.parse(buf)
-                27.toShort() -> HeatData.parse(buf)
-                28.toShort() -> CurrentHeat.parse(buf)
-                29.toShort() -> SportData.parse(buf)
-                30.toShort() -> BpData.parse(buf)
-                42.toShort() -> GetBatteryState.parse(buf)
-                43.toShort() -> SetTime.parse(buf)
-                44.toShort() -> SetWeather.parse(buf)
-                45.toShort() -> GetDeviceConfig.parse(buf)
-                46.toShort() -> GetWatchFace.parse(buf)
-                47.toShort() -> SetWatchFace.parse(buf)
-                52.toShort() -> NotificationFromWatch.parse(buf)
-                53.toShort() -> SetProfile.parse(buf)
-                55.toShort() -> SetAlarm.parse(buf)
-                56.toShort() -> GetAlarm.parse(buf)
-                63.toShort() -> CurrentStep.parse(buf)
-                64.toShort() -> SetMessage.parse(buf)
+            val operation = try {
+                WatchOperation.parse(code)
+            } catch (e: WatchMessageDecodingException) {
+                val b = ByteArray(buf.remaining())
+                buf.get(b)
+                return Unknown(code, b)
+            }
+            // TODO GetSleepData never appears; OtaSendBig we don't know the response.
+            return when (operation) {
+                WatchOperation.DeviceInfo -> DeviceInfo.parse(buf)
+                WatchOperation.OtaGetFirmwareVersion -> OtaGetFirmwareVersion.parse(buf)
+                WatchOperation.OtaSendInfo -> OtaSendInfo.parse(buf)
+                WatchOperation.OtaNegotiateFileOffset -> OtaNegotiateFileOffset.parse(buf)
+                WatchOperation.OtaSendStart -> OtaSendStart.parse(buf)
+                WatchOperation.OtaSendFinish -> OtaSendFinish.parse(buf)
+                WatchOperation.Bind -> Bind.parse(buf)
+                WatchOperation.Unbind -> Unbind.parse(buf)
+                WatchOperation.GetStepData -> GetStepData.parse(buf)
+                WatchOperation.GetHeatData -> GetHeatData.parse(buf)
+                WatchOperation.CurrentHeat -> CurrentHeat.parse(buf)
+                WatchOperation.GetSportData -> GetSportData.parse(buf)
+                WatchOperation.GetBpData -> GetBpData.parse(buf)
+                WatchOperation.GetBatteryState -> GetBatteryState.parse(buf)
+                WatchOperation.SetTime -> SetTime.parse(buf)
+                WatchOperation.SetWeather -> SetWeather.parse(buf)
+                WatchOperation.GetDeviceConfig -> GetDeviceConfig.parse(buf)
+                WatchOperation.GetWatchFace -> GetWatchFace.parse(buf)
+                WatchOperation.SetWatchFace -> SetWatchFace.parse(buf)
+                WatchOperation.NotificationFromWatch -> NotificationFromWatch.parse(buf)
+                WatchOperation.SetProfile -> SetProfile.parse(buf)
+                WatchOperation.SetAlarm -> SetAlarm.parse(buf)
+                WatchOperation.GetAlarm -> GetAlarm.parse(buf)
+                WatchOperation.CurrentStep -> CurrentStep.parse(buf)
+                WatchOperation.SetMessage -> SetMessage.parse(buf)
                 else -> {
                     val b = ByteArray(buf.remaining())
                     buf.get(b)
-                    Unknown(code, b)
+                    Unknown(operation.code, b)
                 }
             }
         }

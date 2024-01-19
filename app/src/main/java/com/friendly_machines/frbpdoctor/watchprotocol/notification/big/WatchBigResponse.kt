@@ -1,6 +1,7 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.notification.big
 
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchMessageDecodingException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -47,12 +48,12 @@ sealed class WatchBigResponse {
         }
     }
 
-    data class HeatData(val data: Array<HeatDataBlock>) : WatchBigResponse() {
+    data class GetHeatData(val data: Array<HeatDataBlock>) : WatchBigResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as HeatData
+            other as GetHeatData
 
             if (!data.contentEquals(other.data)) return false
 
@@ -64,24 +65,24 @@ sealed class WatchBigResponse {
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): HeatData {
+            fun parse(buf: ByteBuffer): GetHeatData {
                 // heat data (big)
                 val arr = ArrayList<HeatDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = HeatDataBlock.parse(buf)
                     arr.add(item)
                 }
-                return HeatData(arr.toTypedArray())
+                return GetHeatData(arr.toTypedArray())
             }
         }
     }
 
-    data class StepData(val data: Array<StepsDataBlock>) : WatchBigResponse() {
+    data class GetStepData(val data: Array<StepsDataBlock>) : WatchBigResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as StepData
+            other as GetStepData
 
             if (!data.contentEquals(other.data)) return false
 
@@ -93,14 +94,14 @@ sealed class WatchBigResponse {
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): StepData {
+            fun parse(buf: ByteBuffer): GetStepData {
                 // step data (big)
                 val arr = ArrayList<StepsDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = StepsDataBlock.parse(buf)
                     arr.add(item)
                 }
-                return StepData(arr.toTypedArray())
+                return GetStepData(arr.toTypedArray())
             }
         }
     }
@@ -125,12 +126,12 @@ sealed class WatchBigResponse {
         }
     }
 
-    data class SportData(val data: Array<SportDataBlock>) : WatchBigResponse() {
+    data class GetSportData(val data: Array<SportDataBlock>) : WatchBigResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as SportData
+            other as GetSportData
 
             if (!data.contentEquals(other.data)) return false
 
@@ -142,25 +143,25 @@ sealed class WatchBigResponse {
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): SportData {
+            fun parse(buf: ByteBuffer): GetSportData {
                 // sport data (big)
                 val arr = ArrayList<SportDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = SportDataBlock.parse(buf)
                     arr.add(item)
                 }
-                return SportData(arr.toTypedArray())
+                return GetSportData(arr.toTypedArray())
 
             }
         }
     }
 
-    data class BpData(val data: Array<BpDataBlock>) : WatchBigResponse() {
+    data class GetBpData(val data: Array<BpDataBlock>) : WatchBigResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as BpData
+            other as GetBpData
 
             if (!data.contentEquals(other.data)) return false
 
@@ -172,34 +173,40 @@ sealed class WatchBigResponse {
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): BpData {
+            fun parse(buf: ByteBuffer): GetBpData {
                 // bp data (big)
                 val arr = ArrayList<BpDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = BpDataBlock.parse(buf)
                     arr.add(item)
                 }
-                return BpData(arr.toTypedArray())
+                return GetBpData(arr.toTypedArray())
             }
         }
     }
 
     companion object {
-        val RAW_BLOOD_PRESSURE: Short = 67.toShort() // (big)
+        const val RAW_BLOOD_PRESSURE: Short = 67.toShort() // (big)
 
-        @OptIn(ExperimentalUnsignedTypes::class)
         fun parse(code: Short, buf: ByteBuffer): WatchBigResponse {
             buf.order(ByteOrder.BIG_ENDIAN)
-            return when (code) {
-                23.toShort() -> StepData.parse(buf)
-                27.toShort() -> HeatData.parse(buf)
-                29.toShort() -> SportData.parse(buf)
-                30.toShort() -> BpData.parse(buf)
-                56.toShort() -> GetAlarm.parse(buf)
+            val operation = try {
+                WatchOperation.parse(code)
+            } catch (e: WatchMessageDecodingException) {
+                val b = ByteArray(buf.remaining())
+                buf.get(b)
+                return Unknown(code, b)
+            }
+            return when (operation) {
+                WatchOperation.GetStepData -> GetStepData.parse(buf)
+                WatchOperation.GetHeatData -> GetHeatData.parse(buf)
+                WatchOperation.GetSportData -> GetSportData.parse(buf)
+                WatchOperation.GetBpData -> GetBpData.parse(buf)
+                WatchOperation.GetAlarm -> GetAlarm.parse(buf)
                 else -> {
                     val b = ByteArray(buf.remaining())
                     buf.get(b)
-                    Unknown(code, b)
+                    Unknown(operation.code, b)
                 }
             }
         }
