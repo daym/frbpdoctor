@@ -2,7 +2,6 @@ package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -14,8 +13,6 @@ import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.scan.ScanResult
 import java.security.MessageDigest
@@ -96,16 +93,22 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
-        if (preference is RxBleDevicePreference) {
-            val scannerFragment = ScannerFragment(this)
-            scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
-        } else if (preference is DatePreference) {
-            val f: DialogFragment
-            f = DatePreferenceDialogFragment.newInstance(preference.getKey())
-            f.setTargetFragment(this, 0) // TODO
-            f.show(parentFragmentManager, null)
-        } else {
-            super.onDisplayPreferenceDialog(preference)
+        when (preference) {
+            is RxBleDevicePreference -> {
+                val scannerFragment = ScannerFragment(this)
+                scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
+            }
+
+            is DatePreference -> {
+                val f: DialogFragment
+                f = DatePreferenceDialogFragment.newInstance(preference.getKey())
+                f.setTargetFragment(this, 0) // TODO
+                f.show(parentFragmentManager, null)
+            }
+
+            else -> {
+                super.onDisplayPreferenceDialog(preference)
+            }
         }
         if (preference.key == "watchMacAddress") {
             val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
