@@ -1,24 +1,23 @@
 package com.friendly_machines.frbpdoctor.ui.home
 
-import android.graphics.drawable.Drawable
-import com.caverock.androidsvg.SVG
 import android.graphics.Canvas
 import android.graphics.drawable.PictureDrawable
+import com.caverock.androidsvg.SVG
 
 class SvgDrawable(private val svg: SVG, private val width: Int, private val height: Int) :
     PictureDrawable(svg.renderToPicture()) {
     override fun draw(canvas: Canvas) {
         val aspectRatio = 1 // TODO: svg.documentWidth / svg.documentHeight
-        var targetWidth = if (width > 0) width else canvas.width
-        var targetHeight = (targetWidth / aspectRatio).toInt()
+        var targetWidth = if (width > 0) width else bounds.width()
+        var targetHeight = (targetWidth / aspectRatio)
 
-        if (targetHeight > canvas.height) {
-            targetHeight = canvas.height
-            targetWidth = (targetHeight * aspectRatio).toInt()
+        if (targetHeight > bounds.height()) {
+            targetHeight = bounds.height()
+            targetWidth = (targetHeight * aspectRatio)
         }
 
-        svg.setDocumentWidth(targetWidth.toFloat())
-        svg.setDocumentHeight(targetHeight.toFloat())
+        svg.documentWidth = targetWidth.toFloat()
+        svg.documentHeight = targetHeight.toFloat()
 
         canvas.save()
         svg.renderToCanvas(canvas)
