@@ -1,10 +1,12 @@
 package com.friendly_machines.frbpdoctor.ui.health
 
 import android.view.View
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmDataBlock
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.BpDataBlock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -13,30 +15,28 @@ import java.time.format.DateTimeFormatter
 
 class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
-    private val openTextView: TextView = itemView.findViewById(R.id.openTextView)
-    private val hourTextView: TextView = itemView.findViewById(R.id.hourTextView)
-    private val minTextView: TextView = itemView.findViewById(R.id.minTextView)
+    private val openCheckBox: CheckBox = itemView.findViewById(R.id.openCheckBox)
+    private val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
     private val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
-    private val repeatMondayTextView: TextView = itemView.findViewById(R.id.repeatMondayTextView)
-    private val repeatTuesdayTextView: TextView = itemView.findViewById(R.id.repeatTuesdayTextView)
-    private val repeatWednesdayTextView: TextView = itemView.findViewById(R.id.repeatWednesdayTextView)
-    private val repeatThursdayTextView: TextView = itemView.findViewById(R.id.repeatThursdayTextView)
-    private val repeatFridayTextView: TextView = itemView.findViewById(R.id.repeatFridayTextView)
-    private val repeatSaturdayTextView: TextView = itemView.findViewById(R.id.repeatSaturdayTextView)
-    private val repeatSundayTextView: TextView = itemView.findViewById(R.id.repeatSundayTextView)
+    private val repeatMondayCheckBox: CheckBox = itemView.findViewById(R.id.repeatMondayCheckBox)
+    private val repeatTuesdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatTuesdayCheckBox)
+    private val repeatWednesdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatWednesdayCheckBox)
+    private val repeatThursdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatThursdayCheckBox)
+    private val repeatFridayCheckBox: CheckBox = itemView.findViewById(R.id.repeatFridayCheckBox)
+    private val repeatSaturdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSaturdayCheckBox)
+    private val repeatSundayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSundayCheckBox)
 
     fun bind(item: AlarmDataBlock) {
         idTextView.text = item.id.toString()
-        openTextView.text = item.open.toString()
-        hourTextView.text = item.hour.toString()
-        minTextView.text = item.min.toString()
-        titleTextView.text = item.title.toString()
-        repeatMondayTextView.text = item.repeats[0].toString()
-        repeatTuesdayTextView.text = item.repeats[1].toString()
-        repeatWednesdayTextView.text = item.repeats[2].toString()
-        repeatThursdayTextView.text = item.repeats[3].toString()
-        repeatFridayTextView.text = item.repeats[4].toString()
-        repeatSaturdayTextView.text = item.repeats[5].toString()
-        repeatSundayTextView.text = item.repeats[6].toString()
+        openCheckBox.isChecked = item.open != 0.toByte()
+        timeTextView.text = "${item.hour}:${item.min}"
+        titleTextView.text = AlarmTitle.parse(item.title).toString()
+        repeatMondayCheckBox.isChecked = item.repeats[0] != 0.toByte()
+        repeatTuesdayCheckBox.isChecked = item.repeats[1] != 0.toByte()
+        repeatWednesdayCheckBox.isChecked = item.repeats[2] != 0.toByte()
+        repeatThursdayCheckBox.isChecked = item.repeats[3] != 0.toByte()
+        repeatFridayCheckBox.isChecked = item.repeats[4] != 0.toByte()
+        repeatSaturdayCheckBox.isChecked = item.repeats[5] != 0.toByte()
+        repeatSundayCheckBox.isChecked = item.repeats[6] != 0.toByte()
     }
 }

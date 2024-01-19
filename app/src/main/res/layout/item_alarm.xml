@@ -12,22 +12,15 @@
         android:layout_weight="1"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/openTextView"
+    <CheckBox
+        android:id="@+id/openCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/hourTextView"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/minTextView"
+        android:id="@+id/timeTextView"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -40,52 +33,52 @@
         android:layout_weight="1"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/repeatMondayTextView"
+    <CheckBox
+        android:id="@+id/repeatMondayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Mondays" />
 
-    <TextView
-        android:id="@+id/repeatTuesdayTextView"
+    <CheckBox
+        android:id="@+id/repeatTuesdayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Tuesdays" />
 
-    <TextView
-        android:id="@+id/repeatWednesdayTextView"
+    <CheckBox
+        android:id="@+id/repeatWednesdayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Wednesdays" />
 
-    <TextView
-        android:id="@+id/repeatThursdayTextView"
+    <CheckBox
+        android:id="@+id/repeatThursdayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Thursdays" />
 
-    <TextView
-        android:id="@+id/repeatFridayTextView"
+    <CheckBox
+        android:id="@+id/repeatFridayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Fridays"/>
 
-    <TextView
-        android:id="@+id/repeatSaturdayTextView"
+    <CheckBox
+        android:id="@+id/repeatSaturdayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Saturdays"/>
 
-    <TextView
-        android:id="@+id/repeatSundayTextView"
+    <CheckBox
+        android:id="@+id/repeatSundayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp" />
+        android:text="Sundays"  />
 </LinearLayout>
