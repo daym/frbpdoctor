@@ -144,6 +144,13 @@ class HealthActivity : AppCompatActivity(), WatchListener {
                     }
                 }
             }
+            is WatchBigResponse.GetAlarm -> {
+                for (fragment in supportFragmentManager.fragments) {
+                    if (fragment is AlarmFragment) {
+                        fragment.setData(response.data)
+                    }
+                }
+            }
             else -> {
 
             }
