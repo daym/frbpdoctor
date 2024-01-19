@@ -34,7 +34,7 @@ object WatchCharacteristic {
         }
         return result
     }
-    fun encodeVariableLengthInteger(input: Int): ByteArray { // protobuf and/or MIDI
+    private fun encodeVariableLengthInteger(input: Int): ByteArray { // protobuf and/or MIDI
         var input = input
         val buf = ByteBuffer.allocate(
             if (input < 0x80) 1
@@ -131,10 +131,7 @@ object WatchCharacteristic {
             buf.get(everythingButCrc)
             val oldCrc = buf.short
             val newCrc = Crc16.crc16(everythingButCrc)
-            if (oldCrc == newCrc) {
-                Log.d(WatchCommunicator.TAG, "CRC of decoded message was OK")
-            } else {
-                Log.e(WatchCommunicator.TAG, "CRC of decoded message was incorrect")
+            if (oldCrc != newCrc) {
                 throw WatchMessageDecodingException("CRC is incorrect (expected crc $oldCrc, calculated crc $newCrc, command $command, sequenceNumber $sequenceNumber, ackedSequenceNumber $ackedSequenceNumber, length $length)")
             }
             return WatchRawResponse(
@@ -152,9 +149,18 @@ object WatchCharacteristic {
         val length = buf.short.toInt()
         val result = ByteArray(length)
         buf.get(result)
-        // padding
-        //val r = buf.remaining()
-        //Log.e(TAG, "remaining $r")
+
+        val oldCrc = buf.short
+        buf.rewind()
+        val bufBeforeCrc = ByteArray(length)
+        buf.get(bufBeforeCrc)
+        val newCrc = Crc16.crc16(bufBeforeCrc)
+// TODO
+//        if (newCrc != oldCrc) {
+//            throw WatchMessageDecodingException("CRC is incorrect (expected crc $oldCrc, calculated crc $newCrc, command $command, sequenceNumber $sequenceNumber, length $length)")
+//        }
+        val r = buf.remaining()
+        Log.e("BIG", "remaining $r")
         return WatchRawResponse(sequenceNumber, sequenceNumber, command, result)
     }
 }
