@@ -6,16 +6,31 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 sealed class WatchBigResponse {
-    data class GetAlarm(val items: List<AlarmDataBlock>) : WatchBigResponse() {
+    data class GetAlarm(val data: Array<AlarmDataBlock>) : WatchBigResponse() {
         companion object {
             fun parse(buf: ByteBuffer): GetAlarm {
-                val items = ArrayList<AlarmDataBlock>()
+                val data = ArrayList<AlarmDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = AlarmDataBlock.parse(buf)
-                    items.add(item)
+                    data.add(item)
                 }
-                return GetAlarm(items = items)
+                return GetAlarm(data = data.toTypedArray())
             }
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as GetAlarm
+
+            if (!data.contentEquals(other.data)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return data.contentHashCode()
         }
     }
 
