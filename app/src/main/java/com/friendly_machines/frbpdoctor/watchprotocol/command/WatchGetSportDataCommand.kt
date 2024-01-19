@@ -1,3 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class WatchGetSportDataCommand : WatchCommand(29, ByteArray(0)) // (big)
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchGetSportDataCommand : WatchCommand(WatchOperation.GetSportData, ByteArray(0)) // (big)

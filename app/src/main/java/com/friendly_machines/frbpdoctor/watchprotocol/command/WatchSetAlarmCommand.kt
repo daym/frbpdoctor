@@ -1,17 +1,18 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class WatchSetAlarmCommand(
-    action: Byte, id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray
+    action: Byte, id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray/*7*/
 ) : WatchCommand(
-    55, run {
+    WatchOperation.SetAlarm, run {
         /**
          * command;
          * action: 1=add; 0=?;
          * title: possibilities: wakeup|work|anniversary|meeting|medicine|date
-         * repeats: multiselect {Mo, Tu, Fr, Sat, Sun}
+         * repeats: multiselect {Mon, Tue, Wed, Thu, Fri, Sat, Sun}
          */
         val buf = ByteBuffer.allocate(1 + 4 + 1 + 1 + 1 + 1 + repeats.size).order(ByteOrder.BIG_ENDIAN)
         buf.put(action)

@@ -1,3 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class WatchCurrentStepCommand : WatchCommand(63, ByteArray(0)) // (big)
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchCurrentStepCommand : WatchCommand(WatchOperation.CurrentStep, ByteArray(0)) // (big)

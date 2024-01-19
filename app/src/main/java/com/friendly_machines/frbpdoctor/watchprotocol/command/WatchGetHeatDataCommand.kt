@@ -1,3 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class WatchGetHeatDataCommand : WatchCommand(27, ByteArray(0)) // (big)
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchGetHeatDataCommand : WatchCommand(WatchOperation.GetHeatData, ByteArray(0)) // (big)

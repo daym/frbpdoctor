@@ -1,3 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class WatchGetDeviceConfigCommand : WatchCommand(45, ByteArray(0)) // (big)
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchGetDeviceConfigCommand : WatchCommand(WatchOperation.GetDeviceConfig, ByteArray(0)) // (big)

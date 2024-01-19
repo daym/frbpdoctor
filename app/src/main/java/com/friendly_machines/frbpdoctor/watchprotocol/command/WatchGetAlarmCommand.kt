@@ -1,2 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
-class WatchGetAlarmCommand : WatchCommand(56, ByteArray(0)) // (big)
+
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchGetAlarmCommand : WatchCommand(WatchOperation.GetAlarm, ByteArray(0)) // (big)

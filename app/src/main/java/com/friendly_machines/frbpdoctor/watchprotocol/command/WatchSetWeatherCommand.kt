@@ -1,12 +1,13 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class WatchSetWeatherCommand(
     weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, title: ByteArray
 ) : WatchCommand(
-    44, run {
+    WatchOperation.SetWeather, run {
         /// TITLE is the big endian short list... ish
         val buf = ByteBuffer.allocate(2 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + title.size).order(ByteOrder.BIG_ENDIAN)
         buf.putShort(weatherType)

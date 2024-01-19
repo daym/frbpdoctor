@@ -1,5 +1,7 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-// Type: 1: ROM; otherwise: font; probably progress
-class WatchOtaRequestCommand(type: Byte): WatchCommand(1, byteArrayOf(type)) {
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+// Type: 1: ROM; 4: font; otherwise pic
+class WatchOtaGetFirmwareVersionCommand(type: Byte): WatchCommand(WatchOperation.OtaGetFirmwareVersion, byteArrayOf(type)) {
 }

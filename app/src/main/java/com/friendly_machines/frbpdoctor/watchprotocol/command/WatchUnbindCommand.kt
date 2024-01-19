@@ -1,3 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.command
 
-class WatchUnbindCommand : WatchCommand(18, ByteArray(0))
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
+
+class WatchUnbindCommand : WatchCommand(WatchOperation.Unbind, ByteArray(0))
