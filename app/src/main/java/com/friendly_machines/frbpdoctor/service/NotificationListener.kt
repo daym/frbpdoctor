@@ -4,9 +4,7 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 
@@ -38,23 +36,23 @@ class NotificationListener : NotificationListenerService() {
                     when (notification.category) {
                         Notification.CATEGORY_CALL -> MessageType.NewCall
                         Notification.CATEGORY_MISSED_CALL -> MessageType.MissedCall
-                        Notification.CATEGORY_NAVIGATION -> MessageType.QQ
-                        Notification.CATEGORY_ALARM -> MessageType.QQ
-                        Notification.CATEGORY_REMINDER -> MessageType.QQ
-                        Notification.CATEGORY_STOPWATCH -> MessageType.QQ
+                        Notification.CATEGORY_NAVIGATION -> MessageType.Qq
+                        Notification.CATEGORY_ALARM -> MessageType.Qq
+                        Notification.CATEGORY_REMINDER -> MessageType.Qq
+                        Notification.CATEGORY_STOPWATCH -> MessageType.Qq
                         Notification.CATEGORY_EVENT -> MessageType.Facebook
-                        Notification.CATEGORY_PROGRESS -> MessageType.QQ // TODO filter out
+                        Notification.CATEGORY_PROGRESS -> MessageType.Qq // TODO filter out
                         Notification.CATEGORY_MESSAGE -> MessageType.Messenger
                         Notification.CATEGORY_EMAIL -> MessageType.Messenger
                         Notification.CATEGORY_PROMO -> MessageType.Facebook // TODO filter out
                         Notification.CATEGORY_RECOMMENDATION -> MessageType.Facebook // TODO filter out
-                        Notification.CATEGORY_STATUS -> MessageType.QQ // TODO maybe filter out
+                        Notification.CATEGORY_STATUS -> MessageType.Qq // TODO maybe filter out
                         Notification.CATEGORY_SOCIAL -> MessageType.Facebook
                         Notification.CATEGORY_WORKOUT -> MessageType.Instagram
-                        Notification.CATEGORY_LOCATION_SHARING -> MessageType.QQ
-                        Notification.CATEGORY_SERVICE -> MessageType.QQ // TODO filter out since it could cause an endless loop (we ourselves use a service to send out to the watch)
-                        Notification.CATEGORY_ERROR -> MessageType.QQ // TODO filter out since it could cause an endless loop (we ourselves use a service to send out to the watch)
-                        Notification.CATEGORY_TRANSPORT -> MessageType.QQ
+                        Notification.CATEGORY_LOCATION_SHARING -> MessageType.Qq
+                        Notification.CATEGORY_SERVICE -> MessageType.Qq // TODO filter out since it could cause an endless loop (we ourselves use a service to send out to the watch)
+                        Notification.CATEGORY_ERROR -> MessageType.Qq // TODO filter out since it could cause an endless loop (we ourselves use a service to send out to the watch)
+                        Notification.CATEGORY_TRANSPORT -> MessageType.Qq
                         //Notification.CATEGORY_SYSTEM -> reserved
                         else -> MessageType.Messenger
                     }, time.toInt(), title, text

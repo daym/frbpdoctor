@@ -2,7 +2,7 @@ package com.friendly_machines.frbpdoctor.watchprotocol.notification.big
 
 enum class MessageType(val code: Byte) {
     Wechat(1),
-    QQ(2),
+    Qq(2),
     Sms(3),
     NewCall(4),
     HungUpCall(5),
