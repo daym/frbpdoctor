@@ -7,7 +7,7 @@ data class SleepDataBlock(val startTimestamp: UInt, val endTimestamp: UInt, val 
         fun parse(buf: ByteBuffer): SleepDataBlock {
             val startTimestamp: UInt = buf.int.toUInt()
             val endTimestamp: UInt = buf.int.toUInt()
-            val quality = buf.get() // TODO
+            val quality = buf.get()
             return SleepDataBlock(startTimestamp, endTimestamp, quality)
         }
     }
