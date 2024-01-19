@@ -11,9 +11,11 @@ import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.WatchBigResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -43,8 +45,9 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     override fun onStart() {
         super.onStart()
         this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
+            binder.getAlarm() // big; TODO move to MainActivity
             binder.getBpData() // ok
-            //binder.getSleepData() // no.
+            binder.getSleepData(1701730800, 1702162800) // no.
             binder.getStepData() // ok
             binder.getHeatData() // ok
             binder.getSportData() // ok
@@ -110,31 +113,31 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 //    }
 
     private val bigBuffers = HashMap<Short, ByteArrayOutputStream>()
-    private fun onBigWatchResponse(response: WatchResponse) {
+    private fun onBigWatchResponse(response: WatchBigResponse) {
         Log.d(TAG, "-> big decoded: $response")
         when (response) {
-            is WatchResponse.SleepData -> {
+            is WatchBigResponse.SleepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is SleepFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchResponse.HeatData -> {
+            is WatchBigResponse.GetHeatData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is HeatFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchResponse.StepData -> {
+            is WatchBigResponse.GetStepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is StepsFragment) {
                         fragment.setData(response.data)
                     }
                 }
             }
-            is WatchResponse.BpData -> {
+            is WatchBigResponse.GetBpData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is BloodPressureFragment) {
                         fragment.setData(response.data)
@@ -150,21 +153,52 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     override fun onWatchResponse(response: WatchResponse) {
     }
 
+    private fun bigAreWeDone(rawResponse: WatchRawResponse): Boolean {
+        return rawResponse.arguments.isEmpty()
+    }
+
     override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
         val command = rawResponse.command
         // FIXME make sure the sequenceNumber are consecutive
-        if (rawResponse.arguments.isEmpty()) { // we are done
+        if (command == WatchOperation.DeviceInfo.code) {
+            // TODO maybe handle the remainder here
             val buffer = bigBuffers[command]
             buffer?.let {
                 bigBuffers[command] = ByteArrayOutputStream()
-                val response = WatchResponse.parse(
-                    rawResponse.command, ByteBuffer.wrap(buffer.toByteArray()).order(
+            }
+        }
+        if (bigAreWeDone(rawResponse)) {
+            var buffer = bigBuffers[command]
+            if (buffer == null) {
+                buffer = ByteArrayOutputStream()
+            }
+
+            bigBuffers[command] = ByteArrayOutputStream()
+            try {
+                val response = WatchBigResponse.parse(
+                    command, ByteBuffer.wrap(buffer.toByteArray()).order(
                         ByteOrder.BIG_ENDIAN
                     )
                 )
                 onBigWatchResponse(response)
+            } catch (e: RuntimeException) {
+                Log.d(TAG,"Parse error while parsing ${buffer.toByteArray()}: $e")
             }
         } else {
+            if (command == WatchBigResponse.RAW_BLOOD_PRESSURE) {
+                if (rawResponse.arguments.size == 4 + 4 + 1 + 1 + 4) {
+                    val buf = ByteBuffer.wrap(rawResponse.arguments).order(ByteOrder.BIG_ENDIAN)
+                    if (buf.get() == 64.toByte() && buf.get() == 64.toByte() && buf.get() == 64.toByte() && buf.get() == 64.toByte()) {
+                        val id = buf.int
+                        val systolicPressure = buf.get()
+                        val diastolicPressure = buf.get()
+                        val time = buf.int
+                        // TODO: also remember those?
+                    }
+                    return
+                } // else adds it to buffer below
+            }
+
             var buffer = bigBuffers[command]
             if (buffer == null) {
                 buffer = ByteArrayOutputStream()
