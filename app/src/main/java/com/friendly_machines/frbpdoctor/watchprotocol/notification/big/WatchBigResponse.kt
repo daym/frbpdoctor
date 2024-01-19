@@ -19,12 +19,12 @@ sealed class WatchBigResponse {
         }
     }
 
-    data class SleepData(val data: Array<SleepDataBlock>) : WatchBigResponse() {
+    data class GetSleepData(val data: Array<SleepDataBlock>) : WatchBigResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as SleepData
+            other as GetSleepData
 
             if (!data.contentEquals(other.data)) return false
 
@@ -36,14 +36,14 @@ sealed class WatchBigResponse {
         }
 
         companion object {
-            fun parse(buf: ByteBuffer): SleepData {
+            fun parse(buf: ByteBuffer): GetSleepData {
                 // sleep data (big)
                 val arr = ArrayList<SleepDataBlock>()
                 while (buf.hasRemaining()) {
                     val item = SleepDataBlock.parse(buf)
                     arr.add(item)
                 }
-                return SleepData(arr.toTypedArray())
+                return GetSleepData(arr.toTypedArray())
             }
         }
     }
@@ -199,6 +199,7 @@ sealed class WatchBigResponse {
             }
             return when (operation) {
                 WatchOperation.GetStepData -> GetStepData.parse(buf)
+                WatchOperation.GetSleepData -> GetSleepData.parse(buf)
                 WatchOperation.GetHeatData -> GetHeatData.parse(buf)
                 WatchOperation.GetSportData -> GetSportData.parse(buf)
                 WatchOperation.GetBpData -> GetBpData.parse(buf)

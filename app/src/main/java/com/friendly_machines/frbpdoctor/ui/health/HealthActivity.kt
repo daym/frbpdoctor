@@ -116,7 +116,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     private fun onBigWatchResponse(response: WatchBigResponse) {
         Log.d(TAG, "-> big decoded: $response")
         when (response) {
-            is WatchBigResponse.SleepData -> {
+            is WatchBigResponse.GetSleepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is SleepFragment) {
                         fragment.setData(response.data)
