@@ -1,14 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.weather.WeatherFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <EditText
+        android:id="@+id/weatherTypeTextNumber"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:ems="3"
+        android:hint="Type"
+        android:inputType="number" />
 
-</FrameLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Temperature"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/weatherMinTempTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="3"
+            android:hint="Minimum Temperature"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/weatherTempTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="3"
+            android:hint="Temperature"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/weatherMaxTempTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="3"
+            android:hint="Maximum Temperature"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/weatherDummyTextNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="4"
+        android:hint="Dummy"
+        android:text="0"
+        android:inputType="number" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/weatherMonthTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="2"
+            android:hint="Month"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/weatherDayOfMonthTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="2"
+            android:hint="Day of Month"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/weatherDayOfWeekMondayBasedTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="1"
+            android:hint="Day of Week"
+            android:inputType="number" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/weatherLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/setWeatherButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set Weather"
+        android:clickable="true"
+         />
+</LinearLayout>
