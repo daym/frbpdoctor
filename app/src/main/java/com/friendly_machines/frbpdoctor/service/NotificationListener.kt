@@ -20,7 +20,6 @@ class NotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        Log.i(TAG, "Notification Posted: " + sbn.packageName)
         try {
             val notification = sbn.notification
             val time = notification.`when`
@@ -36,6 +35,7 @@ class NotificationListener : NotificationListenerService() {
                 return
             }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
+                Log.i(TAG, "Notification Posted: " + sbn.packageName)
                 WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
                     try {
                         binder.setMessage(
