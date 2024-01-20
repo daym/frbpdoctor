@@ -5,10 +5,11 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageEncodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 
-// TODO service dependency on WatchCommunicationService
+// Note: Service dependency on WatchCommunicationService
 class NotificationListener : NotificationListenerService() {
     companion object {
         private const val TAG = "NotificationListener"
@@ -31,35 +32,33 @@ class NotificationListener : NotificationListenerService() {
             if (text == null) {
                 text = notification.toString()
             }
-            if (notification.category == Notification.CATEGORY_SERVICE || notification.category == Notification.CATEGORY_ERROR) {
+            if (notification.category == Notification.CATEGORY_SERVICE || notification.category == Notification.CATEGORY_ERROR || notification.category == Notification.CATEGORY_PROGRESS || notification.category == Notification.CATEGORY_PROMO || notification.category == Notification.CATEGORY_RECOMMENDATION || notification.category == Notification.CATEGORY_STATUS) {
                 return
             }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
                 WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
-                    binder.setMessage(
-                        when (notification.category) {
-                            Notification.CATEGORY_CALL -> MessageType.NewCall
-                            Notification.CATEGORY_MISSED_CALL -> MessageType.MissedCall
-                            Notification.CATEGORY_NAVIGATION -> MessageType.Qq
-                            Notification.CATEGORY_ALARM -> MessageType.Qq
-                            Notification.CATEGORY_REMINDER -> MessageType.Qq
-                            Notification.CATEGORY_STOPWATCH -> MessageType.Qq
-                            Notification.CATEGORY_EVENT -> MessageType.Facebook
-                            Notification.CATEGORY_PROGRESS -> MessageType.Qq // TODO filter out
-                            Notification.CATEGORY_MESSAGE -> MessageType.Messenger
-                            Notification.CATEGORY_EMAIL -> MessageType.Messenger
-                            Notification.CATEGORY_PROMO -> MessageType.Facebook // TODO filter out
-                            Notification.CATEGORY_RECOMMENDATION -> MessageType.Facebook // TODO filter out
-                            Notification.CATEGORY_STATUS -> MessageType.Qq // TODO maybe filter out
-                            Notification.CATEGORY_SOCIAL -> MessageType.Facebook
-                            Notification.CATEGORY_WORKOUT -> MessageType.Instagram
-                            Notification.CATEGORY_LOCATION_SHARING -> MessageType.Qq
-                            Notification.CATEGORY_TRANSPORT -> MessageType.Qq
-                            //Notification.CATEGORY_SYSTEM -> reserved
-                            else -> MessageType.Messenger
-                        }, time.toInt(), title, text
-                    )
-                    stopSelf() // FIXME
+                    try {
+                        binder.setMessage(
+                            when (notification.category) {
+                                Notification.CATEGORY_CALL -> MessageType.NewCall
+                                Notification.CATEGORY_MISSED_CALL -> MessageType.MissedCall
+                                Notification.CATEGORY_NAVIGATION -> MessageType.Qq
+                                Notification.CATEGORY_ALARM -> MessageType.Qq
+                                Notification.CATEGORY_REMINDER -> MessageType.Qq
+                                Notification.CATEGORY_STOPWATCH -> MessageType.Qq
+                                Notification.CATEGORY_EVENT -> MessageType.Facebook
+                                Notification.CATEGORY_MESSAGE -> MessageType.Messenger
+                                Notification.CATEGORY_EMAIL -> MessageType.Messenger
+                                Notification.CATEGORY_SOCIAL -> MessageType.Facebook
+                                Notification.CATEGORY_WORKOUT -> MessageType.Instagram
+                                Notification.CATEGORY_LOCATION_SHARING -> MessageType.Qq
+                                Notification.CATEGORY_TRANSPORT -> MessageType.Qq
+                                //Notification.CATEGORY_SYSTEM -> reserved
+                                else -> MessageType.Messenger
+                            }, time.toInt(), title, text)
+                    } catch (e: WatchMessageEncodingException) {
+                        binder.setMessage(MessageType.Line, time.toInt(),"message too long", "message too long")
+                    }
                 }
             }
         } catch (e: Throwable) {
@@ -68,6 +67,5 @@ class NotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.d(TAG, "Notification Removed: " + sbn.packageName)
     }
 }
