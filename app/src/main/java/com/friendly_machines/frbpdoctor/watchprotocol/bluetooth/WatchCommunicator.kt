@@ -1,6 +1,8 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
 import android.util.Log
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageEncodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic

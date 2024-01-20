@@ -2,6 +2,7 @@ package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
 import android.util.Log
 import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

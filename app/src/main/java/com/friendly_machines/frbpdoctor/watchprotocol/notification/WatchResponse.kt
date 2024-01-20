@@ -1,7 +1,7 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.notification
 
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchMessageDecodingException
+import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.CurrentHeatDataBlock
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.CurrentStepDataBlock
 import java.nio.ByteBuffer
