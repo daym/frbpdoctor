@@ -23,6 +23,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetBatterySta
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetBpDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetDeviceConfigCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetHeatDataCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetRawBpDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSleepDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSportDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetStepDataCommand
@@ -30,6 +31,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetWatchFaceC
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetAlarmCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetMessageCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetProfileCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetStepGoalCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetTimeCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetWeatherCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchUnbindCommand
@@ -130,8 +132,8 @@ class WatchCommunicationService : Service(), WatchListener {
         }
 
         fun setWeather(
-            weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, title: String
-        ) = enqueueCommand(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(title)))
+            weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
+        ) = enqueueCommand(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, encodeWatchString(location)))
 
         fun setMessage(type: MessageType, time: Int, title: String, content: String) = enqueueCommand(
             WatchSetMessageCommand(
@@ -166,12 +168,14 @@ class WatchCommunicationService : Service(), WatchListener {
 
         fun unbindWatch() = enqueueCommand(WatchUnbindCommand())
         fun getDeviceConfig() = enqueueCommand(WatchGetDeviceConfigCommand())
-        fun getBpData() = enqueueCommand(WatchGetBpDataCommand())
+        fun getBpData() = enqueueCommand(WatchGetBpDataCommand()) // FIXME arguments?
         fun getSleepData(startTime: Int, endTime: Int) = enqueueCommand(WatchGetSleepDataCommand(startTime, endTime))
+        fun getRawBpData(startTime: Int, endTime: Int) = enqueueCommand(WatchGetRawBpDataCommand(startTime, endTime))
         fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
         fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
         fun getWatchFace() = enqueueCommand(WatchGetWatchFaceCommand())
         fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
+        fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
 
         fun addListener(that: WatchListener): WatchCommunicationService {
             return this@WatchCommunicationService.addListener(that)
