@@ -146,7 +146,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
     }
 
     override fun onBigWatchRawResponse(response: WatchRawResponse) {
-        // FIXME handle alarm maybe
         Log.d(TAG, "MainActivity: big watch raw response ${response}")
     }
 
