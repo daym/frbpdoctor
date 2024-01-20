@@ -203,13 +203,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val watchMacAddressPreference = findPreference<Preference>("watchMacAddress") as RxBleDevicePreference
         watchMacAddressPreference.setDevice2(device)
 
-        val data = scanResult.scanRecord.manufacturerSpecificData
-        val k = data.keyAt(0) // 2257
-        val key = data.valueAt(0).copyOfRange(0, 16)
-        val keyDigest = MessageDigest.getInstance("MD5").digest(key)
+        val key = scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
+        //val k = data.keyAt(0) // 2257
+        //val key = data.valueAt(0).copyOfRange(0, 16)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        // Assumption: We never want the user to be able to edit keyDigest.
-        AppSettings.setKeyDigest(sharedPreferences, keyDigest)
+        AppSettings.setWatchKey(requireContext(), sharedPreferences, key)
+
         // Note: It's possible that scanning doesn't find anything when we are already connected.
         AppSettings.getUserId(sharedPreferences)?.let { userId ->
             // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)

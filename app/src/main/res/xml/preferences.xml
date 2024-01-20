@@ -13,13 +13,6 @@
         android:title="Watch"
         android:dialogTitle="Select your watch" />
 
-    <!-- TODO remove -->
-    <EditTextPreference
-        android:key="watchKeyDigest"
-        android:title="Watch Key Digest"
-        android:summary="Key digest used for communication with the watch"
-        />
-
     <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
         android:key="userWeight"
         android:title="Weight"

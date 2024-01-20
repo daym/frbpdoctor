@@ -2,9 +2,11 @@ package com.friendly_machines.frbpdoctor.service
 
 import android.app.Service
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.IBinder
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -38,6 +40,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchUnbindCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 import io.reactivex.rxjava3.subjects.PublishSubject
+import java.security.MessageDigest
 import java.util.Calendar
 import kotlin.system.exitProcess
 
@@ -86,8 +89,9 @@ class WatchCommunicationService : Service(), WatchListener {
                 showSetMandatorySettingsDialog()
             } else {
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-                val keyDigest = AppSettings.getKeyDigest(sharedPreferences)
-                if (keyDigest != null) {
+                val key = AppSettings.getWatchKey(this, sharedPreferences)
+                if (key != null) {
+                    val keyDigest = MessageDigest.getInstance("MD5").digest(key)
                     this.setKeyDigest(keyDigest)
                     val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
                     val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
@@ -125,9 +129,6 @@ class WatchCommunicationService : Service(), WatchListener {
 //        }
         fun setProfile(height: Byte, weight: Byte, sex: Byte, age: Byte) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@WatchCommunicationService)
-            AppSettings.getKeyDigest(sharedPreferences)?.let {
-                setKeyDigest(it)
-            }
             enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
         }
 
@@ -215,6 +216,12 @@ class WatchCommunicationService : Service(), WatchListener {
     override fun onWatchResponse(response: WatchResponse) {
         when (response) {
             is WatchResponse.DeviceInfo -> {
+                // FIXME If you say the exact right things, this will return status=0. Otherwise it will never respond.
+                val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+                val key = AppSettings.getWatchKey(this, sharedPreferences)
+                if (key != null) {
+                    enqueueCommand(WatchBindCommand(4711, key))
+                }
             }
 
             else -> {
@@ -234,4 +241,3 @@ class WatchCommunicationService : Service(), WatchListener {
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
     }
 }
-

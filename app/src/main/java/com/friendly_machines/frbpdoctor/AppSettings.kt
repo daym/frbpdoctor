@@ -1,7 +1,15 @@
 package com.friendly_machines.frbpdoctor
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import android.util.Base64
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.spec.GCMParameterSpec
+
 
 object AppSettings {
     const val KEY_USER_ID = "userId"
@@ -9,10 +17,63 @@ object AppSettings {
     const val KEY_USER_HEIGHT = "userHeight"
     const val KEY_USER_SEX = "userSex"
     const val KEY_USER_BIRTHDAY = "userBirthday"
-    private const val KEY_WATCH_KEY_DIGEST = "watchKeyDigest" // invisible to the user
+    private const val KEY_WATCH_KEY = "watchKey" // invisible to the user
     const val KEY_WATCH_MAC_ADDRESS = "watchMacAddress"
 
-    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY_DIGEST, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY)
+    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY)
+
+    private const val AndroidKeyStore = "AndroidKeyStore"
+    private const val MAIN_KEY_ALIAS = "FpBpDoctor"
+
+    private var keyStore: KeyStore? = null
+    private fun enableKeyStore() {
+        if (this.keyStore == null) {
+            this.keyStore = KeyStore.getInstance(AndroidKeyStore)
+            this.keyStore!!.load(null)
+            if (!keyStore!!.containsAlias(MAIN_KEY_ALIAS)) {
+                val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, AndroidKeyStore)
+                keyGenerator.init(
+                    KeyGenParameterSpec.Builder(MAIN_KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).setRandomizedEncryptionRequired(false).build()
+                );
+                keyGenerator.generateKey()
+            }
+        }
+    }
+
+    private fun getKeyStoreSecretKey(context: Context): java.security.Key {
+        enableKeyStore()
+        return this.keyStore!!.getKey(MAIN_KEY_ALIAS, null);
+    }
+
+    private const val AES_MODE = "AES/GCM/NoPadding"
+    private val FIXED_IV = ByteArray(12)
+    internal fun encrypt(context: Context, clearText: ByteArray): ByteArray {
+        val c = Cipher.getInstance(AES_MODE)
+        c.init(Cipher.ENCRYPT_MODE, getKeyStoreSecretKey(context), GCMParameterSpec(128, FIXED_IV))
+        return c.doFinal(clearText)
+    }
+
+    internal fun decrypt(context: Context, cipherText: ByteArray): ByteArray {
+        val c = Cipher.getInstance(AES_MODE)
+        c.init(Cipher.DECRYPT_MODE, getKeyStoreSecretKey(context), GCMParameterSpec(128, FIXED_IV))
+        return c.doFinal(cipherText)
+    }
+
+    fun getWatchKey(context: Context, sharedPreferences: SharedPreferences): ByteArray? {
+        val watchKeyString = sharedPreferences.getString(KEY_WATCH_KEY, "")
+        if (!watchKeyString.isNullOrEmpty()) {
+            return decrypt(context, Base64.decode(watchKeyString, Base64.DEFAULT))
+        } else {
+            return null
+        }
+    }
+
+    fun setWatchKey(context: Context, sharedPreferences: SharedPreferences, key: ByteArray) {
+        //val keyDigest = MessageDigest.getInstance("MD5").digest(key)
+        sharedPreferences.edit().putString(
+            KEY_WATCH_KEY, Base64.encodeToString(encrypt(context, key), Base64.DEFAULT)
+        ).apply()
+    }
 
     fun getUserId(sharedPreferences: SharedPreferences): Long? {
         val userIdString = sharedPreferences.getString(KEY_USER_ID, "")
@@ -22,13 +83,6 @@ object AppSettings {
             return userId
         }
         return null
-    }
-
-    fun setKeyDigest(sharedPreferences: SharedPreferences, keyDigest: ByteArray) {
-        // FIXME update KEY_WATCH_KEY_DIGEST in GUI
-        sharedPreferences.edit().putString(
-                KEY_WATCH_KEY_DIGEST, Base64.encodeToString(keyDigest, Base64.DEFAULT)
-            ).apply()
     }
 
     fun getMacAddress(sharedPreferences: SharedPreferences): String? {
@@ -43,18 +97,6 @@ object AppSettings {
 
     fun clear(sharedPreferences: SharedPreferences) {
         sharedPreferences.edit().clear().apply()
-    }
-
-    fun getKeyDigest(sharedPreferences: SharedPreferences): ByteArray? {
-        val keyDigestBase64 = sharedPreferences.getString(KEY_WATCH_KEY_DIGEST, null)
-        return if (keyDigestBase64 != null) {
-            // TODO: This is a workaround to a dumb ordering bug, and in an ideal world it would be unnecessary
-            Base64.decode(
-                keyDigestBase64, Base64.DEFAULT
-            )
-        } else {
-            null
-        }
     }
 
     /** Note: If weight is not set, return 0 */
