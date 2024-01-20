@@ -1,7 +1,5 @@
 package com.friendly_machines.frbpdoctor.watchprotocol
 
-import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
-
 enum class WatchOperation(val code: Short) {
     DeviceInfo(0.toShort()),
     OtaGetFirmwareVersion(1.toShort()),
