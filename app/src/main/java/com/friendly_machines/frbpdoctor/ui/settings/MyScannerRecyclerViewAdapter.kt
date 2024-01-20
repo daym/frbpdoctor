@@ -33,7 +33,7 @@ class MyScannerRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
+        val item = values[position].bleDevice.name
         holder.contentView.text = item.toString()
     }
 
