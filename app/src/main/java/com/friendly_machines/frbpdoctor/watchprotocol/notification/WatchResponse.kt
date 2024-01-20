@@ -309,8 +309,8 @@ sealed class WatchResponse {
         companion object {
             fun parse(buf: ByteBuffer): NotificationFromWatch {
                 val eventCode: Byte = buf.get()
-                // TODO: status==0 user wants to answer phone call
-                // TODO: status==1 user reconfigured watch (for example language)
+                // TODO: eventCode==0 user wants to answer phone call
+                // TODO: eventCode==1 user reconfigured watch (for example language; but not alarm)
                 return NotificationFromWatch(eventCode = eventCode)
             }
         }
@@ -444,7 +444,7 @@ sealed class WatchResponse {
                 WatchOperation.GetAlarm -> GetAlarm.parse(buf)
                 WatchOperation.CurrentStep -> CurrentStep.parse(buf)
                 WatchOperation.SetMessage -> SetMessage.parse(buf)
-                else -> {
+                else -> { // TODO remove
                     val b = ByteArray(buf.remaining())
                     buf.get(b)
                     Unknown(operation.code, b)
