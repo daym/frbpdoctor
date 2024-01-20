@@ -29,7 +29,7 @@
     <string name="title_health">Health</string>
     <string name="fragment_health">Health</string>
     <string name="clock">Clock</string>
-    <string name="SetAlarm">Set Alarm...</string>
+    <string name="AddAlarm">Add Alarm…</string>
     <string name="settings_activity_title">Settings</string>
     <string name="blood_pressure_title">Blood Pressure</string>
     <string name="steps_title">Steps</string>

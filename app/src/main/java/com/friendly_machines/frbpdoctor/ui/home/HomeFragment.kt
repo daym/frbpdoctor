@@ -75,20 +75,6 @@ class HomeFragment : Fragment() {
         //svgImageView = view.findViewById(R.id.clockView)
         //loadAndDisplaySVG(requireContext())
 
-        val alarmTimeButton = binding.alarmTimeButton
-        val alarmTimePicker = binding.alarmTimePicker
-        alarmTimeButton.setOnClickListener {
-            alarmTimePicker.visibility = View.VISIBLE
-        }
-        alarmTimePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
-            // Store the selected time in your preferred way (e.g., SharedPreferences)
-            val selectedTime = "$hourOfDay:$minute"
-            // TODO: Store selectedTime
-
-            // Hide TimePicker after selection
-            alarmTimePicker.visibility = View.GONE
-        }
-
         return root
     }
 

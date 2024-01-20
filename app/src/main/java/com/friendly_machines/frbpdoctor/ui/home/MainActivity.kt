@@ -123,13 +123,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
                 response.content
             }
 
-            is WatchResponse.GetAlarm -> { // also has a big response, but that's not this one
-                val alarmTimeButton = supportFragmentManager.findFragmentById(R.id.alarmTimeButton)
-                val alarmTimePicker = supportFragmentManager.findFragmentById(R.id.alarmTimePicker)
-
-                response.count
-            }
-
             is WatchResponse.GetBatteryState -> {
                 response.id
                 response.voltage
