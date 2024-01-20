@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.IBinder
-import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -15,10 +14,10 @@ import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.BLE_L2CAP_ATT_HEADER_SIZE
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeWatchString
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCommunicator
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchBindCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchDeviceInfoCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetAlarmCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetBatteryStateCommand
@@ -128,7 +127,6 @@ class WatchCommunicationService : Service(), WatchListener {
 //            return this@WatchCommunicationService
 //        }
         fun setProfile(height: Byte, weight: Byte, sex: Byte, age: Byte) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@WatchCommunicationService)
             enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
         }
 
