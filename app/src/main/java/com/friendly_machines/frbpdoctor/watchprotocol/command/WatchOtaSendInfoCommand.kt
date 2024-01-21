@@ -11,5 +11,5 @@ import java.nio.ByteOrder
  * - type==4(font) -> 1: u8, file length encoded int, encode be int(0x0100_0000), md5 byte[16] no hex, empty array 16
  * - otherwise(pic) -> byte[64], file length encoded int
  */
-class WatchOtaSendInfoCommand(type: Byte, contents: ByteArray, crc32: Int): WatchCommand(WatchOperation.OtaSendInfo, byteArrayOf(type) + contents + ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(crc32).array()) {
+class WatchOtaSendInfoCommand(type: WatchOtaFirmwareType, contents: ByteArray, crc32: Int): WatchCommand(WatchOperation.OtaSendInfo, byteArrayOf(type.code) + contents + ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(crc32).array()) {
 }

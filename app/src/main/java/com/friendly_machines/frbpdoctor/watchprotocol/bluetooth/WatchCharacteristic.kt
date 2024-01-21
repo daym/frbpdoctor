@@ -1,5 +1,6 @@
 package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 
+import android.os.ParcelUuid
 import android.util.Log
 import com.friendly_machines.frbpdoctor.watchprotocol.Crc16
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
@@ -9,10 +10,12 @@ import java.nio.ByteOrder
 import java.util.UUID
 
 object WatchCharacteristic {
+    val serviceUuid: ParcelUuid = ParcelUuid.fromString("0000FE51-0000-1000-8000-00805F9B34FB")
     val writingPortCharacteristic: UUID = UUID.fromString("00000001-0000-1001-8001-00805F9B07D0")
     val notificationCharacteristic: UUID = UUID.fromString("00000002-0000-1001-8001-00805F9B07D0")
     val bigWritingPortCharacteristic: UUID = UUID.fromString("00000003-0000-1001-8001-00805F9B07D0")
     val bigNotificationCharacteristic: UUID = UUID.fromString("00000004-0000-1001-8001-00805F9B07D0")
+
     fun encodeWatchString(input: String): ByteArray {
         val inputChars = input.toCharArray()
         val buf = ByteBuffer.allocate(inputChars.size * 2).order(ByteOrder.BIG_ENDIAN)

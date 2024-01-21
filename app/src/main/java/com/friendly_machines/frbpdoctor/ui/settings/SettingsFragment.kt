@@ -15,7 +15,6 @@ import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.scan.ScanResult
-import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -204,8 +203,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         watchMacAddressPreference.setDevice2(device)
 
         val key = scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
-        //val k = data.keyAt(0) // 2257
-        //val key = data.valueAt(0).copyOfRange(0, 16)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         AppSettings.setWatchKey(requireContext(), sharedPreferences, key)
 

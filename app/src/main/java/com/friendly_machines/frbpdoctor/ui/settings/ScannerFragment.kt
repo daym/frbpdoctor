@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
+import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
@@ -52,16 +53,16 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_scanner_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_scanner, container, false)
         val that = this
+        val list = view.findViewById<RecyclerView>(R.id.list)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
+        if (list is RecyclerView) {
+            with(list) {
+//                layoutManager = when {
+//                    columnCount <= 1 -> LinearLayoutManager(context)
+//                    else -> GridLayoutManager(context, columnCount)
+//                }
                 that.adapter = MyScannerRecyclerViewAdapter(scanResults,  that)
                 adapter = that.adapter
             }
@@ -132,7 +133,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
 
     private fun scan() {
         val rxBleClient = RxBleClient.create(requireContext())
-        val scanFilter = ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString("0000fe51-0000-1000-8000-00805f9b34fb")).build()
+        val scanFilter = ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()
 
         var scanSubscription = rxBleClient.scanBleDevices(
             ScanSettings.Builder()

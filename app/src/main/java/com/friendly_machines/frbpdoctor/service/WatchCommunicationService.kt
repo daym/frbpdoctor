@@ -29,7 +29,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSleepDataC
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetSportDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetStepDataCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchGetWatchFaceCommand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetAlarmCommand
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchChangeAlarmCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetMessageCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetProfileCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetStepGoalCommand
@@ -37,6 +37,9 @@ import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetTimeComman
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchSetWeatherCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchUnbindCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
+import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchChangeAlarmAction
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchProfileSex
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.security.MessageDigest
@@ -126,7 +129,7 @@ class WatchCommunicationService : Service(), WatchListener {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
 //        }
-        fun setProfile(height: Byte, weight: Byte, sex: Byte, age: Byte) {
+        fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte) {
             enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
         }
 
@@ -137,6 +140,12 @@ class WatchCommunicationService : Service(), WatchListener {
         fun setMessage(type: MessageType, time: Int, title: String, content: String) = enqueueCommand(
             WatchSetMessageCommand(
                 type.code, time, encodeWatchString(title), encodeWatchString(content)
+            )
+        )
+
+        fun setMessage2(type: Byte, time: Int, title: String, content: String) = enqueueCommand(
+            WatchSetMessageCommand(
+                type, time, encodeWatchString(title), encodeWatchString(content) // FIXME
             )
         )
 
@@ -154,11 +163,11 @@ class WatchCommunicationService : Service(), WatchListener {
         fun getBatteryState() = enqueueCommand(WatchGetBatteryStateCommand())
         fun getAlarm() = enqueueCommand(WatchGetAlarmCommand())
 
-        fun setAlarm(
-            action: Byte, // 0
-            id: Int, open: Byte, hour: Byte, min: Byte, title: Byte, repeats: ByteArray
+        fun changeAlarm(
+            action: WatchChangeAlarmAction,
+            id: Int, open: Byte, hour: Byte, min: Byte, title: AlarmTitle, repeats: BooleanArray
         ) = enqueueCommand(
-            WatchSetAlarmCommand(action, id, open, hour, min, title, repeats),
+            WatchChangeAlarmCommand(action, id, open, hour, min, title, repeats),
         )
 
         fun bindWatch(userId: Long, key: ByteArray) = enqueueCommand(

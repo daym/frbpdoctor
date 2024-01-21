@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchProfileSex
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -114,16 +115,16 @@ object AppSettings {
         return sharedPreferences.getString(KEY_USER_BIRTHDAY, "")
     }
 
-    private fun getSex(sharedPreferences: SharedPreferences): Byte? {
+    private fun getSex(sharedPreferences: SharedPreferences): WatchProfileSex? {
         val sexString = sharedPreferences.getString(KEY_USER_SEX, "")
         return if (!sexString.isNullOrEmpty()) {
-            sexString.toInt().toByte()
+            WatchProfileSex.parse(sexString.toInt().toByte())
         } else {
             null
         }
     }
 
-    data class Profile(val height: Byte, val weight: Byte, val birthdayString: String, val sex: Byte)
+    data class Profile(val height: Byte, val weight: Byte, val birthdayString: String, val sex: WatchProfileSex)
 
     fun getProfileSettings(sharedPreferences: SharedPreferences): Profile? {
         val weight = getWeight(sharedPreferences)
