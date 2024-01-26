@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import java.util.Calendar
 
@@ -62,7 +62,7 @@ class WeatherFragment : Fragment() {
             val weatherDayOfMonth = Integer.parseUnsignedInt(weatherDayOfMonthTextNumber.text.toString()).toByte()
             val weatherDayOfWeekMondayBased = Integer.parseUnsignedInt(weatherDayOfWeekMondayBasedTextNumber.text.toString()).toByte()
             val weatherLocation = weatherLocationEditView.text.toString()
-            WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetWeather(0)) { binder ->
+            WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetWeather(0)) { binder ->
                 binder.setWeather(weatherType, temp, weatherMaxTemp, weatherMinTemp, dummy, weatherMonth, weatherDayOfMonth, weatherDayOfWeekMondayBased, weatherLocation)
             }
         }

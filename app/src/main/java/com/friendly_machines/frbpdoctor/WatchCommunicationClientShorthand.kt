@@ -7,12 +7,13 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 
-object WatchCommunicationServiceClientShorthand {
+object WatchCommunicationClientShorthand {
     private const val TAG = "WatchCommunicationServiceClientShorthand"
     /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
     private fun bind(context: Context, callback: (ServiceConnection, WatchCommunicationService.WatchCommunicationServiceBinder) -> WatchCommunicationService): ServiceConnection? {
@@ -61,6 +62,7 @@ object WatchCommunicationServiceClientShorthand {
                     }
                     if (response.javaClass == expectedResponse.javaClass) {
                         Log.e(SettingsFragment.TAG, "Command ended in unexpected response $response")
+                        Toast.makeText(context, "Command ended in unexpected response $response", Toast.LENGTH_SHORT).show()
                         context.unbindService(serviceConnection)
                     } else {
                         // Ignore the ones that have the wrong type, assuming that we will eventually get our response.

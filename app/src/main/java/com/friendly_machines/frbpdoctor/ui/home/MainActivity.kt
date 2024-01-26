@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
 
     override fun onStart() {
         super.onStart()
-        this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
+        this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
             binder.setTime()
             binder.getBatteryState()
             binder.getWatchFace() // ok but response is weird
@@ -104,7 +104,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
         }
         super.onStop()
     }
-
 
     override fun onWatchResponse(response: WatchResponse) {
         Log.d(TAG, response.toString())

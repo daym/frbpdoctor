@@ -12,7 +12,7 @@ import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.scan.ScanResult
 import java.text.SimpleDateFormat
@@ -32,13 +32,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     private fun unbindWatch() {
-        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Unbind(0)) {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Unbind(0)) {
             it.unbindWatch()
         }
     }
 
     private fun bindWatch(userId: Long, key: ByteArray) {
-        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Bind(0)) {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Bind(0)) {
             // Just in case the watch was bound somewhere else, unbind it. Better not.
             //it.unbindWatch()
             it.bindWatch(userId, key)
@@ -49,7 +49,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val age = calculateYearsSinceDate(profile.birthdayString)
         assert(age < 256)
         assert(age > 0)
-        WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetProfile(0)) {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetProfile(0)) {
             it.setProfile(profile.height, profile.weight, profile.sex, age.toByte())
         }
     }

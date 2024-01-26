@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
@@ -44,7 +44,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
 
     override fun onStart() {
         super.onStart()
-        this.serviceConnection = WatchCommunicationServiceClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
+        this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
             // TODO don't have magic numbers
             when (binding.viewPager.currentItem) {
                 0 -> binder.getBpData()

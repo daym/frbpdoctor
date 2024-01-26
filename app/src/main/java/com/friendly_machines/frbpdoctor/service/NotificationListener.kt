@@ -4,7 +4,7 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import com.friendly_machines.frbpdoctor.WatchCommunicationServiceClientShorthand
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageEncodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
@@ -36,7 +36,7 @@ class NotificationListener : NotificationListenerService() {
             }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
                 Log.i(TAG, "Notification Posted: " + sbn.packageName)
-                WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
                     try {
                         // TODO what if the call was hung up by the user via the phone?
                         // TODO if there is a new call, keep the WatchCommunicationService alive for a while so we can send further messages (like hangup) to the watch.
