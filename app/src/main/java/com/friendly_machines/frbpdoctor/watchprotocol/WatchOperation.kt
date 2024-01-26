@@ -15,7 +15,6 @@ enum class WatchOperation(val code: Short) {
     CurrentHeat(28.toShort()),
     GetSportData(29.toShort()),
     GetBpData(30.toShort()),
-    // TODO investigate 33 maybe
     GetBatteryState(42.toShort()),
     SetTime(43.toShort()),
     SetWeather(44.toShort()),
