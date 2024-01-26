@@ -1,13 +1,16 @@
 package com.friendly_machines.frbpdoctor.service
 
+import android.Manifest
 import android.app.Service
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.IBinder
+import android.telecom.TelecomManager
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
@@ -46,6 +49,7 @@ import java.security.MessageDigest
 import java.util.Calendar
 import kotlin.system.exitProcess
 
+/** Note: This service will accept calls when user clicks the respective button on the watch. */
 class WatchCommunicationService : Service(), WatchListener {
     companion object {
         const val TAG: String = "WatchCommunicationService"
@@ -220,6 +224,16 @@ class WatchCommunicationService : Service(), WatchListener {
         return this
     }
 
+    private fun acceptIncomingCall() {
+        val telecomManager = this.getSystemService(TELECOM_SERVICE) as TelecomManager
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(this, Manifest.permission.MODIFY_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO use InCallService instead
+            telecomManager.acceptRingingCall()
+        }
+    }
+
     override fun onWatchResponse(response: WatchResponse) {
         when (response) {
             is WatchResponse.DeviceInfo -> {
@@ -228,6 +242,14 @@ class WatchCommunicationService : Service(), WatchListener {
                 if (key != null) {
                     // Note: If you say the exact right things, this will return status=0. Otherwise, it will never respond.
                     enqueueCommand(WatchBindCommand(4711, key))
+                }
+            }
+
+            is WatchResponse.NotificationFromWatch -> {
+                Toast.makeText(this, "Got notification from watch: ${response.eventCode}", Toast.LENGTH_LONG).show()
+
+                if (response.eventCode == WatchResponse.NotificationFromWatch.EVENT_CODE_ANSWER_PHONE_CALL) {
+                    acceptIncomingCall()
                 }
             }
 
