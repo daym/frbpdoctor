@@ -38,6 +38,8 @@ class NotificationListener : NotificationListenerService() {
                 Log.i(TAG, "Notification Posted: " + sbn.packageName)
                 WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
                     try {
+                        // TODO what if the call was hung up by the user via the phone?
+                        // TODO if there is a new call, keep the WatchCommunicationService alive for a while so we can send further messages (like hangup) to the watch.
                         binder.setMessage(
                             when (notification.category) {
                                 Notification.CATEGORY_CALL -> MessageType.NewCall
