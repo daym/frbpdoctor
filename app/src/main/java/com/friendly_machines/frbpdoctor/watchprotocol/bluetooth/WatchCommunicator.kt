@@ -344,39 +344,17 @@ class WatchCommunicator {
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
                             val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-                            val packetIndex = decodeVariableLengthInteger(buf)
-                            if (packetIndex == 0) {
-                                val messageLength = decodeVariableLengthInteger(buf)
-                                //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
-                                val protocolVersion = buf.get() / 16 // rest is reserved
-                                Log.i(TAG, "Watch protocol version is $protocolVersion")
-                                assert(protocolVersion == 4)
-                                // TODO: Collect together enough packets to have messageLength
-                                assert(messageLength == buf.array().size - buf.position())
-                                onNotificationReceived(buf)
-                            } else {
-                                Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
-                                notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
+                            bufferPacket(buf)?.let {
+                                onNotificationReceived(it)
                             }
                         }
 
                         setupNotifications(bigNotificationCharacteristic) { input ->
                             Log.d(TAG, "Big notification received: ${input.contentToString()}")
                             val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-                            val packetIndex = decodeVariableLengthInteger(buf)
-                            if (packetIndex == 0) {
-                                val messageLength = decodeVariableLengthInteger(buf)
-                                //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
-                                val protocolVersion = buf.get() / 16 // rest is reserved
-                                Log.i(TAG, "Watch protocol version is $protocolVersion")
-                                assert(protocolVersion == 4)
-                                // TODO: Collect together enough packets to have messageLength
-                                assert(messageLength == buf.array().size - buf.position())
+                            bufferPacket(buf)?.let {
                                 // note: big: messageLengthRaw - 17 is the total payload len
-                                onBigNotificationReceived(buf)
-                            } else {
-                                Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
-                                notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
+                                onBigNotificationReceived(it)
                             }
                         }
 
@@ -408,6 +386,25 @@ class WatchCommunicator {
                     }
                 })
         )
+    }
+
+    /** Add the given packet to the buffer. If we can assemble an entire message, return that message. */
+    private fun bufferPacket(buf: ByteBuffer): ByteBuffer? {
+        val packetIndex = decodeVariableLengthInteger(buf)
+        if (packetIndex == 0) {
+            val messageLength = decodeVariableLengthInteger(buf)
+            //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
+            val protocolVersion = buf.get() / 16 // rest is reserved
+            Log.i(TAG, "Watch protocol version is $protocolVersion")
+            assert(protocolVersion == 4)
+            // TODO: Collect together enough packets to have messageLength
+            assert(messageLength == buf.array().size - buf.position())
+            return buf
+        } else {
+            Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
+            notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
+            return null
+        }
     }
 
     fun setKeyDigest(keyDigest: ByteArray) {
