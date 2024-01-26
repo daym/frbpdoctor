@@ -11,6 +11,7 @@ import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
+import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
@@ -45,18 +46,7 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     override fun onStart() {
         super.onStart()
         this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-            // TODO don't have magic numbers
-            when (binding.viewPager.currentItem) {
-                0 -> binder.getBpData()
-                1 -> binder.getStepData()
-                2 -> binder.getHeatData()
-                3 -> binder.getSleepData(1701730800, 1702162800)
-                4 -> binder.getSportData()
-                5 -> binder.getAlarm()
-            }
-
-            // TODO WatchCommand.CurrentStep probably history
-            // TODO WatchCommand.CurrentHeat probably history
+            (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
         }
     }
 

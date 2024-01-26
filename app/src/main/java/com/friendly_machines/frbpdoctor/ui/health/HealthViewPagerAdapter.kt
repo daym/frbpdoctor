@@ -3,6 +3,7 @@ package com.friendly_machines.frbpdoctor.ui.health
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 
 class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
@@ -32,4 +33,16 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
             else -> return "Sleep"
         }
     }
+
+    fun requestData(currentItem: Int, binder: WatchCommunicationService.WatchCommunicationServiceBinder) {
+        when (currentItem) {
+            0 -> binder.getBpData()
+            1 -> binder.getStepData()
+            2 -> binder.getHeatData()
+            3 -> binder.getSleepData(1701730800, 1702162800)
+            4 -> binder.getSportData()
+            5 -> binder.getAlarm()
+        }
+    }
+
 }
