@@ -329,6 +329,26 @@ class WatchCommunicator {
         }
     }
 
+    /** Add the given packet to the buffer. If we can assemble an entire message, return that message. */
+    private fun bufferPacket(input: ByteArray): ByteBuffer? {
+        val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
+        val packetIndex = decodeVariableLengthInteger(buf)
+        if (packetIndex == 0) {
+            val messageLength = decodeVariableLengthInteger(buf)
+            //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
+            val protocolVersion = buf.get() / 16 // rest is reserved
+            Log.i(TAG, "Watch protocol version is $protocolVersion")
+            assert(protocolVersion == 4)
+            // TODO: Collect together enough packets to have messageLength
+            assert(messageLength == buf.array().size - buf.position())
+            return buf
+        } else {
+            Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
+            notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
+            return null
+        }
+    }
+
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
     fun start(bleDevice: RxBleDevice, commandQueue: Subject<WatchCommand>) {
         assert(!this.connecting)
@@ -384,26 +404,6 @@ class WatchCommunicator {
                     }
                 })
         )
-    }
-
-    /** Add the given packet to the buffer. If we can assemble an entire message, return that message. */
-    private fun bufferPacket(input: ByteArray): ByteBuffer? {
-        val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-        val packetIndex = decodeVariableLengthInteger(buf)
-        if (packetIndex == 0) {
-            val messageLength = decodeVariableLengthInteger(buf)
-            //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
-            val protocolVersion = buf.get() / 16 // rest is reserved
-            Log.i(TAG, "Watch protocol version is $protocolVersion")
-            assert(protocolVersion == 4)
-            // TODO: Collect together enough packets to have messageLength
-            assert(messageLength == buf.array().size - buf.position())
-            return buf
-        } else {
-            Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
-            notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
-            return null
-        }
     }
 
     fun setKeyDigest(keyDigest: ByteArray) {
