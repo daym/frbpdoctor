@@ -82,19 +82,18 @@ class WatchCommunicator {
         }))
     }
 
-    private fun setupNotifications(characteristicUuid: UUID) {
+    private fun setupNotifications(characteristicUuid: UUID, callback: (input: ByteArray) -> Unit) {
         try {
             val notificationObservable: Observable<ByteArray> = connection!!.setupNotification(characteristicUuid).flatMap { it }
 
             // FIXME also discoverServices ("andThen")
 
-            val disposable = notificationObservable
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ data -> onNotificationReceived(characteristicUuid, data) }, { throwable ->
-                    run {
-                        Log.e(TAG, "Notification error: $throwable")
-                        notifyListenersOfException(throwable)
-                    }
-                })
+            val disposable = notificationObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(callback) { throwable ->
+                run {
+                    Log.e(TAG, "Notification error: $throwable")
+                    notifyListenersOfException(throwable)
+                }
+            }
 
             bleDisposables.add(disposable)
         } catch (e: BleCharacteristicNotFoundException) {
@@ -162,8 +161,49 @@ class WatchCommunicator {
     private var sendingSequenceNumber = AtomicInteger(1) // verified; our first packet after the reset packet needs to be with sendingSequenceNumber > 0
 
     //private var receivingBuffers = ConcurrentHashMap<Int, Pair<Int, ByteArrayOutputStream>>() // packet_0_serial -> (current_serial, buffer)
-    private fun onNotificationReceived(characteristicUuid: UUID, input: ByteArray) {
-        Log.d(TAG, "Notification received: ${characteristicUuid}: ${input.contentToString()}")
+    private fun onNotificationReceived(input: ByteArray) {
+        Log.d(TAG, "Notification received: ${input.contentToString()}")
+        val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
+        val packetIndex = decodeVariableLengthInteger(buf)
+        if (packetIndex == 0) {
+            val messageLength = decodeVariableLengthInteger(buf)
+            //receivingBuffers[command] = Pair(messageLength, ByteArrayOutputStream())
+            val protocolVersion = buf.get() / 16 // rest is reserved
+            Log.i(TAG, "Watch protocol version is $protocolVersion")
+            assert(protocolVersion == 4)
+            // TODO: Collect together enough packets to have messageLength
+            assert(messageLength == buf.array().size - buf.position())
+        } else {
+            Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
+            notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
+        }
+        val result = try {
+            decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
+        } catch (e: WatchMessageDecodingException) {
+            notifyListenersOfException(e)
+            return
+        } catch (e: BufferUnderflowException) {
+            notifyListenersOfException(e)
+            return
+        }
+        if (result.command.toInt() == 0) { // resets sequence numbers
+            sendingSequenceNumber.set(1) // verified.
+            // Note: sequenceNumber == 0, ackedSequenceNumber == 1--8
+        }
+
+        val response = WatchResponse.parse(
+            result.command, ByteBuffer.wrap(result.arguments)
+        )
+        Log.d(TAG, "-> decoded: $response")
+        listeners.forEach {
+            when (result.command) {
+                else -> it.onWatchResponse(response)
+            }
+        }
+    }
+
+    private fun onBigNotificationReceived(input: ByteArray) {
+        Log.d(TAG, "Big notification received: ${input.contentToString()}")
         val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
         val packetIndex = decodeVariableLengthInteger(buf)
         if (packetIndex == 0) {
@@ -179,44 +219,18 @@ class WatchCommunicator {
             Log.e(TAG, "Internal error: Watch protocol buffering not implemented")
             notifyListenersOfException(RuntimeException("watch protocol buffering not implemented"))
         }
-        if (notificationCharacteristic == characteristicUuid) {
-            val result = try {
-                decodeMessage(ByteBuffer.wrap(decryptMessage(buf)))
-            } catch (e: WatchMessageDecodingException) {
-                notifyListenersOfException(e)
-                return
-            } catch (e: BufferUnderflowException) {
-                notifyListenersOfException(e)
-                return
-            }
-            if (result.command.toInt() == 0) { // resets sequence numbers
-                sendingSequenceNumber.set(1) // verified.
-                // Note: sequenceNumber == 0, ackedSequenceNumber == 1--8
-            }
-
-            val response = WatchResponse.parse(
-                result.command, ByteBuffer.wrap(result.arguments)
-            )
-            Log.d(TAG, "-> decoded: $response")
-            listeners.forEach {
-                when (result.command) {
-                    else -> it.onWatchResponse(response)
-                }
-            }
-        } else if (bigNotificationCharacteristic == characteristicUuid) {
-            val result = try {
-                decodeBigMessage(ByteBuffer.wrap(decryptMessage(buf)))
-            } catch (e: WatchMessageDecodingException) {
-                notifyListenersOfException(e)
-                return
-            } catch (e: BufferUnderflowException) {
-                notifyListenersOfException(e)
-                return
-            }
-            listeners.forEach {
-                when (result.command) {
-                    else -> it.onBigWatchRawResponse(rawResponse = result)
-                }
+        val result = try {
+            decodeBigMessage(ByteBuffer.wrap(decryptMessage(buf)))
+        } catch (e: WatchMessageDecodingException) {
+            notifyListenersOfException(e)
+            return
+        } catch (e: BufferUnderflowException) {
+            notifyListenersOfException(e)
+            return
+        }
+        listeners.forEach {
+            when (result.command) {
+                else -> it.onBigWatchRawResponse(rawResponse = result)
             }
         }
     }
@@ -358,8 +372,14 @@ class WatchCommunicator {
                         Log.d(TAG, "Connection established")
 
                         this.connection = connection
-                        setupNotifications(bigNotificationCharacteristic)
-                        setupNotifications(notificationCharacteristic)
+                        setupNotifications(notificationCharacteristic) { data ->
+                            onNotificationReceived(data)
+                        }
+
+                        setupNotifications(bigNotificationCharacteristic) { data ->
+                            onBigNotificationReceived(data)
+                        }
+
                         setupSender(commandQueue = commandQueue)
 
                         val disposable = connection.requestMtu(256).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ mtu ->
