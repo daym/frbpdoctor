@@ -14,7 +14,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 
 object WatchCommunicationClientShorthand {
-    private const val TAG = "WatchCommunicationServiceClientShorthand"
+    private const val TAG = "WatchCommunicationClientShorthand"
     /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
     private fun bind(context: Context, callback: (ServiceConnection, WatchCommunicationService.WatchCommunicationServiceBinder) -> WatchCommunicationService): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
