@@ -39,7 +39,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun bindWatch(userId: Long, key: ByteArray) {
         WatchCommunicationServiceClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Bind(0)) {
-            it.unbindWatch()
+            // Just in case the watch was bound somewhere else, unbind it. Better not.
+            //it.unbindWatch()
             it.bindWatch(userId, key)
         }
     }
@@ -80,13 +81,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val clearPreferencesPreference = findPreference<Preference>("clear_preferences")
         clearPreferencesPreference?.setOnPreferenceClickListener {
             clearAllPreferences()
-            // TODO message here
             true
         }
 
         val watchMacAddressPreference = findPreference<Preference>("watchMacAddress")
         watchMacAddressPreference?.setOnPreferenceClickListener {
-            unbindWatch()
+            val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            if (AppSettings.getMacAddress(sharedPreferences) != null) {
+                Toast.makeText(requireContext(), "Cannot bind to another watch at the same time. Please clear settings here first in order to unbind from the other watch.", Toast.LENGTH_LONG).show()
+            }
             true
         }
     }
@@ -109,11 +112,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 super.onDisplayPreferenceDialog(preference)
             }
         }
-        if (preference.key == "watchMacAddress") {
-            val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val macAddress = AppSettings.getMacAddress(sharedPreferences)
-            preference.summary = macAddress
-        }
     }
 
     /**
@@ -128,6 +126,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             p.setSummaryProvider(DatePreference.SimpleSummaryProvider.instance)
         } else if (p is EditTextPreference) {
             p.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
+        } else if (p is RxBleDevicePreference) {
+            p.summaryProvider = RxBleDevicePreference.SimpleSummaryProvider.instance
         }
     }
 
