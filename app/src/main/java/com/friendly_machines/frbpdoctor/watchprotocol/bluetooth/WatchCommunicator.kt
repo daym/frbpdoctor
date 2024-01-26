@@ -24,6 +24,7 @@ import com.polidea.rxandroidble3.exceptions.BleGattException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
 import java.nio.BufferUnderflowException
@@ -349,6 +350,26 @@ class WatchCommunicator {
         }
     }
 
+    private fun requestMtu(connection: RxBleConnection) {
+        val disposable = connection.requestMtu(256).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ mtu ->
+            run {
+                // mtu: 251
+                this.mtu = mtu
+                this.maxPacketPayloadSize = (mtu - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE).coerceAtMost(251 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE)
+
+                listeners.forEach {
+                    it.onMtuResponse(mtu)
+                }
+            }
+        }, { throwable ->
+            run {
+                Log.e(TAG, "MTU request failed: $throwable")
+                notifyListenersOfException(throwable)
+            }
+        })
+        bleDisposables.add(disposable)
+    }
+
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
     fun start(bleDevice: RxBleDevice, commandQueue: Subject<WatchCommand>) {
         assert(!this.connecting)
@@ -359,7 +380,6 @@ class WatchCommunicator {
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
-
                         this.connection = connection
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
@@ -367,7 +387,6 @@ class WatchCommunicator {
                                 onNotificationReceived(it)
                             }
                         }
-
                         setupNotifications(bigNotificationCharacteristic) { input ->
                             Log.d(TAG, "Big notification received: ${input.contentToString()}")
                             bufferPacket(input)?.let {
@@ -375,27 +394,8 @@ class WatchCommunicator {
                                 onBigNotificationReceived(it)
                             }
                         }
-
                         setupSender(commandQueue = commandQueue)
-
-                        val disposable = connection.requestMtu(256).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ mtu ->
-                            run {
-                                // mtu: 251
-                                this.mtu = mtu
-                                this.maxPacketPayloadSize = (mtu - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE).coerceAtMost(251 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE)
-
-                                listeners.forEach {
-                                    it.onMtuResponse(mtu)
-                                }
-                            }
-                        }, { throwable ->
-                            run {
-                                Log.e(TAG, "MTU request failed: $throwable")
-                                notifyListenersOfException(throwable)
-                            }
-                        })
-
-                        bleDisposables.add(disposable)
+                        requestMtu(connection)
                     }
                 }, { throwable ->
                     run {
