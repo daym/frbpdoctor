@@ -223,10 +223,10 @@ class WatchCommunicationService : Service(), WatchListener {
     override fun onWatchResponse(response: WatchResponse) {
         when (response) {
             is WatchResponse.DeviceInfo -> {
-                // FIXME If you say the exact right things, this will return status=0. Otherwise it will never respond.
                 val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
                 val key = AppSettings.getWatchKey(this, sharedPreferences)
                 if (key != null) {
+                    // Note: If you say the exact right things, this will return status=0. Otherwise, it will never respond.
                     enqueueCommand(WatchBindCommand(4711, key))
                 }
             }
