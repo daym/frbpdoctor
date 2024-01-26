@@ -51,7 +51,8 @@ class HealthActivity : AppCompatActivity(), WatchListener {
                 1 -> binder.getStepData()
                 2 -> binder.getHeatData()
                 3 -> binder.getSleepData(1701730800, 1702162800)
-                4 -> binder.getAlarm()
+                4 -> binder.getSportData()
+                5 -> binder.getAlarm()
             }
 
             // TODO WatchCommand.CurrentStep probably history
@@ -150,6 +151,13 @@ class HealthActivity : AppCompatActivity(), WatchListener {
             is WatchBigResponse.GetAlarm -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is AlarmFragment) {
+                        fragment.setData(response.data)
+                    }
+                }
+            }
+            is WatchBigResponse.GetSportData -> {
+                for (fragment in supportFragmentManager.fragments) {
+                    if (fragment is SportFragment) {
                         fragment.setData(response.data)
                     }
                 }

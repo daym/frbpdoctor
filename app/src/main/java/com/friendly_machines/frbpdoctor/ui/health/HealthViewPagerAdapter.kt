@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return 5
+        return 6
     }
 
     override fun createFragment(position: Int): Fragment {
@@ -15,7 +15,8 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
             1 -> return StepsFragment()
             2 -> return HeatFragment()
             3 -> return SleepFragment()
-            4 -> return AlarmFragment()
+            4 -> return SportFragment()
+            5 -> return AlarmFragment()
             else -> return SleepFragment()
         }
     }
@@ -26,7 +27,8 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
             1 -> return "Steps"
             2 -> return "Heat"
             3 -> return "Sleep"
-            4 -> return "Alarm"
+            4 -> return "Sport"
+            5 -> return "Alarm"
             else -> return "Sleep"
         }
     }
