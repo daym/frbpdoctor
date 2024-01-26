@@ -343,16 +343,14 @@ class WatchCommunicator {
                         this.connection = connection
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
-                            val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-                            bufferPacket(buf)?.let {
+                            bufferPacket(input)?.let {
                                 onNotificationReceived(it)
                             }
                         }
 
                         setupNotifications(bigNotificationCharacteristic) { input ->
                             Log.d(TAG, "Big notification received: ${input.contentToString()}")
-                            val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
-                            bufferPacket(buf)?.let {
+                            bufferPacket(input)?.let {
                                 // note: big: messageLengthRaw - 17 is the total payload len
                                 onBigNotificationReceived(it)
                             }
@@ -389,7 +387,8 @@ class WatchCommunicator {
     }
 
     /** Add the given packet to the buffer. If we can assemble an entire message, return that message. */
-    private fun bufferPacket(buf: ByteBuffer): ByteBuffer? {
+    private fun bufferPacket(input: ByteArray): ByteBuffer? {
+        val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
         val packetIndex = decodeVariableLengthInteger(buf)
         if (packetIndex == 0) {
             val messageLength = decodeVariableLengthInteger(buf)
