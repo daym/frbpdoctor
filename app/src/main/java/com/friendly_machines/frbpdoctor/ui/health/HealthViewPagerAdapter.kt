@@ -12,25 +12,25 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> return BloodPressureFragment()
-            1 -> return StepsFragment()
-            2 -> return HeatFragment()
-            3 -> return SleepFragment()
-            4 -> return SportFragment()
-            5 -> return AlarmFragment()
-            else -> return SleepFragment()
+            0 -> BloodPressureFragment()
+            1 -> StepsFragment()
+            2 -> HeatFragment()
+            3 -> SleepFragment()
+            4 -> SportFragment()
+            5 -> AlarmFragment()
+            else -> SleepFragment()
         }
     }
 
     fun getTabTitle(position: Int): CharSequence? {
         return when (position) {
-            0 -> return "Blood Pressure"
-            1 -> return "Steps"
-            2 -> return "Heat"
-            3 -> return "Sleep"
-            4 -> return "Sport"
-            5 -> return "Alarm"
-            else -> return "Sleep"
+            0 -> "Blood Pressure"
+            1 -> "Steps"
+            2 -> "Heat"
+            3 -> "Sleep"
+            4 -> "Sport"
+            5 -> "Alarm"
+            else -> null
         }
     }
 

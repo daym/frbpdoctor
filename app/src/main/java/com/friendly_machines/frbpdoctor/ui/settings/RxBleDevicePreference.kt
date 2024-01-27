@@ -46,11 +46,6 @@ class RxBleDevicePreference(context: Context?, attrs: AttributeSet?) : DialogPre
         notifyChanged()
     }
 
-    /**
-     * A simple [SummaryProvider] implementation for an
-     * [RxBleDevicePreference]. If no value has been set, the summary displayed will be 'Not
-     * set', otherwise the summary displayed will be the value set for this preference.
-     */
     class SimpleSummaryProvider private constructor() : SummaryProvider<RxBleDevicePreference?> {
         override fun provideSummary(preference: RxBleDevicePreference): CharSequence? {
             return if (preference.device == null) {
@@ -62,14 +57,6 @@ class RxBleDevicePreference(context: Context?, attrs: AttributeSet?) : DialogPre
 
         companion object {
             private var simpleSummaryProvider: SimpleSummaryProvider? = null
-
-            /**
-             * Retrieve a singleton instance of this simple
-             * [SummaryProvider] implementation.
-             *
-             * @return a singleton instance of this simple
-             * [SummaryProvider] implementation
-             */
             val instance: SimpleSummaryProvider?
                 get() {
                     if (simpleSummaryProvider == null) {

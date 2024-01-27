@@ -14,9 +14,6 @@ class SportFragment : Fragment() {
 
     private var recyclerView: RecyclerView? = null
 
-    companion object {
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

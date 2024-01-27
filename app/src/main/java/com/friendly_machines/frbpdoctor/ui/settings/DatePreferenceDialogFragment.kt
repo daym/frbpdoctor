@@ -54,7 +54,7 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
     }
 
     private val datePreference: DatePreference
-        private get() = preference as DatePreference
+        get() = preference as DatePreference
 
     private fun getYear(dateString: String?): Int {
         val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()

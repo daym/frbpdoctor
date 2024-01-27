@@ -13,9 +13,6 @@ import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.BpDataBlo
 class BloodPressureFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
-    companion object {
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

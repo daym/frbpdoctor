@@ -132,8 +132,8 @@ class MainActivity : AppCompatActivity(), WatchListener {
         }
     }
 
-    override fun onBigWatchRawResponse(response: WatchRawResponse) {
-        Log.d(TAG, "MainActivity: big watch raw response $response")
+    override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {
+        Log.d(TAG, "MainActivity: big watch raw response $rawResponse")
     }
 
     override fun onException(exception: Throwable) {
