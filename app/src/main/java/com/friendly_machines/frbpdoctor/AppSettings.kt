@@ -99,14 +99,20 @@ object AppSettings {
         sharedPreferences.edit().clear().apply()
     }
 
-    /** Note: If weight is not set, return 0 */
-    private fun getWeight(sharedPreferences: SharedPreferences): Byte {
-        return sharedPreferences.getInt(KEY_USER_WEIGHT, 0).toByte()
+    private fun getWeight(sharedPreferences: SharedPreferences): Byte? {
+        val result = sharedPreferences.getInt(KEY_USER_WEIGHT, 0).toByte()
+        return if (result == 0.toByte())
+            null
+        else
+            result
     }
 
-    /** Note: If height is not set, return 0 */
-    private fun getHeight(sharedPreferences: SharedPreferences): Byte {
-        return sharedPreferences.getInt(KEY_USER_HEIGHT, 0).toByte()
+    private fun getHeight(sharedPreferences: SharedPreferences): Byte? {
+        val result = sharedPreferences.getInt(KEY_USER_HEIGHT, 0).toByte()
+        return if (result == 0.toByte())
+            null
+        else
+            result
     }
 
     /** Note: If birthday is not set, return "" */
@@ -130,7 +136,7 @@ object AppSettings {
         val height = getHeight(sharedPreferences)
         val birthday = getBirthday(sharedPreferences)
         val sex = getSex(sharedPreferences)
-        if (birthday != null && sex != null) {
+        if (birthday != null && sex != null && weight != null && height != null) {
             return Profile(height = height, weight = weight, birthdayString = birthday, sex = sex)
         }
         return null
