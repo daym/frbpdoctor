@@ -421,7 +421,7 @@ class WatchCommunicator {
         )
     }
 
-    fun onDestroy() {
+    fun destroy() {
         bleDisposables.clear()
     }
 

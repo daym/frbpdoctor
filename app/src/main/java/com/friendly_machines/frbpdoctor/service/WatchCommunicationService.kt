@@ -118,7 +118,7 @@ class WatchCommunicationService : Service(), WatchListener {
 
     override fun onDestroy() {
         communicator.removeListener(this)
-        communicator.onDestroy()
+        communicator.destroy()
         super.onDestroy()
         Log.d(TAG, "Service destroyed")
     }
