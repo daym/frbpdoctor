@@ -13,6 +13,20 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
     private var month = 0
     private var day = 0
     private var datePicker: DatePicker? = null
+    private fun getYear(dateString: String?): Int {
+        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return datePieces[0].toInt()
+    }
+
+    private fun getMonth(dateString: String?): Int {
+        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return datePieces[1].toInt()
+    }
+
+    private fun getDay(dateString: String?): Int {
+        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return datePieces[2].toInt()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var dateString = datePreference.text
@@ -27,10 +41,7 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
     }
 
     override fun onCreateDialogView(context: Context): View? {
-        datePicker = DatePicker(getContext())
-        // Show spinner dialog for old APIs.
-        datePicker!!.calendarViewShown = false
-        return datePicker
+        return DatePicker(getContext())
     }
 
     override fun onBindDialogView(view: View) {
@@ -55,21 +66,6 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
 
     private val datePreference: DatePreference
         get() = preference as DatePreference
-
-    private fun getYear(dateString: String?): Int {
-        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        return datePieces[0].toInt()
-    }
-
-    private fun getMonth(dateString: String?): Int {
-        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        return datePieces[1].toInt()
-    }
-
-    private fun getDay(dateString: String?): Int {
-        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        return datePieces[2].toInt()
-    }
 
     companion object {
         fun newInstance(key: String?): DatePreferenceDialogFragment {
