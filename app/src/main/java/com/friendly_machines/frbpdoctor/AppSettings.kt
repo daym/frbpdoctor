@@ -35,7 +35,7 @@ object AppSettings {
                 val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, AndroidKeyStore)
                 keyGenerator.init(
                     KeyGenParameterSpec.Builder(MAIN_KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).setRandomizedEncryptionRequired(false).build()
-                );
+                )
                 keyGenerator.generateKey()
             }
         }
@@ -43,7 +43,7 @@ object AppSettings {
 
     private fun getKeyStoreSecretKey(context: Context): java.security.Key {
         enableKeyStore()
-        return this.keyStore!!.getKey(MAIN_KEY_ALIAS, null);
+        return this.keyStore!!.getKey(MAIN_KEY_ALIAS, null)
     }
 
     private const val AES_MODE = "AES/GCM/NoPadding"

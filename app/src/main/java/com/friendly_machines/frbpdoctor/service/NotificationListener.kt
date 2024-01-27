@@ -15,10 +15,6 @@ class NotificationListener : NotificationListenerService() {
         private const val TAG = "NotificationListener"
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         try {
             val notification = sbn.notification

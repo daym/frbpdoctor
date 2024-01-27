@@ -169,9 +169,9 @@ class WatchCommunicationService : Service(), WatchListener {
 
         fun changeAlarm(
             action: WatchChangeAlarmAction,
-            id: Int, open: Byte, hour: Byte, min: Byte, title: AlarmTitle, repeats: BooleanArray
+            id: Int, enabled: Boolean, hour: Byte, min: Byte, title: AlarmTitle, repeats: BooleanArray
         ) = enqueueCommand(
-            WatchChangeAlarmCommand(action, id, open, hour, min, title, repeats),
+            WatchChangeAlarmCommand(action, id, enabled, hour, min, title, repeats),
         )
 
         fun bindWatch(userId: Long, key: ByteArray) = enqueueCommand(
