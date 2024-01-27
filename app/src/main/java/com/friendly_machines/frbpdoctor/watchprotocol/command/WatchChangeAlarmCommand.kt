@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class WatchChangeAlarmCommand(
-    action: WatchChangeAlarmAction, id: Int, open: Byte, hour: Byte, min: Byte, title: AlarmTitle, repeats: BooleanArray/*7*/
+    action: WatchChangeAlarmAction, id: Int, enabled: Boolean, hour: Byte, min: Byte, title: AlarmTitle, repeats: BooleanArray/*7*/
 ) : WatchCommand(
     WatchOperation.SetAlarm, run {
         /**
@@ -15,7 +15,7 @@ class WatchChangeAlarmCommand(
         val buf = ByteBuffer.allocate(1 + 4 + 1 + 1 + 1 + 1 + repeats.size).order(ByteOrder.BIG_ENDIAN)
         buf.put(action.code)
         buf.putInt(id)
-        buf.put(open)
+        buf.put(if (enabled) { 1.toByte() } else { 0.toByte() })
         buf.put(hour)
         buf.put(min)
         buf.put(title.code)

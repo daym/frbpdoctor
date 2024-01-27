@@ -7,4 +7,8 @@ enum class AlarmTitle(val code: Byte) {
             return AlarmTitle.values().find { it.code == code }
         }
     }
+//    override fun toString(): String {
+//        return displayText
+//    }
+
 }

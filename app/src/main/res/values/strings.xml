@@ -40,5 +40,7 @@
     <string name="tab_text_2">Tab 2</string>
     <string name="notification_listener_service">Notification listener</string>
     <string name="watch_communication_service">Watch communication</string>
+    <string name="SetStepGoal">Set Step Goal...</string>
+    <string name="enabled">Enabled</string>
 
 </resources>

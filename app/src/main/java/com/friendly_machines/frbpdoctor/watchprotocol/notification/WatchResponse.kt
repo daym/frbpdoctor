@@ -387,6 +387,18 @@ sealed class WatchResponse {
         }
     }
 
+    data class SetStepGoal(
+        val status: Byte
+    ) : WatchResponse() // verified
+    {
+        companion object {
+            fun parse(buf: ByteBuffer): SetStepGoal {
+                val status = buf.get()
+                return SetStepGoal(status = status)
+            }
+        }
+    }
+
     data class Unknown(val code: Short, val arguments: ByteArray) : WatchResponse() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -440,6 +452,7 @@ sealed class WatchResponse {
                 WatchOperation.SetWatchFace -> SetWatchFace.parse(buf)
                 WatchOperation.NotificationFromWatch -> NotificationFromWatch.parse(buf)
                 WatchOperation.SetProfile -> SetProfile.parse(buf)
+                WatchOperation.SetStepGoal -> SetStepGoal.parse(buf)
                 WatchOperation.SetAlarm -> SetAlarm.parse(buf)
                 WatchOperation.GetAlarm -> GetAlarm.parse(buf)
                 WatchOperation.CurrentStep -> CurrentStep.parse(buf)
