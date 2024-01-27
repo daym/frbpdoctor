@@ -64,7 +64,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
 //        val textView: TextView = binding.textHome
 //        homeViewModel.text.observe(viewLifecycleOwner) {
@@ -75,7 +74,7 @@ class HomeFragment : Fragment() {
         //svgImageView = view.findViewById(R.id.clockView)
         //loadAndDisplaySVG(requireContext())
 
-        return root
+        return binding.root
     }
 
 

@@ -48,13 +48,13 @@ object AppSettings {
 
     private const val AES_MODE = "AES/GCM/NoPadding"
     private val FIXED_IV = ByteArray(12)
-    internal fun encrypt(context: Context, clearText: ByteArray): ByteArray {
+    private fun encrypt(context: Context, clearText: ByteArray): ByteArray {
         val c = Cipher.getInstance(AES_MODE)
         c.init(Cipher.ENCRYPT_MODE, getKeyStoreSecretKey(context), GCMParameterSpec(128, FIXED_IV))
         return c.doFinal(clearText)
     }
 
-    internal fun decrypt(context: Context, cipherText: ByteArray): ByteArray {
+    private fun decrypt(context: Context, cipherText: ByteArray): ByteArray {
         val c = Cipher.getInstance(AES_MODE)
         c.init(Cipher.DECRYPT_MODE, getKeyStoreSecretKey(context), GCMParameterSpec(128, FIXED_IV))
         return c.doFinal(cipherText)
@@ -62,10 +62,10 @@ object AppSettings {
 
     fun getWatchKey(context: Context, sharedPreferences: SharedPreferences): ByteArray? {
         val watchKeyString = sharedPreferences.getString(KEY_WATCH_KEY, "")
-        if (!watchKeyString.isNullOrEmpty()) {
-            return decrypt(context, Base64.decode(watchKeyString, Base64.DEFAULT))
+        return if (!watchKeyString.isNullOrEmpty()) {
+            decrypt(context, Base64.decode(watchKeyString, Base64.DEFAULT))
         } else {
-            return null
+            null
         }
     }
 
@@ -80,8 +80,7 @@ object AppSettings {
         val userIdString = sharedPreferences.getString(KEY_USER_ID, "")
         // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
         if (!userIdString.isNullOrEmpty() && userIdString.toLong() != 0L) {
-            val userId = userIdString.toLong()
-            return userId
+            return userIdString.toLong()
         }
         return null
     }

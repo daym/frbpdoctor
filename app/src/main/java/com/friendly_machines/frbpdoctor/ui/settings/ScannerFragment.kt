@@ -2,15 +2,12 @@ package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.ParcelUuid
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
@@ -76,14 +73,6 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
         // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
 
-        // TODO: Customize parameter initialization
-        @JvmStatic
-        fun newInstance(columnCount: Int, resultListener: ScannerResultListener) =
-            ScannerFragment(resultListener).apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
-            }
     }
 
     override fun onItemClick(position: Int) {

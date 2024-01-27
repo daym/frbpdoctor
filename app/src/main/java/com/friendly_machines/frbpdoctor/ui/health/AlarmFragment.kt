@@ -19,7 +19,6 @@ class AlarmFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     companion object {
-        fun newInstance() = AlarmFragment()
     }
 
     override fun onCreateView(

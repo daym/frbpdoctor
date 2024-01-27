@@ -7,11 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmDataBlock
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.BpDataBlock
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)

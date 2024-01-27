@@ -15,7 +15,6 @@ class SportFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     companion object {
-        fun newInstance() = SportFragment()
     }
 
     override fun onCreateView(

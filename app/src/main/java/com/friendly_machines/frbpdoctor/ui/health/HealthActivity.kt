@@ -11,7 +11,6 @@ import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchOperation
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
@@ -35,11 +34,6 @@ class HealthActivity : AppCompatActivity(), WatchListener {
     private lateinit var handler: Handler
     private lateinit var binding: ActivityHealthBinding
 //    private var appBarConfiguration: AppBarConfiguration? = null
-
-    override fun onPause() {
-        super.onPause()
-        // TODO
-    }
 
     private var serviceConnection: ServiceConnection? = null
 

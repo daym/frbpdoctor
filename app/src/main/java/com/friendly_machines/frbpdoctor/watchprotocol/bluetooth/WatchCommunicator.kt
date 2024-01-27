@@ -3,7 +3,6 @@ package com.friendly_machines.frbpdoctor.watchprotocol.bluetooth
 import android.util.Log
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageDecodingException
 import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageEncodingException
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.decodeBigMessage
@@ -15,6 +14,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteris
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.encodeMiddlePacket
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic.writingPortCharacteristic
+import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchCommand
 import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
@@ -24,7 +24,6 @@ import com.polidea.rxandroidble3.exceptions.BleGattException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.Subject
 import java.nio.BufferUnderflowException

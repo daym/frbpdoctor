@@ -79,11 +79,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onPause() {
-        super.onPause()
-        // TODO
-    }
-
     private var serviceConnection: ServiceConnection? = null
 
     override fun onStart() {
@@ -138,7 +133,7 @@ class MainActivity : AppCompatActivity(), WatchListener {
     }
 
     override fun onBigWatchRawResponse(response: WatchRawResponse) {
-        Log.d(TAG, "MainActivity: big watch raw response ${response}")
+        Log.d(TAG, "MainActivity: big watch raw response $response")
     }
 
     override fun onException(exception: Throwable) {

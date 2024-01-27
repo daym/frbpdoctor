@@ -21,7 +21,6 @@ class StepsFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     companion object {
-        fun newInstance() = StepsFragment()
     }
 
     override fun onCreateView(

@@ -22,16 +22,6 @@ class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference
     override fun onSetInitialValue(defaultValue: Any?) {
         date = getPersistedString(defaultValue as String?)
     }
-    /**
-     * Gets the date as a string from the current data storage.
-     *
-     * @return string representation of the date.
-     */
-    /**
-     * Saves the date as a string in the current data storage.
-     *
-     * @param text string representation of the date to save.
-     */
     var date: String?
         get() = dateValue
         set(text) {

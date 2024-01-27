@@ -15,7 +15,6 @@ class SleepFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     companion object {
-        fun newInstance() = SleepFragment()
     }
 
     override fun onCreateView(

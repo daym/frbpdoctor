@@ -14,7 +14,6 @@ class BloodPressureFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     companion object {
-        fun newInstance() = BloodPressureFragment()
     }
 
     override fun onCreateView(

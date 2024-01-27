@@ -3,7 +3,6 @@ package com.friendly_machines.frbpdoctor
 import android.app.Application
 import android.content.Intent
 import android.provider.Settings
-import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.polidea.rxandroidble3.LogConstants
 import com.polidea.rxandroidble3.LogOptions
