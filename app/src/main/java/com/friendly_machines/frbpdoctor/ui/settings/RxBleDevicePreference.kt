@@ -7,18 +7,7 @@ import androidx.preference.DialogPreference
 import com.friendly_machines.frbpdoctor.R
 import com.polidea.rxandroidble3.RxBleDevice
 
-/**
- * A dialog preference that shown calendar in the dialog.
- *
- *
- * Saves a string value.
- */
 class RxBleDevicePreference(context: Context?, attrs: AttributeSet?) : DialogPreference(context!!, attrs) {
-    /**
-     * Gets the date as a string from the current data storage.
-     *
-     * @return string representation of the date.
-     */
     var device: RxBleDevice? = null
 
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
@@ -30,11 +19,6 @@ class RxBleDevicePreference(context: Context?, attrs: AttributeSet?) : DialogPre
         device = defaultValue as RxBleDevice?
     }
 
-    /**
-     * Saves the date as a string in the current data storage.
-     *
-     * @param device string representation of the date to save.
-     */
     fun setDevice2(device: RxBleDevice) {
         val wasBlocking = shouldDisableDependents()
         this.device = device
