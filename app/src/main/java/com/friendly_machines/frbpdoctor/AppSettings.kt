@@ -131,6 +131,9 @@ object AppSettings {
 
     data class Profile(val height: Byte, val weight: Byte, val birthdayString: String, val sex: WatchProfileSex)
 
+    fun isProfileSetting(key: String): Boolean {
+        return key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY
+    }
     fun getProfileSettings(sharedPreferences: SharedPreferences): Profile? {
         val weight = getWeight(sharedPreferences)
         val height = getHeight(sharedPreferences)

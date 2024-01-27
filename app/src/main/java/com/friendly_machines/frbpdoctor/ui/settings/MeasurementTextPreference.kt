@@ -8,18 +8,6 @@ import com.friendly_machines.frbpdoctor.R
 class MeasurementTextPreference(context: Context, attrs: AttributeSet) : EditTextPreference(context, attrs) {
     private var unit: String? = null
 
-    init {
-        // Retrieve the unit attribute from XML
-        val typedArray = context.obtainStyledAttributes(attrs,
-            R.styleable.MeasurementTextPreference
-        )
-        unit = typedArray.getString(R.styleable.MeasurementTextPreference_unit)
-        typedArray.recycle()
-
-        // Set the unit as the summary for display
-        summary = unit
-    }
-
     fun getUnit(): String? {
         return unit
     }
@@ -37,5 +25,33 @@ class MeasurementTextPreference(context: Context, attrs: AttributeSet) : EditTex
             0
         }
         return persistInt(intValue)
+    }
+    class SimpleSummaryProvider private constructor() : SummaryProvider<MeasurementTextPreference?> {
+        override fun provideSummary(preference: MeasurementTextPreference): CharSequence? {
+            return if (preference.unit == null) {
+                preference.text
+            } else {
+                val text = preference.text
+                val unit = preference.unit
+                "$text $unit"
+            }
+        }
+
+        companion object {
+            val instance: SimpleSummaryProvider by lazy {
+                SimpleSummaryProvider()
+            }
+        }
+    }
+
+    init {
+        // Retrieve the unit attribute from XML
+        val typedArray = context.obtainStyledAttributes(attrs,
+            R.styleable.MeasurementTextPreference
+        )
+        unit = typedArray.getString(R.styleable.MeasurementTextPreference_unit)
+        typedArray.recycle()
+
+        summaryProvider = SimpleSummaryProvider.instance
     }
 }

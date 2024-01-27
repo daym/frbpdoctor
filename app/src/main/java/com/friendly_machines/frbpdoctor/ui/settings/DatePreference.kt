@@ -13,7 +13,7 @@ import com.friendly_machines.frbpdoctor.R
  *
  * Saves a string value.
  */
-class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference(context!!, attrs) {
+class DatePreference(context: Context, attrs: AttributeSet) : DialogPreference(context, attrs) {
     private var dateValue: String? = null
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
         return a.getString(index)
@@ -35,11 +35,6 @@ class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference
             notifyChanged()
         }
 
-    /**
-     * A simple [androidx.preference.Preference.SummaryProvider] implementation for an
-     * [DatePreference]. If no value has been set, the summary displayed will be 'Not
-     * set', otherwise the summary displayed will be the value set for this preference.
-     */
     class SimpleSummaryProvider private constructor() : SummaryProvider<DatePreference> {
         override fun provideSummary(preference: DatePreference): CharSequence? {
             return if (TextUtils.isEmpty(preference.date)) {
@@ -50,22 +45,13 @@ class DatePreference(context: Context?, attrs: AttributeSet?) : DialogPreference
         }
 
         companion object {
-            private var sSimpleSummaryProvider: SimpleSummaryProvider? = null
-
-            /**
-             * Retrieve a singleton instance of this simple
-             * [androidx.preference.Preference.SummaryProvider] implementation.
-             *
-             * @return a singleton instance of this simple
-             * [androidx.preference.Preference.SummaryProvider] implementation
-             */
-            val instance: SimpleSummaryProvider?
-                get() {
-                    if (sSimpleSummaryProvider == null) {
-                        sSimpleSummaryProvider = SimpleSummaryProvider()
-                    }
-                    return sSimpleSummaryProvider
-                }
+            val instance: SimpleSummaryProvider by lazy {
+                SimpleSummaryProvider()
+            }
         }
+    }
+
+    init {
+        summaryProvider = SimpleSummaryProvider.instance
     }
 }

@@ -1,12 +1,17 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.MyApplication
@@ -18,61 +23,93 @@ import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanResult
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
-/**
- * A fragment representing a list of Items.
- */
 class ScannerFragment(private val resultListener: ScannerResultListener) : /* ListFragment */ DialogFragment(), MyScannerRecyclerViewAdapter.ItemClickListener {
     private lateinit var adapter: MyScannerRecyclerViewAdapter
-    private lateinit var scanResults: MutableList<ScanResult>
-    private var columnCount = 1
+    private val scanResults: MutableList<ScanResult> = mutableListOf()
 
     interface ScannerResultListener {
         fun onScanningUserSelectedDevice(scanResult: ScanResult)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        scanResults = mutableListOf()
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
+    private fun withBluetoothPermissions(callback: () -> Unit) {
         if (MyApplication.rxBleClient.isConnectRuntimePermissionGranted) {
-            scan()
+            callback()
         } else {
-            requestConnectionPermission(MyApplication.rxBleClient)
+//                Manifest.permission.BLUETOOTH_CONNECT,
+//                Manifest.permission.BLUETOOTH_SCAN,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+            // TODO RequestMultiplePermissions ?
+            val bluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isPermissionGranted ->
+                if (isPermissionGranted) {
+                    callback()
+                } else {
+                    // FIXME ?!
+                }
+            }
+            bluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN)
         }
     }
 
+    private fun scan() {
+        val rxBleClient = RxBleClient.create(requireContext())
+        val scanFilter = ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()
+        rxBleClient.scanBleDevices(
+            ScanSettings.Builder()
+                //.setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
+                .build(), scanFilter
+        ).subscribe(object : Observer<ScanResult> {
+            override fun onSubscribe(d: Disposable) {
+                Log.d(TAG, "on subscribe")
+            }
+
+            override fun onError(e: Throwable) {
+                Log.d(TAG, "Scan onError", e)
+                Toast.makeText(requireContext(), "Error while scanning: $e", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onComplete() {
+                Log.d(TAG, "on complete")
+                // TODO nicer thing
+                Toast.makeText(requireContext(), "Scanning complete", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNext(scanResult: ScanResult) {
+                val device: RxBleDevice = scanResult.bleDevice
+                Log.d(TAG, "Scan - " + device.name)
+                val f = scanResults.find { it.bleDevice == device }
+                if (f == null) {
+                    scanResults.add(scanResult)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        })
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_scanner, container, false)
         val that = this
         val list = view.findViewById<RecyclerView>(R.id.list)
-
-        if (list is RecyclerView) {
-            with(list) {
-//                layoutManager = when {
-//                    columnCount <= 1 -> LinearLayoutManager(context)
-//                    else -> GridLayoutManager(context, columnCount)
-//                }
-                that.adapter = MyScannerRecyclerViewAdapter(scanResults,  that)
-                adapter = that.adapter
-            }
+        with(list) {
+            that.adapter = MyScannerRecyclerViewAdapter(scanResults, that)
+            adapter = that.adapter
         }
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        withBluetoothPermissions {
+            scan()
+        }
+    }
+
     companion object {
         const val TAG = "ScannerFragment"
-
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
-
     }
 
     override fun onItemClick(position: Int) {
@@ -80,80 +117,4 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
         resultListener.onScanningUserSelectedDevice(scanResult)
         dismiss()  // Close the dialog
     }
-
-    //    private fun requestBluetoothPermission() {
-//        ActivityCompat.requestPermissions(
-//            this,
-//            arrayOf(
-//                Manifest.permission.BLUETOOTH_CONNECT,
-//                Manifest.permission.BLUETOOTH_SCAN,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ),
-//            BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE
-//        )
-//    }
-
-    private val REQUEST_PERMISSION_BLE_CONNECT = 102
-    private fun requestConnectionPermission(client: RxBleClient) =
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            /*
-             * the below would cause a ArrayIndexOutOfBoundsException on API < 31. Yet it should not be called then as runtime
-             * permissions are not needed and RxBleClient.isConnectRuntimePermissionGranted() returns `true`
-             */
-            arrayOf(client.recommendedConnectRuntimePermissions[0]),
-            REQUEST_PERMISSION_BLE_CONNECT
-        )
-
-    private fun isConnectionPermissionGranted(requestCode: Int, grantResults: IntArray) =
-        requestCode == REQUEST_PERMISSION_BLE_CONNECT && grantResults[0] == PackageManager.PERMISSION_GRANTED
-
-    @Deprecated("Deprecated in Android")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (isConnectionPermissionGranted(requestCode, grantResults)) {
-            scan()
-        }
-    }
-
-    private fun scan() {
-        val rxBleClient = RxBleClient.create(requireContext())
-        val scanFilter = ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()
-
-        var scanSubscription = rxBleClient.scanBleDevices(
-            ScanSettings.Builder()
-                //.setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
-                .build(),
-            scanFilter
-        )
-            .subscribe(object : Observer<ScanResult> {
-                override fun onSubscribe(d: Disposable) {
-                    Log.d(TAG, "on subscribe")
-                }
-
-                override fun onError(e: Throwable) {
-                    Log.d(TAG, "Scan onError", e)
-                }
-
-                override fun onComplete() {
-                    Log.d(TAG, "on complete")
-                }
-
-                override fun onNext(scanResult: ScanResult) {
-                    val device: RxBleDevice = scanResult.bleDevice
-                    Log.d(TAG, "Scan - " + device.name)
-                    val f = scanResults.find { it.bleDevice == device }
-                    if (f == null) {
-                        scanResults.add(scanResult)
-                        adapter.notifyDataSetChanged()
-                    }
-                }
-            }
-            )
-    }
-
 }

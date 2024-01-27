@@ -61,29 +61,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
-
-        // FIXME test
-        //        for (preferenceKey in AppSettings.MANDATORY_SETTINGS) {
-//            val preference = findPreference<Preference>(preferenceKey)
-//            preference?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, _ ->
-//                onSharedPreferenceChanged(preferenceManager.sharedPreferences, preferenceKey)
-//                true
-//            }
-//        }
-        initSummary(preferenceScreen)
-
-        val clearPreferencesPreference = findPreference<Preference>("clear_preferences")
-        clearPreferencesPreference?.setOnPreferenceClickListener {
+        findPreference<Preference>("clear_preferences")?.setOnPreferenceClickListener {
             clearAllPreferences()
-            true
-        }
-
-        val watchMacAddressPreference = findPreference<Preference>("watchMacAddress")
-        watchMacAddressPreference?.setOnPreferenceClickListener {
-            val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            if (AppSettings.getMacAddress(sharedPreferences) != null) {
-                Toast.makeText(requireContext(), "Cannot bind to another watch at the same time. Please clear settings here first in order to unbind from the other watch.", Toast.LENGTH_LONG).show()
-            }
             true
         }
     }
@@ -94,50 +73,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val scannerFragment = ScannerFragment(this)
                 scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
             }
-
             is DatePreference -> {
                 val f: DialogFragment
                 f = DatePreferenceDialogFragment.newInstance(preference.getKey())
                 f.setTargetFragment(this, 0) // TODO
                 f.show(parentFragmentManager, null)
             }
-
             else -> {
                 super.onDisplayPreferenceDialog(preference)
             }
-        }
-    }
-
-    /**
-     * Sets up summary providers for the preferences.
-     *
-     * @param p The preference to set up summary provider.
-     */
-    private fun setPreferenceSummary(p: Preference) {
-        // No need to set up preference summaries for checkbox preferences because
-        // they can be set up in xml using summaryOff and summary On
-        if (p is DatePreference) {
-            p.setSummaryProvider(DatePreference.SimpleSummaryProvider.instance)
-        } else if (p is EditTextPreference) {
-            p.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
-        } else if (p is RxBleDevicePreference) {
-            p.summaryProvider = RxBleDevicePreference.SimpleSummaryProvider.instance
-        }
-    }
-
-    /**
-     * Walks through all preferences.
-     *
-     * @param p The starting preference to search from.
-     */
-    private fun initSummary(p: Preference) {
-        if (p is PreferenceGroup) {
-            val pGrp: PreferenceGroup = p
-            for (i in 0 until pGrp.preferenceCount) {
-                initSummary(pGrp.getPreference(i))
-            }
-        } else {
-            setPreferenceSummary(p)
         }
     }
 
@@ -167,14 +111,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key != null && sharedPreferences != null) {
-//            if (key == "watchMacAddress") {
-//                val macAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")
-//                val watchMacAddressPreference = findPreference<Preference>("watchMacAddress")
-//                watchMacAddressPreference?.summary = macAddress
-//            }
-            if (key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY) {
+            if (AppSettings.isProfileSetting(key)) {
                 AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
-                    // TODO wind down the amount of stuff per second
                     setProfile(profile)
                 }
             }
@@ -193,8 +131,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onScanningUserSelectedDevice(scanResult: ScanResult) {
         val device = scanResult.bleDevice
-        val watchMacAddressPreference = findPreference<Preference>("watchMacAddress") as RxBleDevicePreference
-        watchMacAddressPreference.setDevice2(device)
+        findPreference<RxBleDevicePreference>("watchMacAddress")?.setDevice2(device)
 
         val key = scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -206,5 +143,4 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             bindWatch(userId, key)
         }
     }
-
 }
