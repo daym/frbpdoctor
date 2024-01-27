@@ -1,3 +1,5 @@
+package com.friendly_machines.frbpdoctor.ui.health
+
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -16,10 +18,9 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-class EditAlarmDialog(action: WatchChangeAlarmAction) : DialogFragment() {
+class EditAlarmDialog(private val action: WatchChangeAlarmAction) : DialogFragment() {
     private lateinit var timeEditText: EditText
     private lateinit var dayCheckBoxes: List<CheckBox>
-    private val action = action
 
     // Interface to communicate the selected alarm data to the calling activity/fragment
     interface OnAlarmSetListener {
@@ -44,11 +45,11 @@ class EditAlarmDialog(action: WatchChangeAlarmAction) : DialogFragment() {
         val builder = AlertDialog.Builder(activity)
         val inflater = requireActivity().layoutInflater
         val view: View = inflater.inflate(R.layout.dialog_edit_alarm, null)
-        timeEditText = view.findViewById<EditText>(R.id.timeEditText)!!
+        timeEditText = view.findViewById(R.id.timeEditText)!!
         dayCheckBoxes = arrayOf(
             R.id.repeatMondayCheckBox, R.id.repeatTuesdayCheckBox, R.id.repeatWednesdayCheckBox, R.id.repeatThursdayCheckbox, R.id.repeatFridayCheckbox, R.id.repeatSaturdayCheckBox, R.id.repeatSundayCheckbox
         ).map {
-            view.findViewById<CheckBox>(it)!!
+            view.findViewById(it)!!
         }
         timeEditText.setOnClickListener {
             showTimePickerDialog()
@@ -77,7 +78,7 @@ class EditAlarmDialog(action: WatchChangeAlarmAction) : DialogFragment() {
                 repeatOnDaysOfWeek[i] = dayCheckBoxes[i].isChecked
             }
             val title = titleSpinner.selectedItem as AlarmTitle
-            if (!timeString.isNullOrEmpty()) {
+            if (timeString.isNotEmpty()) {
                 try {
                     val dateFormat = SimpleDateFormat("HH:mm")
                     val parsedDate = dateFormat.parse(timeString)
