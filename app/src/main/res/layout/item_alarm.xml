@@ -13,7 +13,7 @@
         android:textSize="16sp" />
 
     <CheckBox
-        android:id="@+id/openCheckBox"
+        android:id="@+id/enabledCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

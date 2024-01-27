@@ -10,7 +10,7 @@ import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitl
 
 class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
-    private val openCheckBox: CheckBox = itemView.findViewById(R.id.openCheckBox)
+    private val enabledCheckBox: CheckBox = itemView.findViewById(R.id.enabledCheckBox)
     private val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
     private val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
     private val repeatMondayCheckBox: CheckBox = itemView.findViewById(R.id.repeatMondayCheckBox)
@@ -23,7 +23,7 @@ class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(item: AlarmDataBlock) {
         idTextView.text = item.id.toString()
-        openCheckBox.isChecked = item.open != 0.toByte()
+        enabledCheckBox.isChecked = item.enabled != 0.toByte()
         timeTextView.text = "${item.hour}:${item.min}"
         titleTextView.text = AlarmTitle.parse(item.title).toString()
         repeatMondayCheckBox.isChecked = item.repeats[0] != 0.toByte()
