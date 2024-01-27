@@ -15,15 +15,15 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
     private var datePicker: DatePicker? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var dateValue = datePreference.date
-        if (dateValue.isNullOrEmpty()) {
+        var dateString = datePreference.text
+        if (dateString.isNullOrEmpty()) {
             val calendar = Calendar.getInstance()
             val df = SimpleDateFormat("yyyy-MM-dd")
-            dateValue = df.format(calendar.time)
+            dateString = df.format(calendar.time)
         }
-        year = getYear(dateValue)
-        month = getMonth(dateValue)
-        day = getDay(dateValue)
+        year = getYear(dateString)
+        month = getMonth(dateString)
+        day = getDay(dateString)
     }
 
     override fun onCreateDialogView(context: Context): View? {
@@ -43,12 +43,12 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
             year = datePicker!!.year
             month = datePicker!!.month + 1
             day = datePicker!!.dayOfMonth
-            val dateVal = (year.toString() + "-"
+            val dateString = (year.toString() + "-"
                     + month.toString() + "-"
                     + day.toString())
             val preference = datePreference
-            if (preference.callChangeListener(dateVal)) {
-                preference.date = dateVal
+            if (preference.callChangeListener(dateString)) {
+                preference.text = dateString
             }
         }
     }
