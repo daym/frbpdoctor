@@ -131,7 +131,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onScanningUserSelectedDevice(scanResult: ScanResult) {
         val device = scanResult.bleDevice
-        findPreference<RxBleDevicePreference>("watchMacAddress")?.setDevice2(device)
+        findPreference<RxBleDevicePreference>("watchMacAddress")?.text = device.macAddress
 
         val key = scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())

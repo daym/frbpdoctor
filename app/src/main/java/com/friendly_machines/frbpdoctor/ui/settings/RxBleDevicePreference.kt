@@ -10,9 +10,6 @@ import com.friendly_machines.frbpdoctor.R
 import com.polidea.rxandroidble3.RxBleDevice
 
 class RxBleDevicePreference(context: Context, attrs: AttributeSet?) : EditTextPreference(context, attrs) {
-    fun setDevice2(device: RxBleDevice) {
-        this.text = device.macAddress
-    }
 
 //    class SimpleSummaryProvider private constructor() : SummaryProvider<RxBleDevicePreference?> {
 //        override fun provideSummary(preference: RxBleDevicePreference): CharSequence? {
