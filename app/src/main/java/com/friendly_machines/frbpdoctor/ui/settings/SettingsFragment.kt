@@ -2,7 +2,6 @@ package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.preference.EditTextPreference
@@ -24,11 +23,6 @@ import java.util.Locale
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, ScannerFragment.ScannerResultListener {
     companion object {
         const val TAG: String = "SettingsFragment"
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 
     private fun unbindWatch() {
@@ -213,7 +207,4 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
 }
