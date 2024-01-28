@@ -35,21 +35,17 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
     }
 
     private fun withBluetoothPermissions(callback: () -> Unit) {
-        if (MyApplication.rxBleClient.isConnectRuntimePermissionGranted) {
+        if (MyApplication.rxBleClient.isScanRuntimePermissionGranted && MyApplication.rxBleClient.isConnectRuntimePermissionGranted) {
             callback()
         } else {
 //                Manifest.permission.BLUETOOTH_CONNECT,
 //                Manifest.permission.BLUETOOTH_SCAN,
 //                Manifest.permission.ACCESS_FINE_LOCATION
-            // TODO RequestMultiplePermissions ?
-            val bluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isPermissionGranted ->
-                if (isPermissionGranted) {
-                    callback()
-                } else {
-                    // FIXME ?!
-                }
+            val bluetoothPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                // TODO check
+                callback()
             }
-            bluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN)
+            bluetoothPermissionLauncher.launch(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT))
         }
     }
 
