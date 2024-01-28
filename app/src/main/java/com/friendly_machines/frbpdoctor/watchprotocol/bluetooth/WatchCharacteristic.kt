@@ -114,7 +114,7 @@ object WatchCharacteristic {
         buffer.put(body)
         val rawBuffer0 = buffer.array()
         val crc = Crc16.crc16(rawBuffer0)
-        buffer = ByteBuffer.allocate(buffer.limit() + 2)
+        buffer = ByteBuffer.allocate(buffer.limit() + 2).order(ByteOrder.BIG_ENDIAN)
         buffer.put(rawBuffer0)
         buffer.putShort(crc)
         return buffer.array()
