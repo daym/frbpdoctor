@@ -4,15 +4,13 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceManager
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
 import com.polidea.rxandroidble3.scan.ScanResult
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -26,13 +24,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     private fun unbindWatch() {
-        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Unbind(0)) {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.Unbind) {
             it.unbindWatch()
         }
     }
 
     private fun bindWatch(userId: Long, key: ByteArray) {
-        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.Bind(0)) {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.Bind) {
             // Just in case the watch was bound somewhere else, unbind it. Better not.
             //it.unbindWatch()
             it.bindWatch(userId, key)
@@ -41,9 +39,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
-        assert(age < 256)
-        assert(age > 0)
-        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetProfile(0)) {
+        if (age <= 0 || age >= 256)
+            throw RuntimeException("profile age is invalid")
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetProfile) {
             it.setProfile(profile.height, profile.weight, profile.sex, age.toByte())
         }
     }
@@ -54,9 +52,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         AppSettings.clear(sharedPreferences)
 
+
         Toast.makeText(requireContext(), "Settings cleared", Toast.LENGTH_LONG).show()
         // Since the settings gui doesn't update, close it so the user doesn't see the wrong values.
         activity?.finish()
+        System.exit(1) // ...
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -73,12 +73,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val scannerFragment = ScannerFragment(this)
                 scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
             }
+
             is DatePreference -> {
                 val f: DialogFragment
                 f = DatePreferenceDialogFragment.newInstance(preference.getKey())
                 f.setTargetFragment(this, 0) // TODO
                 f.show(parentFragmentManager, null)
             }
+
             else -> {
                 super.onDisplayPreferenceDialog(preference)
             }
@@ -113,7 +115,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         if (key != null && sharedPreferences != null) {
             if (AppSettings.isProfileSetting(key)) {
                 AppSettings.getProfileSettings(sharedPreferences)?.let { profile ->
-                    setProfile(profile)
+                    try {
+                        setProfile(profile)
+                    } catch (e: RuntimeException) {
+                        Toast.makeText(requireContext(), "Error setting profile: $e", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
@@ -133,9 +139,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val device = scanResult.bleDevice
         findPreference<RxBleDevicePreference>("watchMacAddress")?.text = device.macAddress
 
-        val key = scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        AppSettings.setWatchKey(requireContext(), sharedPreferences, key)
+
+        var watchCommunicatorClassname = "unknown"
+        val key = if (com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
+            watchCommunicatorClassname = "com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator"
+            "dummy".toByteArray(Charsets.US_ASCII)
+        } else if (com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
+            watchCommunicatorClassname = "com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator"
+            scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
+        } else {
+            "unknown".toByteArray(Charsets.US_ASCII)
+        }
+        AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
 
         // Note: It's possible that scanning doesn't find anything when we are already connected.
         AppSettings.getUserId(sharedPreferences)?.let { userId ->

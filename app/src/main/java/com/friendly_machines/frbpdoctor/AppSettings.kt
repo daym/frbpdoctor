@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchProfileSex
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -13,6 +13,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 
 object AppSettings {
+    const val KEY_WATCH_COMMUNICATOR_CLASS = "watchCommunicatorClass"
     const val KEY_USER_ID = "userId"
     const val KEY_USER_WEIGHT = "userWeight"
     const val KEY_USER_HEIGHT = "userHeight"
@@ -21,7 +22,7 @@ object AppSettings {
     private const val KEY_WATCH_KEY = "watchKey" // invisible to the user
     const val KEY_WATCH_MAC_ADDRESS = "watchMacAddress"
 
-    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY)
+    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_COMMUNICATOR_CLASS, KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY)
 
     private const val AndroidKeyStore = "AndroidKeyStore"
     private const val MAIN_KEY_ALIAS = "FpBpDoctor"
@@ -69,10 +70,12 @@ object AppSettings {
         }
     }
 
-    fun setWatchKey(context: Context, sharedPreferences: SharedPreferences, key: ByteArray) {
+    fun setWatchCommunicatorSettings(context: Context, sharedPreferences: SharedPreferences, key: ByteArray, watchCommunicatorClassname: String) {
         //val keyDigest = MessageDigest.getInstance("MD5").digest(key)
         sharedPreferences.edit().putString(
             KEY_WATCH_KEY, Base64.encodeToString(encrypt(context, key), Base64.DEFAULT)
+        ).putString(
+            KEY_WATCH_COMMUNICATOR_CLASS, watchCommunicatorClassname
         ).apply()
     }
 
@@ -92,7 +95,7 @@ object AppSettings {
     fun areMandatorySettingsSet(sharedPreferences: SharedPreferences): Boolean {
         return MANDATORY_SETTINGS.all { key ->
             sharedPreferences.contains(key)
-        }
+        } && !sharedPreferences.getString(KEY_WATCH_COMMUNICATOR_CLASS, "").isNullOrEmpty()
     }
 
     fun clear(sharedPreferences: SharedPreferences) {
@@ -134,12 +137,13 @@ object AppSettings {
     fun isProfileSetting(key: String): Boolean {
         return key == AppSettings.KEY_USER_HEIGHT || key == AppSettings.KEY_USER_WEIGHT || key == AppSettings.KEY_USER_SEX || key == AppSettings.KEY_USER_BIRTHDAY
     }
+
     fun getProfileSettings(sharedPreferences: SharedPreferences): Profile? {
         val weight = getWeight(sharedPreferences)
         val height = getHeight(sharedPreferences)
         val birthday = getBirthday(sharedPreferences)
         val sex = getSex(sharedPreferences)
-        if (birthday != null && sex != null && weight != null && height != null) {
+        if (!birthday.isNullOrEmpty() && sex != null && weight != null && height != null) {
             return Profile(height = height, weight = weight, birthdayString = birthday, sex = sex)
         }
         return null

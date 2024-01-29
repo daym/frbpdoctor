@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.SportDataBlock
 
-class SportAdapter(private val data: List<SportDataBlock>) : RecyclerView.Adapter<SportViewHolder>() {
+class SportAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>) : RecyclerView.Adapter<SportViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SportViewHolder {
         val itemView = LayoutInflater.from(parent.context)

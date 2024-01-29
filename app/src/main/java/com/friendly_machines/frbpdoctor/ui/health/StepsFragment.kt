@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 
 class StepsFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
@@ -35,7 +34,7 @@ class StepsFragment : Fragment() {
                     val stepGoalText = stepGoalEditText.text.toString()
                     try {
                         val stepGoal = Integer.parseInt(stepGoalText)
-                        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetStepGoal(0)) { binder ->
+                        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetStepGoal) { binder ->
                             binder.setStepGoal(stepGoal)
                         }
                     } catch (e: NumberFormatException) {
@@ -60,7 +59,7 @@ class StepsFragment : Fragment() {
         this.recyclerView = recyclerView
     }
 
-    fun setData(data: Array<StepsDataBlock>) {
+    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock>) {
         val adapter = StepsAdapter(data.sortedBy { it.dayTimestamp })
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()

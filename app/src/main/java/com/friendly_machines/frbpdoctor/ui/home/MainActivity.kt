@@ -10,7 +10,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -18,13 +17,12 @@ import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchListener
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchRawResponse
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
-class MainActivity : AppCompatActivity(), WatchListener {
+class MainActivity : AppCompatActivity(), IWatchListener {
     private lateinit var handler: Handler
     private lateinit var binding: ActivityMainBinding
 
@@ -98,38 +96,6 @@ class MainActivity : AppCompatActivity(), WatchListener {
             serviceConnection = null
         }
         super.onStop()
-    }
-
-    override fun onWatchResponse(response: WatchResponse) {
-        Log.d(TAG, response.toString())
-        when (response) {
-            is WatchResponse.DeviceInfo -> {
-
-                response.romVersion // maybe lower 16 bits: protocol version: hi, lo
-                response.soc
-                response.protocolVersion
-            }
-
-            is WatchResponse.GetWatchFace -> {
-                val clockView = supportFragmentManager.findFragmentById(R.id.clockView)
-
-                response.count
-                response.content
-            }
-
-            is WatchResponse.GetBatteryState -> {
-                response.id
-                response.voltage
-            }
-
-            is WatchResponse.NotificationFromWatch -> {
-                Toast.makeText(this, "Got notification from watch: ${response.eventCode}", Toast.LENGTH_LONG).show()
-            }
-
-            else -> {
-                // ignore
-            }
-        }
     }
 
     override fun onBigWatchRawResponse(rawResponse: WatchRawResponse) {

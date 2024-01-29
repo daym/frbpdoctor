@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock
 
-class SleepAdapter(private val data: List<SleepDataBlock>) : RecyclerView.Adapter<SleepViewHolder>() {
+class SleepAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock>) : RecyclerView.Adapter<SleepViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_steps, parent, false)

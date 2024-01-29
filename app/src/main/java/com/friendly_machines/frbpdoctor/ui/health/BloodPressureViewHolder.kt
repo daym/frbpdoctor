@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.BpDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -16,7 +16,7 @@ class BloodPressureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
     private val diastolicPressureTextView: TextView = itemView.findViewById(R.id.diastolicPressureTextView)
     private val pulseTextView: TextView = itemView.findViewById(R.id.pulseTextView)
 
-    fun bind(item: BpDataBlock) {
+    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.BpDataBlock) {
         val instant = Instant.ofEpochSecond(item.timestamp.toLong())
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

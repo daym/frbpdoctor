@@ -75,6 +75,9 @@ dependencies {
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.material3:material3'
+    implementation project(path: ':fr_yhe_api')
+    implementation project(path: ':fr_yhe_med')
+    implementation project(path: ':fr_yhe_pro')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

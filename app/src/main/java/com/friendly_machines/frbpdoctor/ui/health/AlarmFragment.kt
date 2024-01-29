@@ -10,10 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchChangeAlarmAction
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction
 
 class AlarmFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
@@ -30,12 +28,12 @@ class AlarmFragment : Fragment() {
 
         val addAlarmTimeButton = view.findViewById<Button>(R.id.addAlarmButton)
         addAlarmTimeButton.setOnClickListener {
-            val editAlarmDialog = EditAlarmDialog(WatchChangeAlarmAction.Add)
+            val editAlarmDialog = EditAlarmDialog(com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Add)
             editAlarmDialog.addListener(object : EditAlarmDialog.OnAlarmSetListener {
-                override fun onAlarmSet(enabled: Boolean, title: AlarmTitle, hour: Byte, min: Byte, repeatOnDaysOfWeek: BooleanArray) {
-                    WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetAlarm(0)) { binder ->
+                override fun onAlarmSet(enabled: Boolean, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, hour: Byte, min: Byte, repeatOnDaysOfWeek: BooleanArray) {
+                    WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeAlarm) { binder ->
                         val id = 1 // FIXME
-                        binder.changeAlarm(WatchChangeAlarmAction.Add, id, enabled, hour, min, title, repeatOnDaysOfWeek)
+                        binder.addAlarm(id, enabled, hour, min, title, repeatOnDaysOfWeek)
                     }
                     // TODO refresh alarm list maybe
                 }
@@ -49,7 +47,7 @@ class AlarmFragment : Fragment() {
         this.recyclerView = recyclerView
     }
 
-    fun setData(data: Array<AlarmDataBlock>) {
+    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>) {
         val adapter = AlarmAdapter(data.sortedBy { it.id })
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()

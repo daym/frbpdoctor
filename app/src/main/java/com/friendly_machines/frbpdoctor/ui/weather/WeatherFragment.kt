@@ -9,7 +9,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import java.util.Calendar
 
 /**
@@ -21,15 +21,6 @@ class WeatherFragment : Fragment() {
     // TODO: Rename and change types of parameters
 //    private var param1: String? = null
 //    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,8 +53,10 @@ class WeatherFragment : Fragment() {
             val weatherDayOfMonth = Integer.parseUnsignedInt(weatherDayOfMonthTextNumber.text.toString()).toByte()
             val weatherDayOfWeekMondayBased = Integer.parseUnsignedInt(weatherDayOfWeekMondayBasedTextNumber.text.toString()).toByte()
             val weatherLocation = weatherLocationEditView.text.toString()
-            WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponse.SetWeather(0)) { binder ->
-                binder.setWeather(weatherType, temp, weatherMaxTemp, weatherMinTemp, dummy, weatherMonth, weatherDayOfMonth, weatherDayOfWeekMondayBased, weatherLocation)
+            WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetMessage) { binder ->
+                //binder.setWeather(weatherType, temp, weatherMaxTemp, weatherMinTemp, dummy, weatherMonth, weatherDayOfMonth, weatherDayOfWeekMondayBased, weatherLocation)
+                binder.setMessage2(dummy, 1705786832, "", "")
+                weatherDummyTextNumber.setText((dummy + 1).toString())
             }
         }
         return view

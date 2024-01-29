@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.StepsDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock
 
-class StepsAdapter(private val data: List<StepsDataBlock>) : RecyclerView.Adapter<StepsViewHolder>() {
+class StepsAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock>) : RecyclerView.Adapter<StepsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StepsViewHolder {
         val itemView = LayoutInflater.from(parent.context)

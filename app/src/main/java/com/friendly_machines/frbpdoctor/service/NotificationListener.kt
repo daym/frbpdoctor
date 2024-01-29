@@ -5,9 +5,8 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.frbpdoctor.watchprotocol.WatchMessageEncodingException
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.WatchResponse
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.MessageType
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageEncodingException
 
 // Note: Service dependency on WatchCommunicationService
 class NotificationListener : NotificationListenerService() {
@@ -32,30 +31,30 @@ class NotificationListener : NotificationListenerService() {
             }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
                 Log.i(TAG, "Notification Posted: " + sbn.packageName)
-                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this, WatchResponse.SetMessage(0)) { binder ->
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this, WatchResponseType.SetMessage) { binder ->
                     try {
                         // TODO what if the call was hung up by the user via the phone?
                         // TODO if there is a new call, keep the WatchCommunicationService alive for a while so we can send further messages (like hangup) to the watch.
                         binder.setMessage(
                             when (notification.category) {
-                                Notification.CATEGORY_CALL -> MessageType.NewCall
-                                Notification.CATEGORY_MISSED_CALL -> MessageType.MissedCall
-                                Notification.CATEGORY_NAVIGATION -> MessageType.Qq
-                                Notification.CATEGORY_ALARM -> MessageType.Qq
-                                Notification.CATEGORY_REMINDER -> MessageType.Qq
-                                Notification.CATEGORY_STOPWATCH -> MessageType.Qq
-                                Notification.CATEGORY_EVENT -> MessageType.Facebook
-                                Notification.CATEGORY_MESSAGE -> MessageType.Messenger
-                                Notification.CATEGORY_EMAIL -> MessageType.Messenger
-                                Notification.CATEGORY_SOCIAL -> MessageType.Facebook
-                                Notification.CATEGORY_WORKOUT -> MessageType.Instagram
-                                Notification.CATEGORY_LOCATION_SHARING -> MessageType.Qq
-                                Notification.CATEGORY_TRANSPORT -> MessageType.Qq
+                                Notification.CATEGORY_CALL -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.NewCall
+                                Notification.CATEGORY_MISSED_CALL -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.MissedCall
+                                Notification.CATEGORY_NAVIGATION -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
+                                Notification.CATEGORY_ALARM -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
+                                Notification.CATEGORY_REMINDER -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
+                                Notification.CATEGORY_STOPWATCH -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
+                                Notification.CATEGORY_EVENT -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Facebook
+                                Notification.CATEGORY_MESSAGE -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Messenger
+                                Notification.CATEGORY_EMAIL -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Messenger
+                                Notification.CATEGORY_SOCIAL -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Facebook
+                                Notification.CATEGORY_WORKOUT -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Instagram
+                                Notification.CATEGORY_LOCATION_SHARING -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
+                                Notification.CATEGORY_TRANSPORT -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
                                 //Notification.CATEGORY_SYSTEM -> reserved
-                                else -> MessageType.Messenger
+                                else -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Messenger
                             }, time.toInt(), title, text)
                     } catch (e: WatchMessageEncodingException) {
-                        binder.setMessage(MessageType.Line, time.toInt(),"message too long", "message too long")
+                        binder.setMessage(com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Line, time.toInt(),"message too long", "message too long")
                     }
                 }
             }

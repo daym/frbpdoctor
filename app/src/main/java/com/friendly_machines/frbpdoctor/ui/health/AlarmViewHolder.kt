@@ -5,8 +5,8 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmDataBlock
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
+import com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed
 
 class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
@@ -21,11 +21,11 @@ class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val repeatSaturdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSaturdayCheckBox)
     private val repeatSundayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSundayCheckBox)
 
-    fun bind(item: AlarmDataBlock) {
+    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock) {
         idTextView.text = item.id.toString()
         enabledCheckBox.isChecked = item.enabled != 0.toByte()
         timeTextView.text = "${item.hour}:${item.min}"
-        titleTextView.text = AlarmTitle.parse(item.title).toString()
+        titleTextView.text = com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed.parse(item.title).toString()
         repeatMondayCheckBox.isChecked = item.repeats[0] != 0.toByte()
         repeatTuesdayCheckBox.isChecked = item.repeats[1] != 0.toByte()
         repeatWednesdayCheckBox.isChecked = item.repeats[2] != 0.toByte()

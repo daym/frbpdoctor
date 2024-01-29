@@ -3,7 +3,7 @@ package com.friendly_machines.frbpdoctor.ui.health
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
 
 class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
@@ -34,7 +34,7 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
         }
     }
 
-    fun requestData(currentItem: Int, binder: WatchCommunicationService.WatchCommunicationServiceBinder) {
+    fun requestData(currentItem: Int, binder: IWatchCommunication) {
         when (currentItem) {
             0 -> binder.getBpData()
             1 -> binder.getStepData()

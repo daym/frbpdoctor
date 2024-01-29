@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.SportDataBlock
 
 class SportViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val startTimestampTextView: TextView = itemView.findViewById(R.id.startTimestampTextView)
@@ -16,7 +16,7 @@ class SportViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val speedTextView: TextView = itemView.findViewById(R.id.speedTextView)
     private val stepCountTextView: TextView = itemView.findViewById(R.id.stepCountTextView)
 
-    fun bind(item: SportDataBlock) {
+    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.SportDataBlock) {
         startTimestampTextView.text = "${item.timestamp}"
         sportTypeTextView.text = item.sportType.toString()
         avgHeartRateTextView.text = item.avgHeartRate.toString()

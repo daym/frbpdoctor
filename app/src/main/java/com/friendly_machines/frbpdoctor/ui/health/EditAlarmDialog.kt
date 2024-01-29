@@ -12,19 +12,19 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.command.WatchChangeAlarmAction
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.AlarmTitle
+import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction
+import com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-class EditAlarmDialog(private val action: WatchChangeAlarmAction) : DialogFragment() {
+class EditAlarmDialog(private val action: com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction) : DialogFragment() {
     private lateinit var timeEditText: EditText
     private lateinit var dayCheckBoxes: List<CheckBox>
 
     // Interface to communicate the selected alarm data to the calling activity/fragment
     interface OnAlarmSetListener {
-        fun onAlarmSet(enabled: Boolean, title: AlarmTitle, hour: Byte, min: Byte, repeatOnDaysOfWeek: BooleanArray)
+        fun onAlarmSet(enabled: Boolean, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, hour: Byte, min: Byte, repeatOnDaysOfWeek: BooleanArray)
     }
 
     private var listener: OnAlarmSetListener? = null
@@ -63,21 +63,21 @@ class EditAlarmDialog(private val action: WatchChangeAlarmAction) : DialogFragme
         val titleAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            AlarmTitle.values()
+            com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed.values()
         )
         titleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         titleSpinner.adapter = titleAdapter
 
         builder.setPositiveButton(when (action) {
-            WatchChangeAlarmAction.Add -> "Add Alarm"
-            WatchChangeAlarmAction.Edit -> "Change Alarm"
+            com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Add -> "Add Alarm"
+            com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Edit -> "Change Alarm"
         }) { _, _ ->
             val timeString = timeEditText.text.toString()
             val repeatOnDaysOfWeek = BooleanArray(7)
             for (i in 0..6) {
                 repeatOnDaysOfWeek[i] = dayCheckBoxes[i].isChecked
             }
-            val title = titleSpinner.selectedItem as AlarmTitle
+            val title = titleSpinner.selectedItem as com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed
             if (timeString.isNotEmpty()) {
                 try {
                     val dateFormat = SimpleDateFormat("HH:mm")

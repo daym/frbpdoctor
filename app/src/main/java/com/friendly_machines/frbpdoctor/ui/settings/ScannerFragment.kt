@@ -1,29 +1,23 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.bluetooth.WatchCharacteristic
 import com.polidea.rxandroidble3.RxBleClient
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.scan.ScanFilter
 import com.polidea.rxandroidble3.scan.ScanResult
 import com.polidea.rxandroidble3.scan.ScanSettings
 import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
 class ScannerFragment(private val resultListener: ScannerResultListener) : /* ListFragment */ DialogFragment(), MyScannerRecyclerViewAdapter.ItemClickListener {
@@ -51,7 +45,7 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
 
     private fun scan() {
         val rxBleClient = RxBleClient.create(requireContext())
-        val scanFilter = ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()
+        val scanFilter = ScanFilter.Builder().build()
         rxBleClient.scanBleDevices(
             ScanSettings.Builder()
                 //.setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH)
@@ -76,7 +70,9 @@ class ScannerFragment(private val resultListener: ScannerResultListener) : /* Li
                 val device: RxBleDevice = scanResult.bleDevice
                 Log.d(TAG, "Scan - " + device.name)
                 val f = scanResults.find { it.bleDevice == device }
-                if (f == null) {
+                if (f == null && scanResult.scanRecord.serviceUuids != null) {
+                    scanResult.scanRecord.serviceUuids.find { it == com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.serviceUuid
+                            || it == com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.serviceUuid }
                     scanResults.add(scanResult)
                     adapter.notifyDataSetChanged()
                 }

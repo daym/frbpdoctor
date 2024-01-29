@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "FrBpDoctor"
 include ':app'
+include ':fr_yhe_med'
+include ':fr_yhe_pro'
+include ':fr_yhe_api'

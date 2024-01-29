@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SportDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.SportDataBlock
 
 class SportFragment : Fragment() {
 
@@ -32,7 +32,7 @@ class SportFragment : Fragment() {
         this.recyclerView = recyclerView
     }
 
-    fun setData(data: Array<SportDataBlock>) {
+    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>) {
         val adapter = SportAdapter(data.sortedBy { it.timestamp })
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()

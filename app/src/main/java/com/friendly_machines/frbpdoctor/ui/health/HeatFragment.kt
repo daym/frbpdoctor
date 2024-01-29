@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.HeatDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock
 
 class HeatFragment : Fragment() {
 
@@ -33,7 +33,7 @@ class HeatFragment : Fragment() {
         this.recyclerView = recyclerView
     }
 
-    fun setData(data: Array<HeatDataBlock>) {
+    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock>) {
         val adapter = HeatAdapter(data.sortedBy { it.dayTimestamp })
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()

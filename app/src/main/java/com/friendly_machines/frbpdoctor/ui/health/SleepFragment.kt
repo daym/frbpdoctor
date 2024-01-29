@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.frbpdoctor.watchprotocol.notification.big.SleepDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock
 
 class SleepFragment : Fragment() {
 
@@ -32,7 +32,7 @@ class SleepFragment : Fragment() {
         this.recyclerView = recyclerView
     }
 
-    fun setData(data: Array<SleepDataBlock>) {
+    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock>) {
         val adapter = SleepAdapter(data.sortedBy { it.startTimestamp })
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()
