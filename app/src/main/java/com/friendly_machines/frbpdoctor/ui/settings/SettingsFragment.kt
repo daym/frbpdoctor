@@ -112,29 +112,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 override fun onAssociationPending(intentSender: IntentSender) {
                     // Called when a device is found. Launch the IntentSender so the user can select the device they want to pair with.
                     if (intentSender != null) {
+                        // Doesn't work
 //                        val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-//                            if (result.resultCode == Activity.RESULT_OK) {
-//                                val data = result.data
-//                                // The user chose to pair the app with a Bluetooth LE device.
-//                                val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
-//                                // data.getParcelableExtra(CompanionDeviceManager.EXTRA_ASSOCIATION); associationInfo.getAssociatedDevice missing in android 33
-//                                scanResult?.let {
-//                                    onScanningUserSelectedDevice(it)
-//                                }
-//                            }
+//                          onActivityResult(SELECT_DEVICE_REQUEST_CODE, result.resultCode, result.data)
 //                        }
 //                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+                        // The selection dialog is intentSender. Start it.
                         startIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null)
                     }
                 }
 
                 override fun onAssociationCreated(associationInfo: AssociationInfo) {
-                    //associationInfo.getAssociatedDevice missing in android 33
+                    // associationInfo.getAssociatedDevice missing in android 33
                     associationInfo.deviceMacAddress
                 }
 
                 override fun onFailure(errorMessage: CharSequence?) {
-                    // Handle the failure.
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                 }
             })
     }
