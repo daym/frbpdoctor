@@ -258,7 +258,6 @@ class WatchCommunicator: IWatchCommunicator {
         command: WatchCommand
     ) {
         val sendingSequenceNumber = this.sendingSequenceNumber.getAndAdd(1)
-        // TODO very few commands go via sendInternal3 instead (via bigWritingPortCharacteristic; same format)
         sendInternal(
             sendingSequenceNumber,
             command.operation.code,
@@ -311,9 +310,9 @@ class WatchCommunicator: IWatchCommunicator {
             val year = calendar[Calendar.YEAR].toShort()
             val month = calendar[Calendar.MONTH].toByte()
             val day = calendar[Calendar.DAY_OF_MONTH].toByte()
-            val hour = calendar[Calendar.DAY_OF_MONTH].toByte()
-            val minute = calendar[Calendar.DAY_OF_MONTH].toByte()
-            val second = calendar[Calendar.DAY_OF_MONTH].toByte()
+            val hour = calendar[Calendar.HOUR].toByte()
+            val minute = calendar[Calendar.MINUTE].toByte()
+            val second = calendar[Calendar.SECOND].toByte()
             val weekDay = calendar[Calendar.DAY_OF_WEEK].toByte() // FIXME shuffle so monday is 0
             enqueueCommand(
                 WatchSSetTimeCommand(year, month, day, hour, minute, second, weekDay)
