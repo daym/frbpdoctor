@@ -123,7 +123,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             SELECT_DEVICE_REQUEST_CODE -> when (resultCode) {
                 Activity.RESULT_OK -> {
                     // The user chose to pair the app with a Bluetooth LE device.
-                    val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
+                    val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)
                     // data.getParcelableExtra(CompanionDeviceManager.EXTRA_ASSOCIATION); associationInfo.getAssociatedDevice missing in android 33
                     scanResult?.let {
                         selectDevice(it)
