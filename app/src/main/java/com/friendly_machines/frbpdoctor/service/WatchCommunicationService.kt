@@ -18,7 +18,6 @@ import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import java.security.MessageDigest
-import kotlin.system.exitProcess
 
 /** Note: This service will accept calls when user clicks the respective button on the watch. */
 class WatchCommunicationService : Service(), IWatchListener {
