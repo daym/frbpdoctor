@@ -126,7 +126,7 @@ object AppSettings {
     private fun getSex(sharedPreferences: SharedPreferences): WatchProfileSex? {
         val sexString = sharedPreferences.getString(KEY_USER_SEX, "")
         return if (!sexString.isNullOrEmpty()) {
-            WatchProfileSex.parse(sexString.toInt().toByte())
+            WatchProfileSex.valueOf(sexString)
         } else {
             null
         }

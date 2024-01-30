@@ -6,7 +6,12 @@ import com.friendly_machines.fr_yhe_med.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchSetProfileCommand(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte) : WatchCommand(WatchOperation.SetProfile, run {
-    byteArrayOf(height, weight, sex.code, age)
+    byteArrayOf(
+        height, weight, when (sex) {
+            WatchProfileSex.Female -> 0
+            WatchProfileSex.Male -> 1
+        }, age
+    )
 }) {
     data class Response(val status: Byte) : // verified
         WatchResponse() {

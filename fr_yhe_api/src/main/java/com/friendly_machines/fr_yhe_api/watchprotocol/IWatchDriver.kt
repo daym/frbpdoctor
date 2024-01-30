@@ -8,5 +8,5 @@ interface IWatchDriver {
     val deviceFilter: DeviceFilter<*>
     fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean
     val communicator: IWatchCommunicator
-    fun start(scanRecord: ScanRecord?, continuation: (key: ByteArray) -> Unit)
+    fun createCommunicator(scanRecord: ScanRecord?, continuation: (key: ByteArray) -> Unit)
 }

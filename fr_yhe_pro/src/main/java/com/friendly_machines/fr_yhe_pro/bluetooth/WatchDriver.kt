@@ -17,7 +17,7 @@ class WatchDriver: IWatchDriver {
     }
     override val communicator = WatchCommunicator()
     // Returns: Key
-    override fun start(scanRecord: ScanRecord?, continuation: (key: ByteArray) -> Unit) {
+    override fun createCommunicator(scanRecord: ScanRecord?, continuation: (key: ByteArray) -> Unit) {
         continuation("dummy".toByteArray(Charsets.US_ASCII))
     }
 }
