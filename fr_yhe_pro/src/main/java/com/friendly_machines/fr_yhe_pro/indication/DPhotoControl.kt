@@ -9,7 +9,7 @@ control:
    1 for preparing shooting
    2 for shooting
  */
-data class DPhotoControl(val code: Short, val control: Byte)  : WatchResponse(){
+data class DPhotoControl(val code: Short, val control: Byte) : WatchResponse() {
     companion object {
         private const val WeCouldRespondCode: Short = (0x03 + WatchResponseFactory.D_RESPONSE_CODE_OFFSET).toShort()
         fun parse(buf: ByteBuffer): DPhotoControl {

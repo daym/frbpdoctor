@@ -4,8 +4,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_med.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchGetWatchFaceCommand : WatchCommand(WatchOperation.GetWatchFace, ByteArray(0))
-{
+class WatchGetWatchFaceCommand : WatchCommand(WatchOperation.GetWatchFace, ByteArray(0)) {
     @OptIn(ExperimentalUnsignedTypes::class)
     data class Response(val count: Short, val content: UIntArray) : // verified
         WatchResponse() {

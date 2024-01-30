@@ -8,13 +8,13 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
-import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
-import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
+import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 
 object WatchCommunicationClientShorthand {
     private const val TAG = "WatchCommunicationClientShorthand"

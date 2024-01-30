@@ -8,10 +8,9 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
-import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction
 
 class AlarmFragment : Fragment() {
     private var recyclerView: RecyclerView? = null

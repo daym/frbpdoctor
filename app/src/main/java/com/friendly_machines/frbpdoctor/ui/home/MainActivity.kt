@@ -13,12 +13,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
-import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 

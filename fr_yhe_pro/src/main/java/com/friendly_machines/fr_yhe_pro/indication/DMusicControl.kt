@@ -11,7 +11,7 @@ control:
     4 volume up
     5 volume down
  */
-data class DMusicControl(val code: Short, val control: Byte)  : WatchResponse() {
+data class DMusicControl(val code: Short, val control: Byte) : WatchResponse() {
     companion object {
         private const val WeCouldRespondCode: Short = (0x04 + WatchResponseFactory.D_RESPONSE_CODE_OFFSET).toShort()
         fun parse(buf: ByteBuffer): DMusicControl {

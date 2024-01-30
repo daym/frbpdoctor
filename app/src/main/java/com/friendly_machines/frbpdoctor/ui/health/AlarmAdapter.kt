@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock
 
 class AlarmAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>) : RecyclerView.Adapter<AlarmViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmViewHolder {

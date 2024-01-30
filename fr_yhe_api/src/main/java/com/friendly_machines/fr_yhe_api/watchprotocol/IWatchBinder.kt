@@ -2,7 +2,7 @@ package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
 
-interface IWatchBinder: IBinder {
+interface IWatchBinder : IBinder {
     fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte)
     fun setWeather(
         weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
@@ -16,9 +16,11 @@ interface IWatchBinder: IBinder {
     fun addAlarm(
         id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
     )
+
     fun editAlarm(
         id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
     )
+
     fun bindWatch(userId: Long, key: ByteArray)
     fun unbindWatch()
     fun getDeviceConfig()

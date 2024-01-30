@@ -9,7 +9,7 @@
         android:id="@+id/navigation_home"
         android:name="com.friendly_machines.frbpdoctor.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_navigation_home_to_healthActivity"
             app:destination="@id/healthActivity"

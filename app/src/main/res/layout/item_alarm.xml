@@ -66,19 +66,19 @@
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Fridays"/>
+        android:text="Fridays" />
 
     <CheckBox
         android:id="@+id/repeatSaturdayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Saturdays"/>
+        android:text="Saturdays" />
 
     <CheckBox
         android:id="@+id/repeatSundayCheckBox"
         android:layout_width="10dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Sundays"  />
+        android:text="Sundays" />
 </LinearLayout>

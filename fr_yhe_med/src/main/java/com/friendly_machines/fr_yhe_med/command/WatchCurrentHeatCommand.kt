@@ -1,8 +1,8 @@
 package com.friendly_machines.fr_yhe_med.command
 
-import com.friendly_machines.fr_yhe_med.WatchOperation
 import com.friendly_machines.fr_yhe_api.commondata.CurrentHeatDataBlock
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
+import com.friendly_machines.fr_yhe_med.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchCurrentHeatCommand : WatchCommand(WatchOperation.CurrentHeat, ByteArray(0)) // (big)

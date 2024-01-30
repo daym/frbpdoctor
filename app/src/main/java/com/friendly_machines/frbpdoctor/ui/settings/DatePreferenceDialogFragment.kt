@@ -27,6 +27,7 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
         val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         return datePieces[2].toInt()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var dateString = datePreference.text

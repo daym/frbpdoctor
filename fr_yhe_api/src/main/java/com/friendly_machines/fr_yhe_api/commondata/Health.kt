@@ -206,7 +206,7 @@ data class HFallDataBlock(
     val state: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 
+        val SIZE: Int = 4 + 1
 
         fun parsePro(buf: ByteBuffer): HFallDataBlock {
             return HFallDataBlock(
@@ -262,6 +262,7 @@ data class HHealthMonitoringDataBlock(
         }
     }
 }
+
 data class HHistorySportModeDataBlock(
     val startTime: Int,
     val endTime: Int,

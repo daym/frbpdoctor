@@ -12,8 +12,6 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction
-import com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -68,10 +66,12 @@ class EditAlarmDialog(private val action: com.friendly_machines.fr_yhe_med.comma
         titleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         titleSpinner.adapter = titleAdapter
 
-        builder.setPositiveButton(when (action) {
-            com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Add -> "Add Alarm"
-            com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Edit -> "Change Alarm"
-        }) { _, _ ->
+        builder.setPositiveButton(
+            when (action) {
+                com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Add -> "Add Alarm"
+                com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Edit -> "Change Alarm"
+            }
+        ) { _, _ ->
             val timeString = timeEditText.text.toString()
             val repeatOnDaysOfWeek = BooleanArray(7)
             for (i in 0..6) {

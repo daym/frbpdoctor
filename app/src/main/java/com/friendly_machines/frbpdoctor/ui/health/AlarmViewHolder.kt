@@ -5,8 +5,6 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock
-import com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed
 
 class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)

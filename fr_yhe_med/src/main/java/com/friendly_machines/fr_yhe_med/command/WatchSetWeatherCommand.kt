@@ -21,8 +21,7 @@ class WatchSetWeatherCommand(
         buf.put(dayOfWeekMondayBased) // FIXME make more abstract
         buf.put(location)
         buf.array()
-    })
-{
+    }) {
     data class Response(
         val status: Byte // verified
     ) : WatchResponse() {

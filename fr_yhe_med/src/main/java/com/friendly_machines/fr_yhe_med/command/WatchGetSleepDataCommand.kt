@@ -12,7 +12,7 @@ class WatchGetSleepDataCommand(startTime: Int, endTime: Int) : WatchCommand(Watc
     buf.array()
 }) // (big)
 {
-    data class Response(val dummy: Byte): WatchResponse() {
+    data class Response(val dummy: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
                 // There seem to be 10 B, all 0.

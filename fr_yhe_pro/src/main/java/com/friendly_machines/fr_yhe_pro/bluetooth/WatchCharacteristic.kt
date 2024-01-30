@@ -1,8 +1,5 @@
 package com.friendly_machines.fr_yhe_pro.bluetooth
 
-import android.bluetooth.le.ScanFilter
-import android.companion.BluetoothLeDeviceFilter
-import android.companion.DeviceFilter
 import android.os.ParcelUuid
 import java.util.UUID
 

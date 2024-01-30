@@ -7,6 +7,7 @@ interface IWatchCommunicator {
 
     fun start(bleDevice: RxBleDevice, keyDigest: ByteArray)
     fun stop()
+
     // addListener result is untested.
     fun addListener(listener: IWatchListener): IWatchBinder
     fun removeListener(listener: IWatchListener)

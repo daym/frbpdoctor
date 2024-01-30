@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
 
 class BloodPressureAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.BpDataBlock>) : RecyclerView.Adapter<BloodPressureViewHolder>() {
 

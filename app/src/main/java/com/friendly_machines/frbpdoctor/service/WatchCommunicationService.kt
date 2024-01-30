@@ -44,6 +44,7 @@ class WatchCommunicationService : Service(), IWatchListener {
         showSetMandatorySettingsDialog()
         return
     }
+
     override fun onCreate() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
             return die("No bluetooth LE support in the phone")

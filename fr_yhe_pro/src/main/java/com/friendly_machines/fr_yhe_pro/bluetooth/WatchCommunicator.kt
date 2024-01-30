@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger
  *   2. Attribute Protocol (ATT) Header (3 B): Opcode (1 B) and attribute handle (2 B)
  *   3. The actual ATT payload (up to 244 B)
  */
-class WatchCommunicator: IWatchCommunicator {
+class WatchCommunicator : IWatchCommunicator {
     private var bleDisposables = CompositeDisposable()
     private var mtu: Int = 23
 
@@ -289,7 +289,7 @@ class WatchCommunicator: IWatchCommunicator {
 
         override fun setWeather(
             weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
-        ) = enqueueCommand(WatchASetTodayWeatherCommand("FIXME", "FIXME",  "FIXME", 42/*FIXME*/))
+        ) = enqueueCommand(WatchASetTodayWeatherCommand("FIXME", "FIXME", "FIXME", 42/*FIXME*/))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
             WatchANotificationPushCommand(type.code /* FIXME */, title, content)
@@ -317,6 +317,7 @@ class WatchCommunicator: IWatchCommunicator {
         override fun getBatteryState() {
             // FIXME
         }
+
         override fun getAlarm() {
             enqueueCommand(WatchSGetAllAlarmsCommand())
         }
@@ -340,29 +341,37 @@ class WatchCommunicator: IWatchCommunicator {
         override fun unbindWatch() {
             // FIXME
         }
+
         override fun getDeviceConfig() = enqueueCommand(WatchGGetDeviceInfoCommand())
         override fun getBpData() {
             // FIXME
         }
+
         override fun getSleepData(startTime: Int, endTime: Int) {
             // FIXME
         }
+
         override fun getRawBpData(startTime: Int, endTime: Int) {
             // FIXME
         }
+
         override fun getStepData() {
             // FIXME
         }
+
         override fun getHeatData() {
             // FIXME
         }
+
         override fun getWatchFace() = enqueueCommand(WatchWGetWatchDialInfoCommand())
         override fun getSportData() {
             // FIXME
         }
+
         override fun setStepGoal(steps: Int) {
             // FIXME
         }
+
         override fun addListener(that: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(that)
             return this@WatchCommunicator.binder // FIXME is that right?
@@ -385,5 +394,6 @@ class WatchCommunicator: IWatchCommunicator {
             return this@WatchCommunicator.removeListener(that)
         }
     }
+
     override val binder = WatchCommunicationServiceBinder()
 }

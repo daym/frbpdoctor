@@ -1,19 +1,18 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
         android:key="userId"
         android:title="User ID"
         android:inputType="number"
         android:digits="0123456789"
-        app:useSimpleSummaryProvider="true"
-        />
+        app:useSimpleSummaryProvider="true" />
 
     <com.friendly_machines.frbpdoctor.ui.settings.RxBleDevicePreference
         android:key="watchMacAddress"
         android:title="Watch"
         android:dialogTitle="Select your watch"
-        app:useSimpleSummaryProvider="true"
-        />
+        app:useSimpleSummaryProvider="true" />
 
     <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
         android:key="userWeight"
@@ -25,7 +24,7 @@
         android:key="userHeight"
         android:title="Height"
         android:inputType="number"
-        app:unit="cm"/>
+        app:unit="cm" />
 
     <ListPreference
         android:key="userSex"
@@ -33,23 +32,19 @@
         android:dialogTitle="Select your sex"
         android:entries="@array/sex_options"
         android:entryValues="@array/sex_values"
-        app:useSimpleSummaryProvider="true"
-        />
+        app:useSimpleSummaryProvider="true" />
 
     <com.friendly_machines.frbpdoctor.ui.settings.DatePreference
         android:title="Birthday"
         android:key="userBirthday"
-        app:useSimpleSummaryProvider="true"
-         />
+        app:useSimpleSummaryProvider="true" />
 
     <Preference
         android:key="clear_preferences"
-        android:title="Clear Preferences and unbind watch"
-        />
+        android:title="Clear Preferences and unbind watch" />
 
     <Preference
         android:key="set_time_on_watch"
-        android:title="Set time on watch (to current time)"
-        />
+        android:title="Set time on watch (to current time)" />
 
 </PreferenceScreen>

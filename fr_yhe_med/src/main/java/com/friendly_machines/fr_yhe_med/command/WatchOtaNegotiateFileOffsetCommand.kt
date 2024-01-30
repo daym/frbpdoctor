@@ -7,8 +7,7 @@ import java.nio.ByteBuffer
 // See <https://developer.tuya.com/en/docs/iot-device-dev/OTA_BLE> for a possible workflow.
 // Purpose: Probably to resume.
 // TODO: We could also specify an offset here maybe.
-class WatchOtaNegotiateFileOffsetCommand(type: WatchOtaFirmwareType): WatchCommand(WatchOperation.OtaNegotiateFileOffset, byteArrayOf(type.code))
-{
+class WatchOtaNegotiateFileOffsetCommand(type: WatchOtaFirmwareType) : WatchCommand(WatchOperation.OtaNegotiateFileOffset, byteArrayOf(type.code)) {
     data class Response(val type: Byte, val offset: Int) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {

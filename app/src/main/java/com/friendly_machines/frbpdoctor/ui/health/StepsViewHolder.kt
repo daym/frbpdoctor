@@ -4,7 +4,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock
 
 class StepsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val dayTimestampTextView: TextView = itemView.findViewById(R.id.dayTimestampTextView)

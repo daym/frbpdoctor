@@ -8,13 +8,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
-import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
-import com.friendly_machines.fr_yhe_med.WatchOperation
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
-import com.friendly_machines.fr_yhe_med.WatchBigResponseMed
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -110,6 +108,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetHeatData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is HeatFragment) {
@@ -117,6 +116,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetStepData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is StepsFragment) {
@@ -124,6 +124,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetBpData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is BloodPressureFragment) {
@@ -131,6 +132,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetAlarm -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is AlarmFragment) {
@@ -138,6 +140,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetSportData -> {
                 for (fragment in supportFragmentManager.fragments) {
                     if (fragment is SportFragment) {
@@ -145,6 +148,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                     }
                 }
             }
+
             else -> {
 
             }
@@ -180,7 +184,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener {
                 )
                 onBigWatchResponse(response)
             } catch (e: RuntimeException) {
-                Log.d(TAG,"Parse error while parsing ${buffer.toByteArray()}: $e")
+                Log.d(TAG, "Parse error while parsing ${buffer.toByteArray()}: $e")
             }
         } else {
             if (command == com.friendly_machines.fr_yhe_med.WatchBigResponseMed.RAW_BLOOD_PRESSURE) {

@@ -17,15 +17,15 @@ class MeasurementTextPreference(context: Context, attrs: AttributeSet) : EditTex
     }
 
     override fun persistString(value: String?): Boolean {
-        val intValue = try{
+        val intValue = try {
             Integer.parseInt(value!!)
-        }
-        catch (e: NumberFormatException){
+        } catch (e: NumberFormatException) {
             e.printStackTrace()
             0
         }
         return persistInt(intValue)
     }
+
     class SimpleSummaryProvider private constructor() : SummaryProvider<MeasurementTextPreference?> {
         override fun provideSummary(preference: MeasurementTextPreference): CharSequence? {
             return if (preference.unit == null) {
@@ -46,7 +46,8 @@ class MeasurementTextPreference(context: Context, attrs: AttributeSet) : EditTex
 
     init {
         // Retrieve the unit attribute from XML
-        val typedArray = context.obtainStyledAttributes(attrs,
+        val typedArray = context.obtainStyledAttributes(
+            attrs,
             R.styleable.MeasurementTextPreference
         )
         unit = typedArray.getString(R.styleable.MeasurementTextPreference_unit)

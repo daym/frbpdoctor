@@ -56,6 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             it.setTime()
         }
     }
+
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
         if (age <= 0 || age >= 256)
@@ -119,7 +120,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            SELECT_DEVICE_REQUEST_CODE -> when(resultCode) {
+            SELECT_DEVICE_REQUEST_CODE -> when (resultCode) {
                 Activity.RESULT_OK -> {
                     // The user chose to pair the app with a Bluetooth LE device.
                     val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
@@ -129,13 +130,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     }
                 }
             }
+
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     private fun scan() {
         val deviceManager = requireContext().getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
-        val watchChoosingExecutor: Executor =  Executor { it.run() }
+        val watchChoosingExecutor: Executor = Executor { it.run() }
         val associationRequest = watchDrivers.fold(AssociationRequest.Builder().setDeviceProfile(AssociationRequest.DEVICE_PROFILE_WATCH)) { builder, watchDriver ->
             builder.addDeviceFilter(watchDriver.deviceFilter)
         }.build()
@@ -175,6 +177,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 f.setTargetFragment(this, 0) // TODO
                 f.show(parentFragmentManager, null)
             }
+
             else -> {
                 super.onDisplayPreferenceDialog(preference)
             }

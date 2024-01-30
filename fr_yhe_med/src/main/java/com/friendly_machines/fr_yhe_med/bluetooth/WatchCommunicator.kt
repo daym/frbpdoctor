@@ -11,6 +11,10 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingException
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageEncodingException
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.decodeBigMessage
@@ -37,10 +41,6 @@ import com.friendly_machines.fr_yhe_med.command.WatchGetSleepDataCommand
 import com.friendly_machines.fr_yhe_med.command.WatchGetSportDataCommand
 import com.friendly_machines.fr_yhe_med.command.WatchGetStepDataCommand
 import com.friendly_machines.fr_yhe_med.command.WatchGetWatchFaceCommand
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_med.command.WatchSetMessageCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetProfileCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetStepGoalCommand
@@ -86,15 +86,16 @@ import javax.crypto.spec.SecretKeySpec
  *   3. The actual ATT payload (up to 244 B)
  */
 private const val B = 1
-private const val BLE_L2CAP_HEADER_SIZE: Int = 4* B
+private const val BLE_L2CAP_HEADER_SIZE: Int = 4 * B
+
 // ATT_MTU counts starting from here.
-private const val BLE_ATT_HEADER_SIZE: Int = 3* B
+private const val BLE_ATT_HEADER_SIZE: Int = 3 * B
 internal const val BLE_L2CAP_ATT_HEADER_SIZE: Int = BLE_L2CAP_HEADER_SIZE + BLE_ATT_HEADER_SIZE
 
 // Our packets usually have this maximal overhead--except for the first packet (which has 6 B). TODO nicer?
-private const val ENCODED_PACKET_MAJORITY_HEADER_SIZE: Int = 4* B
+private const val ENCODED_PACKET_MAJORITY_HEADER_SIZE: Int = 4 * B
 
-public class WatchCommunicator: IWatchCommunicator {
+public class WatchCommunicator : IWatchCommunicator {
     private var bleDisposables = CompositeDisposable()
     private var mtu: Int = 23
     private var maxPacketPayloadSize: Int = 23 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE
@@ -110,6 +111,7 @@ public class WatchCommunicator: IWatchCommunicator {
             else
                 return false
         }
+
         val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
 
         const val TAG: String = "WatchCommunicator"
@@ -532,11 +534,11 @@ public class WatchCommunicator: IWatchCommunicator {
         override fun getBatteryState() = enqueueCommand(WatchGetBatteryStateCommand())
         override fun getAlarm() = enqueueCommand(WatchGetAlarmCommand())
 
-        override fun addAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray)  = enqueueCommand(
+        override fun addAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray) = enqueueCommand(
             WatchChangeAlarmCommand(WatchChangeAlarmAction.Add, id, enabled, hour, min, title, repeats),
         )
 
-        override fun editAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray)  = enqueueCommand(
+        override fun editAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray) = enqueueCommand(
             WatchChangeAlarmCommand(WatchChangeAlarmAction.Edit, id, enabled, hour, min, title, repeats),
         )
 
@@ -595,6 +597,7 @@ public class WatchCommunicator: IWatchCommunicator {
                         return WatchResponseAnalysisResult.Mismatch
                     }
                 }
+
                 WatchResponseType.SetStepGoal -> {
                     if (response is WatchSetStepGoalCommand.Response) {
                         if (response.status == 0.toByte()) {
@@ -618,6 +621,7 @@ public class WatchCommunicator: IWatchCommunicator {
                         return WatchResponseAnalysisResult.Mismatch
                     }
                 }
+
                 WatchResponseType.Bind -> {
                     if (response is WatchBindCommand.Response) {
                         if (response.status == 0.toByte()) {
@@ -629,6 +633,7 @@ public class WatchCommunicator: IWatchCommunicator {
                         return WatchResponseAnalysisResult.Mismatch
                     }
                 }
+
                 WatchResponseType.SetProfile -> {
                     if (response is WatchSetProfileCommand.Response) {
                         if (response.status == 0.toByte()) {
@@ -648,5 +653,6 @@ public class WatchCommunicator: IWatchCommunicator {
             return this@WatchCommunicator.removeListener(that)
         }
     }
+
     override val binder = WatchCommunicationServiceBinder()
 }

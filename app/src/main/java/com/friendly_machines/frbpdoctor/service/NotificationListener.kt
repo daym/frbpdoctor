@@ -4,9 +4,9 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageEncodingException
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 
 // Note: Service dependency on WatchCommunicationService
 class NotificationListener : NotificationListenerService() {
@@ -52,9 +52,10 @@ class NotificationListener : NotificationListenerService() {
                                 Notification.CATEGORY_TRANSPORT -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Qq
                                 //Notification.CATEGORY_SYSTEM -> reserved
                                 else -> com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Messenger
-                            }, time.toInt(), title, text)
+                            }, time.toInt(), title, text
+                        )
                     } catch (e: WatchMessageEncodingException) {
-                        binder.setMessage(com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Line, time.toInt(),"message too long", "message too long")
+                        binder.setMessage(com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed.Line, time.toInt(), "message too long", "message too long")
                     }
                 }
             }

@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
-import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
 
 class BloodPressureFragment : Fragment() {
     private var recyclerView: RecyclerView? = null

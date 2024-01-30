@@ -15,6 +15,7 @@ enum class MessageTypeMed(val code: Byte) {
     Twitter(17),
     Viber(18),
     Whatsapp(19);
+
     companion object {
         fun parse(code: Byte): MessageTypeMed? {
             return values().find { it.code == code }
