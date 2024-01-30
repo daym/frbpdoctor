@@ -2,7 +2,7 @@ package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
 
-interface IWatchCommunication: IBinder {
+interface IWatchBinder: IBinder {
     fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte)
     fun setWeather(
         weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
@@ -30,8 +30,8 @@ interface IWatchCommunication: IBinder {
     fun getWatchFace()
     fun getSportData()
     fun setStepGoal(steps: Int)
-    fun addListener(watchListener: IWatchListener): IWatchCommunication
-    fun removeListener(it: IWatchCommunication)
+    fun addListener(watchListener: IWatchListener): IWatchBinder
+    fun removeListener(it: IWatchBinder)
     fun resetSequenceNumbers()
     fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalyzationResult
 }

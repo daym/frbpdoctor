@@ -5,7 +5,7 @@ import android.companion.BluetoothLeDeviceFilter
 import android.companion.DeviceFilter
 import android.os.Binder
 import android.util.Log
-import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingException
@@ -483,7 +483,7 @@ public class WatchCommunicator: IWatchCommunicator {
         this.listeners.remove(listener)
     }
 
-    override fun addListener(listener: IWatchListener): IWatchCommunication {
+    override fun addListener(listener: IWatchListener): IWatchBinder {
         this.listeners.add(listener)
         return this.binder
     }
@@ -494,7 +494,7 @@ public class WatchCommunicator: IWatchCommunicator {
         }
     }
 
-    inner class WatchCommunicationServiceBinder : Binder(), IWatchCommunication {
+    inner class WatchCommunicationServiceBinder : Binder(), IWatchBinder {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
 //        }
@@ -555,12 +555,12 @@ public class WatchCommunicator: IWatchCommunicator {
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
 
-        override fun addListener(watchListener: IWatchListener): IWatchCommunication {
+        override fun addListener(watchListener: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(watchListener)
             return this@WatchCommunicator.binder
         }
 
-        override fun removeListener(it: IWatchCommunication) {
+        override fun removeListener(it: IWatchBinder) {
             TODO("Not yet implemented") // FIXME
         }
 

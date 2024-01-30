@@ -10,7 +10,7 @@ import android.util.Log
 import android.widget.Toast
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
-import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalyzationResult
@@ -20,11 +20,11 @@ object WatchCommunicationClientShorthand {
     private const val TAG = "WatchCommunicationClientShorthand"
 
     /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
-    private fun bind(context: Context, callback: (ServiceConnection, IWatchCommunication) -> IWatchCommunication): ServiceConnection? {
+    private fun bind(context: Context, callback: (ServiceConnection, IWatchBinder) -> IWatchBinder): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
-            private var disconnector: IWatchCommunication? = null
+            private var disconnector: IWatchBinder? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as IWatchCommunication
+                val binder = service as IWatchBinder
                 callback(this, binder).let {
                     assert(this.disconnector == null)
                     this.disconnector = it
@@ -56,7 +56,7 @@ object WatchCommunicationClientShorthand {
      *
      * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
      */
-    fun bindExecOneCommandUnbind(context: Context, expectedResponseType: WatchResponseType, callback: (IWatchCommunication) -> Unit) {
+    fun bindExecOneCommandUnbind(context: Context, expectedResponseType: WatchResponseType, callback: (IWatchBinder) -> Unit) {
         bind(context) { _, binder ->
             val disconnector = binder.addListener(object : IWatchListener {
                 override fun onWatchResponse(response: WatchResponse) {
@@ -88,11 +88,11 @@ object WatchCommunicationClientShorthand {
      * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms. Uses up handler.
      * Return a handle that can be passed to unbindService.
      */
-    fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: IWatchListener, callback: (IWatchCommunication) -> Unit): ServiceConnection? {
+    fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: IWatchListener, callback: (IWatchBinder) -> Unit): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {
-            private var disconnector: IWatchCommunication? = null
+            private var disconnector: IWatchBinder? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as IWatchCommunication
+                val binder = service as IWatchBinder
                 disconnector = binder.addListener(listener)
                 val periodicTask: Runnable = object : Runnable {
                     override fun run() {

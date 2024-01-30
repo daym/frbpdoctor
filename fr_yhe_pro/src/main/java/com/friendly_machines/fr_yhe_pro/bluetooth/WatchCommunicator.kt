@@ -1,11 +1,8 @@
 package com.friendly_machines.fr_yhe_pro.bluetooth
 
-import android.bluetooth.le.ScanFilter
-import android.companion.BluetoothLeDeviceFilter
-import android.companion.DeviceFilter
 import android.os.Binder
 import android.util.Log
-import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingException
@@ -271,7 +268,7 @@ class WatchCommunicator: IWatchCommunicator {
         this.listeners.remove(listener)
     }
 
-    override fun addListener(listener: IWatchListener): IWatchCommunication {
+    override fun addListener(listener: IWatchListener): IWatchBinder {
         this.listeners.add(listener)
         return this.binder
     }
@@ -282,7 +279,7 @@ class WatchCommunicator: IWatchCommunicator {
         }
     }
 
-    inner class WatchCommunicationServiceBinder : Binder(), IWatchCommunication {
+    inner class WatchCommunicationServiceBinder : Binder(), IWatchBinder {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
 //        }
@@ -366,12 +363,12 @@ class WatchCommunicator: IWatchCommunicator {
         override fun setStepGoal(steps: Int) {
             // FIXME
         }
-        override fun addListener(that: IWatchListener): IWatchCommunication {
+        override fun addListener(that: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(that)
             return this@WatchCommunicator.binder // FIXME is that right?
         }
 
-        override fun removeListener(it: IWatchCommunication) {
+        override fun removeListener(it: IWatchBinder) {
             TODO("Not yet implemented") // FIXME
         }
 
