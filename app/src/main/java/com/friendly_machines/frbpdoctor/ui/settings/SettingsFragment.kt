@@ -51,6 +51,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
     }
 
+    private fun setTime() {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetProfile) {
+            it.setTime()
+        }
+    }
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
         if (age <= 0 || age >= 256)
@@ -77,6 +82,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         setPreferencesFromResource(R.xml.preferences, rootKey)
         findPreference<Preference>("clear_preferences")?.setOnPreferenceClickListener {
             clearAllPreferences()
+            true
+        }
+        findPreference<Preference>("set_time_on_watch")?.setOnPreferenceClickListener {
+            setTime()
             true
         }
     }

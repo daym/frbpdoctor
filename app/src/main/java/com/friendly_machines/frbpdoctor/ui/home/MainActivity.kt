@@ -82,9 +82,9 @@ class MainActivity : AppCompatActivity(), IWatchListener {
     override fun onStart() {
         super.onStart()
         this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
-            binder.setTime()
-            binder.getBatteryState()
-            binder.getWatchFace() // ok but response is weird
+            //binder.setTime()
+            //binder.getBatteryState()
+            //binder.getWatchFace() // ok but response is weird
         }
         // nope. startService(serviceIntent)
     }
