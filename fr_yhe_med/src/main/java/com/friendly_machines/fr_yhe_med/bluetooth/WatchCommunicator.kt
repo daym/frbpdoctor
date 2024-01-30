@@ -39,7 +39,7 @@ import com.friendly_machines.fr_yhe_med.command.WatchGetStepDataCommand
 import com.friendly_machines.fr_yhe_med.command.WatchGetWatchFaceCommand
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalyzationResult
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_med.command.WatchSetMessageCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetProfileCommand
@@ -570,74 +570,74 @@ public class WatchCommunicator: IWatchCommunicator {
             )
         }
 
-        override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalyzationResult {
+        override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult {
             when (expectedResponseType) {
                 WatchResponseType.SetMessage -> {
                     if (response is WatchSetMessageCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.ChangeAlarm -> {
                     if (response is WatchChangeAlarmCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
                 WatchResponseType.SetStepGoal -> {
                     if (response is WatchSetStepGoalCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.Unbind -> {
                     if (response is WatchUnbindCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
                 WatchResponseType.Bind -> {
                     if (response is WatchBindCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
                 WatchResponseType.SetProfile -> {
                     if (response is WatchSetProfileCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalyzationResult.Ok
+                            return WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalyzationResult.Err
+                            return WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalyzationResult.Mismatch
+                        return WatchResponseAnalysisResult.Mismatch
                     }
                 }
             }

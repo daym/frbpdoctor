@@ -9,7 +9,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingExcept
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalyzationResult
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_pro.Crc16rev
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.bigIndicationPortCharacteristic
@@ -375,9 +375,9 @@ class WatchCommunicator: IWatchCommunicator {
         override fun resetSequenceNumbers() {
         }
 
-        override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalyzationResult {
+        override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult {
             // FIXME
-            return WatchResponseAnalyzationResult.Err
+            return WatchResponseAnalysisResult.Err
         }
 
         // FIXME

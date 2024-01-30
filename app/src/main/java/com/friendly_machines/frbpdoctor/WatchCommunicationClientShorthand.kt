@@ -13,7 +13,7 @@ import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
-import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalyzationResult
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 
 object WatchCommunicationClientShorthand {
@@ -61,17 +61,17 @@ object WatchCommunicationClientShorthand {
             val disconnector = binder.addListener(object : IWatchListener {
                 override fun onWatchResponse(response: WatchResponse) {
                     when (binder.analyzeResponse(response, expectedResponseType)) {
-                        WatchResponseAnalyzationResult.Ok -> {
+                        WatchResponseAnalysisResult.Ok -> {
                             // FIXME context.unbindService(serviceConnection)
                             Log.d(SettingsFragment.TAG, "Command finished successfully with response $response")
                             return
                         }
 
-                        WatchResponseAnalyzationResult.Mismatch -> {
+                        WatchResponseAnalysisResult.Mismatch -> {
                             // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
                         }
 
-                        WatchResponseAnalyzationResult.Err -> {
+                        WatchResponseAnalysisResult.Err -> {
                             Log.e(SettingsFragment.TAG, "Command ended in unexpected response $response")
                             Toast.makeText(context, "Command ended in unexpected response $response", Toast.LENGTH_SHORT).show()
                         }

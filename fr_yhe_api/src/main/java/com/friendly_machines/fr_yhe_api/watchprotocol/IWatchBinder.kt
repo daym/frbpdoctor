@@ -33,5 +33,5 @@ interface IWatchBinder: IBinder {
     fun addListener(watchListener: IWatchListener): IWatchBinder
     fun removeListener(it: IWatchBinder)
     fun resetSequenceNumbers()
-    fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalyzationResult
+    fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult
 }
