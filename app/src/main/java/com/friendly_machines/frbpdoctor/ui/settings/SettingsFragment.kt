@@ -1,10 +1,8 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.app.Activity
-import android.bluetooth.le.ScanFilter
 import android.companion.AssociationInfo
 import android.companion.AssociationRequest
-import android.companion.BluetoothLeDeviceFilter
 import android.companion.CompanionDeviceManager
 import android.content.Context
 import android.content.Intent
@@ -12,8 +10,6 @@ import android.content.IntentSender
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -80,6 +76,37 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
     }
 
+    private fun selectDevice(scanResult: android.bluetooth.le.ScanResult) {
+        val watchMacAddress = scanResult.device.address
+        val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
+        findPreference<RxBleDevicePreference>("watchMacAddress")?.text = watchMacAddress
+
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        var watchCommunicatorClassname = "unknown"
+        val key = if (com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
+            watchCommunicatorClassname = com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.javaClass.canonicalName
+            "dummy".toByteArray(Charsets.US_ASCII)
+        } else if (com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
+            watchCommunicatorClassname = com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.javaClass.canonicalName
+            val scanRecord = scanResult.scanRecord
+            if (scanRecord != null) {
+                scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
+            } else {
+                return
+            }
+        } else {
+            "unknown".toByteArray(Charsets.US_ASCII)
+        }
+        AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
+
+        // Note: It's possible that scanning doesn't find anything when we are already connected.
+        AppSettings.getUserId(sharedPreferences)?.let { userId ->
+            // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
+            bindWatch(userId, key)
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             SELECT_DEVICE_REQUEST_CODE -> when(resultCode) {
@@ -88,7 +115,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
                     // data.getParcelableExtra(CompanionDeviceManager.EXTRA_ASSOCIATION); associationInfo.getAssociatedDevice missing in android 33
                     scanResult?.let {
-                        onScanningUserSelectedDevice(it)
+                        selectDevice(it)
                     }
                 }
             }
@@ -196,34 +223,4 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    fun onScanningUserSelectedDevice(scanResult: android.bluetooth.le.ScanResult) {
-        val watchMacAddress = scanResult.device.address
-        val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
-        findPreference<RxBleDevicePreference>("watchMacAddress")?.text = watchMacAddress
-
-        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        var watchCommunicatorClassname = "unknown"
-        val key = if (com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
-            watchCommunicatorClassname = "com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator"
-            "dummy".toByteArray(Charsets.US_ASCII)
-        } else if (com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
-            watchCommunicatorClassname = "com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator"
-            val scanRecord = scanResult.scanRecord
-            if (scanRecord != null) {
-                scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
-            } else {
-                return
-            }
-        } else {
-            "unknown".toByteArray(Charsets.US_ASCII)
-        }
-        AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
-
-        // Note: It's possible that scanning doesn't find anything when we are already connected.
-        AppSettings.getUserId(sharedPreferences)?.let { userId ->
-            // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-            bindWatch(userId, key)
-        }
-    }
 }
