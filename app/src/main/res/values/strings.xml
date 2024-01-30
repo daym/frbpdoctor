@@ -7,12 +7,10 @@
         <item>Female</item>
         <item>Male</item>
     </string-array>
-
     <string-array name="sex_values">
-        <item>0</item>
-        <item>1</item>
+        <item>Female</item>
+        <item>Male</item>
     </string-array>
-
     <string name="userWeight">weight</string>
     <string name="userHeight">height</string>
     <string name="userBirthday">birthday</string>

@@ -94,7 +94,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             it.compatibleWith(scanResult.scanRecord)
         }?.let { watchDriver ->
             if (watchDriver.compatibleWith(scanResult.scanRecord)) {
-                watchDriver.start(scanResult.scanRecord) { key ->
+                watchDriver.createCommunicator(scanResult.scanRecord) { key ->
                     watchCommunicatorClassname = watchDriver.id
                     AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
 
