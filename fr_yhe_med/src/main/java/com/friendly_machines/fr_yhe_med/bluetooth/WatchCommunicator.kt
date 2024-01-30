@@ -1,5 +1,8 @@
 package com.friendly_machines.fr_yhe_med.bluetooth
 
+import android.bluetooth.le.ScanFilter
+import android.companion.BluetoothLeDeviceFilter
+import android.companion.DeviceFilter
 import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
@@ -51,7 +54,6 @@ import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.exceptions.BleCharacteristicNotFoundException
 import com.polidea.rxandroidble3.exceptions.BleConflictingNotificationAlreadySetException
 import com.polidea.rxandroidble3.exceptions.BleGattException
-import com.polidea.rxandroidble3.scan.ScanRecord
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -102,9 +104,13 @@ public class WatchCommunicator: IWatchCommunicator {
     private var connection: RxBleConnection? = null
 
     companion object {
-        fun compatibleWith(scanRecord: ScanRecord): Boolean {
-            return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
+        fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
+            if (scanRecord != null)
+                return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
+            else
+                return false
         }
+        val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
 
         const val TAG: String = "WatchCommunicator"
         val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
@@ -121,12 +127,7 @@ public class WatchCommunicator: IWatchCommunicator {
     private fun setupSender(commandQueue: Subject<WatchCommand>) {
         // TODO .onBackpressureBuffer().flatMap(bytesAndFilter -> {}, 1/*serialized communication*/)
         bleDisposables.add(commandQueue.subscribe({
-            try {
-                sendAll(it)
-            } catch (e: Throwable) {
-                Log.e(TAG, "setupSender: $e")
-                // FIXME awful
-            }
+            sendAll(it)
         }, {
             Log.e(TAG, "setupSender: $it")
         }))
@@ -411,6 +412,7 @@ public class WatchCommunicator: IWatchCommunicator {
                 this.mtu = mtu
                 this.maxPacketPayloadSize = (mtu - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE).coerceAtMost(251 - BLE_L2CAP_ATT_HEADER_SIZE - ENCODED_PACKET_MAJORITY_HEADER_SIZE)
 
+                //setupSender(commandQueue = commandQueue)
                 listeners.forEach {
                     it.onMtuResponse(mtu)
                 }

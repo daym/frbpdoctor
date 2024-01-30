@@ -1,5 +1,8 @@
 package com.friendly_machines.fr_yhe_med.bluetooth
 
+import android.bluetooth.le.ScanFilter
+import android.companion.BluetoothLeDeviceFilter
+import android.companion.DeviceFilter
 import android.os.ParcelUuid
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingException
@@ -10,7 +13,7 @@ import java.nio.ByteOrder
 import java.util.UUID
 
 object WatchCharacteristic {
-    val serviceUuid: ParcelUuid = ParcelUuid.fromString("0000FE51-0000-1000-8000-00805F9B34FB")
+    internal val serviceUuid: ParcelUuid = ParcelUuid.fromString("0000FE51-0000-1000-8000-00805F9B34FB")
     val writingPortCharacteristic: UUID = UUID.fromString("00000001-0000-1001-8001-00805F9B07D0")
     val notificationCharacteristic: UUID = UUID.fromString("00000002-0000-1001-8001-00805F9B07D0")
     val bigWritingPortCharacteristic: UUID = UUID.fromString("00000003-0000-1001-8001-00805F9B07D0")

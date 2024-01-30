@@ -2,24 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+    <uses-feature
+        android:name="android.software.companion_device_setup"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+    <uses-permission android:name="android.permission.BLUETOOTH" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_PROFILE_WATCH" />
+    <uses-permission
+        android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-
-    <uses-permission-sdk-23
-        android:name="android.permission.ACCESS_COARSE_LOCATION"
-        android:maxSdkVersion="30"
-        tools:node="replace" />
-    <uses-permission-sdk-23
-        android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="30"
-        tools:node="replace" />
 
     <application
         android:name=".MyApplication"
@@ -31,7 +28,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FrBpDoctor"
-        tools:targetApi="31">
+        tools:targetApi="33">
+        <service
+            android:name=".service.WatchCommunicationService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/watch_communication_service" />
+        <service
+            android:name=".service.NotificationListener"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/notification_listener_service"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".ui.settings.WatchSelectionActivity"
+            android:exported="false"
+            android:label="@string/title_activity_watch_selection"
+            android:theme="@style/Theme.FrBpDoctor.NoActionBar" />
         <activity
             android:name=".ui.weather.WeatherActivity"
             android:exported="false" />
@@ -40,23 +58,6 @@
             android:exported="false"
             android:label="@string/title_activity_health"
             android:theme="@style/Theme.FrBpDoctor.NoActionBar" />
-
-        <service
-            android:name=".service.WatchCommunicationService"
-            android:label="@string/watch_communication_service"
-            android:enabled="true"
-            android:exported="false" />
-
-        <service
-            android:exported="true"
-            android:enabled="true"
-            android:name=".service.NotificationListener"
-            android:label="@string/notification_listener_service"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-            <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService" />
-            </intent-filter>
-        </service>
 
         <activity
             android:name=".ui.home.MainActivity"

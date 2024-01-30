@@ -1,26 +1,39 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
+import android.app.Activity
+import android.bluetooth.le.ScanFilter
+import android.companion.AssociationInfo
+import android.companion.AssociationRequest
+import android.companion.BluetoothLeDeviceFilter
+import android.companion.CompanionDeviceManager
+import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.AppSettings
+import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
-import com.polidea.rxandroidble3.scan.ScanResult
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.Executor
 
 // FIXME Android has an actual "Settings Fragment" in the menu
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, ScannerFragment.ScannerResultListener {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
         const val TAG: String = "SettingsFragment"
+        const val SELECT_DEVICE_REQUEST_CODE = 42
     }
 
     private fun unbindWatch() {
@@ -67,20 +80,74 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            SELECT_DEVICE_REQUEST_CODE -> when(resultCode) {
+                Activity.RESULT_OK -> {
+                    // The user chose to pair the app with a Bluetooth LE device.
+                    val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
+                    // data.getParcelableExtra(CompanionDeviceManager.EXTRA_ASSOCIATION); associationInfo.getAssociatedDevice missing in android 33
+                    scanResult?.let {
+                        onScanningUserSelectedDevice(it)
+                    }
+                }
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun scan() {
+        val deviceManager = requireContext().getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
+        val executor: Executor =  Executor { it.run() } // FIXME use default executor
+
+        val associationRequest = AssociationRequest.Builder()
+            .setDeviceProfile(AssociationRequest.DEVICE_PROFILE_WATCH)
+            .addDeviceFilter(com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.deviceFilter)
+            .addDeviceFilter(com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.deviceFilter)
+            .build()
+
+        deviceManager.associate(associationRequest,
+            executor,
+            object : CompanionDeviceManager.Callback() {
+                override fun onAssociationPending(intentSender: IntentSender) {
+                    // Called when a device is found. Launch the IntentSender so the user can select the device they want to pair with.
+                    if (intentSender != null) {
+//                        val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+//                            if (result.resultCode == Activity.RESULT_OK) {
+//                                val data = result.data
+//                                // The user chose to pair the app with a Bluetooth LE device.
+//                                val scanResult = data?.getParcelableExtra(android.companion.CompanionDeviceManager.EXTRA_DEVICE, android.bluetooth.le.ScanResult::class.java)!!
+//                                // data.getParcelableExtra(CompanionDeviceManager.EXTRA_ASSOCIATION); associationInfo.getAssociatedDevice missing in android 33
+//                                scanResult?.let {
+//                                    onScanningUserSelectedDevice(it)
+//                                }
+//                            }
+//                        }
+//                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+                        startIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null)
+                    }
+                }
+
+                override fun onAssociationCreated(associationInfo: AssociationInfo) {
+                    //associationInfo.getAssociatedDevice missing in android 33
+                    associationInfo.deviceMacAddress
+                }
+
+                override fun onFailure(errorMessage: CharSequence?) {
+                    // Handle the failure.
+                }
+            })
+    }
+
     override fun onDisplayPreferenceDialog(preference: Preference) {
         when (preference) {
-            is RxBleDevicePreference -> {
-                val scannerFragment = ScannerFragment(this)
-                scannerFragment.show(requireActivity().supportFragmentManager, "ScannerFragment")
-            }
-
+            is RxBleDevicePreference -> scan()
             is DatePreference -> {
                 val f: DialogFragment
                 f = DatePreferenceDialogFragment.newInstance(preference.getKey())
                 f.setTargetFragment(this, 0) // TODO
                 f.show(parentFragmentManager, null)
             }
-
             else -> {
                 super.onDisplayPreferenceDialog(preference)
             }
@@ -135,9 +202,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onScanningUserSelectedDevice(scanResult: ScanResult) {
-        val device = scanResult.bleDevice
-        findPreference<RxBleDevicePreference>("watchMacAddress")?.text = device.macAddress
+    fun onScanningUserSelectedDevice(scanResult: android.bluetooth.le.ScanResult) {
+        val watchMacAddress = scanResult.device.address
+        val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
+        findPreference<RxBleDevicePreference>("watchMacAddress")?.text = watchMacAddress
 
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
@@ -147,7 +215,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             "dummy".toByteArray(Charsets.US_ASCII)
         } else if (com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
             watchCommunicatorClassname = "com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator"
-            scanResult.scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
+            val scanRecord = scanResult.scanRecord
+            if (scanRecord != null) {
+                scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
+            } else {
+                return
+            }
         } else {
             "unknown".toByteArray(Charsets.US_ASCII)
         }

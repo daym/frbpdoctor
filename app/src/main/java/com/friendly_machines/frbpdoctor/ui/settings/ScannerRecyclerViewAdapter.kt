@@ -11,17 +11,16 @@ import com.polidea.rxandroidble3.scan.ScanResult
 /**
  * [RecyclerView.Adapter]
  */
-class MyScannerRecyclerViewAdapter(
+class ScannerRecyclerViewAdapter(
     private val values: List<ScanResult>,
     private val onItemClickListener: ItemClickListener
 
-) : RecyclerView.Adapter<MyScannerRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ScannerRecyclerViewAdapter.ViewHolder>() {
     interface ItemClickListener {
         fun onItemClick(position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-
         return ViewHolder(
             FragmentScannerBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -29,7 +28,6 @@ class MyScannerRecyclerViewAdapter(
                 false
             )
         )
-
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -52,7 +50,6 @@ class MyScannerRecyclerViewAdapter(
 //            deviceNameTextView.text = deviceName
 //        }
 
-        // TODO fun bind...
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
         }
@@ -63,7 +60,5 @@ class MyScannerRecyclerViewAdapter(
                 onItemClickListener.onItemClick(position)
             }
         }
-
     }
-
 }

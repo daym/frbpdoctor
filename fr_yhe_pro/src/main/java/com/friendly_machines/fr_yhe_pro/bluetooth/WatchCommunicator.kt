@@ -1,5 +1,8 @@
 package com.friendly_machines.fr_yhe_pro.bluetooth
 
+import android.bluetooth.le.ScanFilter
+import android.companion.BluetoothLeDeviceFilter
+import android.companion.DeviceFilter
 import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunication
@@ -30,7 +33,6 @@ import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.exceptions.BleCharacteristicNotFoundException
 import com.polidea.rxandroidble3.exceptions.BleConflictingNotificationAlreadySetException
 import com.polidea.rxandroidble3.exceptions.BleGattException
-import com.polidea.rxandroidble3.scan.ScanRecord
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -60,8 +62,13 @@ class WatchCommunicator: IWatchCommunicator {
     private var connection: RxBleConnection? = null
 
     companion object {
-        fun compatibleWith(scanRecord: ScanRecord): Boolean {
-            return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
+        val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
+
+        fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
+            if (scanRecord != null)
+                return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
+            else
+                return false
         }
 
         const val TAG: String = "WatchCommunicator"
