@@ -51,9 +51,7 @@ class WatchCommunicationService : Service(), IWatchListener {
         if (!areMandatorySettingsSet())
             return die("settings missing")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val key = AppSettings.getWatchKey(this, sharedPreferences)
-        if (key == null)
-            return die("Key was null")
+        val key = AppSettings.getWatchKey(this, sharedPreferences) ?: return die("Key was null")
         val keyDigest = MessageDigest.getInstance("MD5").digest(key)
         val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
         val watchCommunicatorClassname = sharedPreferences.getString(AppSettings.KEY_WATCH_COMMUNICATOR_CLASS, "")!!
@@ -90,10 +88,10 @@ class WatchCommunicationService : Service(), IWatchListener {
 
     override fun onBind(intent: Intent): IBinder? {
         val communicator = this.communicator
-        if (communicator != null) {
-            return communicator.binder
+        return if (communicator != null) {
+            communicator.binder
         } else {
-            return null
+            null
         }
     }
 
@@ -107,15 +105,6 @@ class WatchCommunicationService : Service(), IWatchListener {
     }
 
     // TODO what if we are restarted: will the listener be restored?!
-
-    fun removeListener(listener: IWatchListener) {
-        communicator?.removeListener(listener)
-    }
-
-    private fun addListener(listener: IWatchListener): WatchCommunicationService {
-        communicator?.addListener(listener)
-        return this
-    }
 
     private fun acceptIncomingCall() {
         val telecomManager = this.getSystemService(TELECOM_SERVICE) as TelecomManager

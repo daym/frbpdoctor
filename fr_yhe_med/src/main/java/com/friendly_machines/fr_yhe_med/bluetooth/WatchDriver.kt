@@ -10,10 +10,10 @@ class WatchDriver : IWatchDriver {
     override val id: String = WatchCommunicator.javaClass.canonicalName.removeSuffix(".Companion") // FIXME
     override val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
     override fun isCompatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
-        if (scanRecord != null)
-            return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
+        return if (scanRecord != null)
+            scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
         else
-            return false
+            false
     }
 
     override val communicator = WatchCommunicator()

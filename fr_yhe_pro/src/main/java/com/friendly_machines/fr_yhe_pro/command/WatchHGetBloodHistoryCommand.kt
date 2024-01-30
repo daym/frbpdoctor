@@ -3,7 +3,7 @@ package com.friendly_machines.fr_yhe_pro.command
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
-import com.friendly_machines.frbpdoctor.watchprotocol.commondata.HBloodDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.HBloodDataBlock
 import java.nio.ByteBuffer
 
 // FIXME: Test

@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 
 class WatchCurrentStepCommand : WatchCommand(WatchOperation.CurrentStep, ByteArray(0)) // (big)
 {
-    data class Response(val block: com.friendly_machines.fr_yhe_api.commondata.CurrentStepDataBlock) : WatchResponse() // (big)
+    data class Response(val block: CurrentStepDataBlock) : WatchResponse() // (big)
     {
         companion object {
             fun parse(buf: ByteBuffer): Response {

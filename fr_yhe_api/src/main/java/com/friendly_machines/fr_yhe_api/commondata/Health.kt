@@ -10,7 +10,7 @@ data class HSportDataBlock(
     val calories: Short
 ) {
     companion object {
-        val SIZE: Int = 4 + 4 + 2 + 2 + 2
+        const val SIZE: Int = 4 + 4 + 2 + 2 + 2
 
         fun parsePro(buf: ByteBuffer): HSportDataBlock {
             return HSportDataBlock(
@@ -28,7 +28,7 @@ data class HSleepDataBlock(
     val dummy: Byte
 ) {
     companion object {
-        val SIZE: Int = 20 // FIXME
+        const val SIZE: Int = 20 // FIXME
 
         fun parsePro(buf: ByteBuffer): HSleepDataBlock {
             // FIXME
@@ -42,7 +42,7 @@ data class HHeartDataBlock(
     val r11: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 1
+        const val SIZE: Int = 4 + 1 + 1
 
         fun parsePro(buf: ByteBuffer): HHeartDataBlock {
             // FIXME parse one more byte and throw it away
@@ -61,7 +61,7 @@ data class HBloodDataBlock(
     val bloodDbp: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 1 + 1 + 1
+        const val SIZE: Int = 4 + 1 + 1 + 1 + 1
 
         fun parsePro(buf: ByteBuffer): HBloodDataBlock {
             // FIXME parse one more dummy byte
@@ -92,7 +92,7 @@ data class HAllDataBlock(
     val bloodSugarValue: Byte
 ) {
     companion object {
-        val SIZE: Int = 20
+        const val SIZE: Int = 20
 
         fun parsePro(buf: ByteBuffer): HAllDataBlock {
             // FIXME parse 2 garbage bytes
@@ -122,7 +122,7 @@ data class HBloodOxygenDataBlock(
     val value: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 1
+        const val SIZE: Int = 4 + 1 + 1
 
         fun parsePro(buf: ByteBuffer): HBloodOxygenDataBlock {
             return HBloodOxygenDataBlock(
@@ -147,7 +147,7 @@ data class HTemperatureAndHumidityDataBlock(
     val humidityFloat: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 1 + 1 + 1 + 1
+        const val SIZE: Int = 4 + 1 + 1 + 1 + 1 + 1
 
         fun parsePro(buf: ByteBuffer): HTemperatureAndHumidityDataBlock {
             return HTemperatureAndHumidityDataBlock(
@@ -170,7 +170,7 @@ data class HTemperatureDataBlock(
     val valueFloat: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 1 + 1 // TOO BIG 
+        const val SIZE: Int = 4 + 1 + 1 + 1 // TOO BIG
 
         fun parsePro(buf: ByteBuffer): HTemperatureDataBlock {
             return HTemperatureDataBlock(
@@ -189,7 +189,7 @@ data class HAmbientLightDataBlock(
     val value: Short
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 2 // TOO BIG 
+        const val SIZE: Int = 4 + 1 + 2 // TOO BIG
 
         fun parsePro(buf: ByteBuffer): HAmbientLightDataBlock {
             return HAmbientLightDataBlock(
@@ -206,7 +206,7 @@ data class HFallDataBlock(
     val state: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1
+        const val SIZE: Int = 4 + 1
 
         fun parsePro(buf: ByteBuffer): HFallDataBlock {
             return HFallDataBlock(
@@ -237,7 +237,7 @@ data class HHealthMonitoringDataBlock(
     val r39: Byte
 ) {
     companion object {
-        val SIZE: Int = 25 // FIXME maybe wrong
+        const val SIZE: Int = 25 // FIXME maybe wrong
 
         fun parsePro(buf: ByteBuffer): HHealthMonitoringDataBlock {
             return HHealthMonitoringDataBlock(
@@ -277,7 +277,7 @@ data class HHistorySportModeDataBlock(
     val maxHeartRate: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 4 + 4 + 2 + 2 + 1 + 1 + 1 + 4 + 1 + 1 // TODO pad
+        const val SIZE: Int = 4 + 4 + 4 + 2 + 2 + 1 + 1 + 1 + 4 + 1 + 1 // TODO pad
 
         fun parsePro(buf: ByteBuffer): HHistorySportModeDataBlock {
             return HHistorySportModeDataBlock(
@@ -318,7 +318,7 @@ data class HComprehensiveMeasurementDataBlock(
     val triglycerideCholesterolFloat: Byte
 ) {
     companion object {
-        val SIZE: Int = 22 // FIXME need to skip 22 ?!
+        const val SIZE: Int = 22 // FIXME need to skip 22 ?!
 
         fun parsePro(buf: ByteBuffer): HComprehensiveMeasurementDataBlock {
             return HComprehensiveMeasurementDataBlock(
@@ -350,7 +350,7 @@ data class HBackgroundReminderRecordDataBlock(
     val r9: Byte
 ) {
     companion object {
-        val SIZE: Int = 4 + 1 + 3 // FIXME way too little
+        const val SIZE: Int = 4 + 1 + 3 // FIXME way too little
 
         fun parsePro(buf: ByteBuffer): HBackgroundReminderRecordDataBlock {
             return HBackgroundReminderRecordDataBlock(

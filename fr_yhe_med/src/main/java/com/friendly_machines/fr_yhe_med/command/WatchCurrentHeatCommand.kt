@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 
 class WatchCurrentHeatCommand : WatchCommand(WatchOperation.CurrentHeat, ByteArray(0)) // (big)
 {
-    data class Response(val data: com.friendly_machines.fr_yhe_api.commondata.CurrentHeatDataBlock) : WatchResponse() {
+    data class Response(val data: CurrentHeatDataBlock) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
                 // current heat (big)

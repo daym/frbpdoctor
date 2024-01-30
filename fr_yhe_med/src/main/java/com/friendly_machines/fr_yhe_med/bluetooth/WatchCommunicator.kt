@@ -105,15 +105,6 @@ public class WatchCommunicator : IWatchCommunicator {
     private var connection: RxBleConnection? = null
 
     companion object {
-        fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
-            if (scanRecord != null)
-                return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
-            else
-                return false
-        }
-
-        val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
-
         const val TAG: String = "WatchCommunicator"
         val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
     }
@@ -575,74 +566,74 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult {
             when (expectedResponseType) {
                 WatchResponseType.SetMessage -> {
-                    if (response is WatchSetMessageCommand.Response) {
+                    return if (response is WatchSetMessageCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.ChangeAlarm -> {
-                    if (response is WatchChangeAlarmCommand.Response) {
+                    return if (response is WatchChangeAlarmCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.SetStepGoal -> {
-                    if (response is WatchSetStepGoalCommand.Response) {
+                    return if (response is WatchSetStepGoalCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.Unbind -> {
-                    if (response is WatchUnbindCommand.Response) {
+                    return if (response is WatchUnbindCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.Bind -> {
-                    if (response is WatchBindCommand.Response) {
+                    return if (response is WatchBindCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
 
                 WatchResponseType.SetProfile -> {
-                    if (response is WatchSetProfileCommand.Response) {
+                    return if (response is WatchSetProfileCommand.Response) {
                         if (response.status == 0.toByte()) {
-                            return WatchResponseAnalysisResult.Ok
+                            WatchResponseAnalysisResult.Ok
                         } else {
-                            return WatchResponseAnalysisResult.Err
+                            WatchResponseAnalysisResult.Err
                         }
                     } else {
-                        return WatchResponseAnalysisResult.Mismatch
+                        WatchResponseAnalysisResult.Mismatch
                     }
                 }
             }

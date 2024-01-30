@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.Executor
+import kotlin.system.exitProcess
 
 // FIXME Android has an actual "Settings Fragment" in the menu
 
@@ -76,7 +77,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         Toast.makeText(requireContext(), "Settings cleared", Toast.LENGTH_LONG).show()
         // Since the settings gui doesn't update, close it so the user doesn't see the wrong values.
         activity?.finish()
-        System.exit(1) // ...
+        exitProcess(1) // ...
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

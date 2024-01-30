@@ -56,7 +56,7 @@ class DatePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
             year = datePicker!!.year
             month = datePicker!!.month + 1
             day = datePicker!!.dayOfMonth
-            val dateString = String.format("%d-%02d-%02d", year, month, day);
+            val dateString = String.format("%d-%02d-%02d", year, month, day)
             val preference = datePreference
             if (preference.callChangeListener(dateString)) {
                 preference.text = dateString

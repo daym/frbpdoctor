@@ -10,11 +10,11 @@ class RxBleDevicePreference(context: Context, attrs: AttributeSet?) : EditTextPr
     class SimpleSummaryProvider private constructor() : SummaryProvider<RxBleDevicePreference?> {
         override fun provideSummary(preference: RxBleDevicePreference): CharSequence? {
             val watchMacAddress = preference.text
-            if (watchMacAddress != null) {
+            return if (watchMacAddress != null) {
                 val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
-                return bleDevice.name
+                bleDevice.name
             } else {
-                return null
+                null
             }
         }
 
