@@ -41,6 +41,7 @@ class WatchCommunicationService : Service(), IWatchListener {
 
     private fun die(message: String) {
         Log.e(TAG, message)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         showSetMandatorySettingsDialog()
         return
     }
@@ -59,7 +60,12 @@ class WatchCommunicationService : Service(), IWatchListener {
         val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
         if (watchCommunicatorClassname == "")
             return die("Unknown watch type")
-        val communicator = classLoader.loadClass(watchCommunicatorClassname).newInstance() as IWatchCommunicator
+
+        val communicator = try {
+            classLoader.loadClass(watchCommunicatorClassname).newInstance() as IWatchCommunicator
+        } catch (e: ClassNotFoundException) {
+            return die("Communicator wasn't found: $e")
+        }
         communicator.addListener(this)
         communicator.start(bleDevice, keyDigest)
         this.communicator = communicator
