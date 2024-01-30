@@ -9,7 +9,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 class WatchDriver: IWatchDriver {
     override val id: String = WatchCommunicator.javaClass.canonicalName.removeSuffix(".Companion") // FIXME
     override val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
-    override fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
+    override fun isCompatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
         if (scanRecord != null)
             return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
         else
