@@ -59,7 +59,7 @@ class NotificationListener : NotificationListenerService() {
                     }
                 }
             }
-        } catch (e: Throwable) {
+        } catch (e: RuntimeException) {
             Log.e(TAG, "Notification error: $e")
         }
     }
