@@ -62,15 +62,6 @@ class WatchCommunicator: IWatchCommunicator {
     private var connection: RxBleConnection? = null
 
     companion object {
-        val deviceFilter: DeviceFilter<*> = BluetoothLeDeviceFilter.Builder().setScanFilter(ScanFilter.Builder().setServiceUuid(WatchCharacteristic.serviceUuid).build()).build()
-
-        fun compatibleWith(scanRecord: android.bluetooth.le.ScanRecord?): Boolean {
-            if (scanRecord != null)
-                return scanRecord.serviceUuids.find { it == WatchCharacteristic.serviceUuid } != null
-            else
-                return false
-        }
-
         const val TAG: String = "WatchCommunicator"
     }
 

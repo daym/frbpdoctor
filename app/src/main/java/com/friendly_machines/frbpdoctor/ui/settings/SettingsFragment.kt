@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
@@ -30,6 +31,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     companion object {
         const val TAG: String = "SettingsFragment"
         const val SELECT_DEVICE_REQUEST_CODE = 42
+        val watchDrivers: List<IWatchDriver> = listOf(
+            com.friendly_machines.fr_yhe_pro.bluetooth.WatchDriver(),
+            com.friendly_machines.fr_yhe_med.bluetooth.WatchDriver(),
+        )
     }
 
     private fun unbindWatch() {
@@ -84,26 +89,22 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         var watchCommunicatorClassname = "unknown"
-        val key = if (com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
-            watchCommunicatorClassname = com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.javaClass.canonicalName
-            "dummy".toByteArray(Charsets.US_ASCII)
-        } else if (com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.compatibleWith(scanResult.scanRecord)) {
-            watchCommunicatorClassname = com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.javaClass.canonicalName
-            val scanRecord = scanResult.scanRecord
-            if (scanRecord != null) {
-                scanRecord.manufacturerSpecificData[2257].copyOfRange(0, 16)
-            } else {
-                return
-            }
-        } else {
-            "unknown".toByteArray(Charsets.US_ASCII)
-        }
-        AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
+        AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, "unknown".toByteArray(Charsets.US_ASCII), watchCommunicatorClassname)
+        watchDrivers.find {
+            it.compatibleWith(scanResult.scanRecord)
+        }?.let { watchDriver ->
+            if (watchDriver.compatibleWith(scanResult.scanRecord)) {
+                watchDriver.start(scanResult.scanRecord) { key ->
+                    watchCommunicatorClassname = watchDriver.id
+                    AppSettings.setWatchCommunicatorSettings(requireContext(), sharedPreferences, key, watchCommunicatorClassname)
 
-        // Note: It's possible that scanning doesn't find anything when we are already connected.
-        AppSettings.getUserId(sharedPreferences)?.let { userId ->
-            // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
-            bindWatch(userId, key)
+                    // Note: It's possible that scanning doesn't find anything when we are already connected.
+                    AppSettings.getUserId(sharedPreferences)?.let { userId ->
+                        // TODO: If userId is null, synth one from the digits in device.name or something (and store it in SharedPreferences and also in Settings GUI)
+                        bindWatch(userId, key)
+                    }
+                }
+            }
         }
     }
 
@@ -125,16 +126,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun scan() {
         val deviceManager = requireContext().getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
-        val executor: Executor =  Executor { it.run() } // FIXME use default executor
-
-        val associationRequest = AssociationRequest.Builder()
-            .setDeviceProfile(AssociationRequest.DEVICE_PROFILE_WATCH)
-            .addDeviceFilter(com.friendly_machines.fr_yhe_pro.bluetooth.WatchCommunicator.deviceFilter)
-            .addDeviceFilter(com.friendly_machines.fr_yhe_med.bluetooth.WatchCommunicator.deviceFilter)
-            .build()
-
+        val watchChoosingExecutor: Executor =  Executor { it.run() }
+        val associationRequest = watchDrivers.fold(AssociationRequest.Builder().setDeviceProfile(AssociationRequest.DEVICE_PROFILE_WATCH)) { builder, watchDriver ->
+            builder.addDeviceFilter(watchDriver.deviceFilter)
+        }.build()
         deviceManager.associate(associationRequest,
-            executor,
+            watchChoosingExecutor,
             object : CompanionDeviceManager.Callback() {
                 override fun onAssociationPending(intentSender: IntentSender) {
                     // Called when a device is found. Launch the IntentSender so the user can select the device they want to pair with.
