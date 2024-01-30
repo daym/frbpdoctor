@@ -1,4 +1,4 @@
-package com.friendly_machines.frbpdoctor.watchprotocol.commondata
+package com.friendly_machines.fr_yhe_api.commondata
 
 import java.nio.ByteBuffer
 
