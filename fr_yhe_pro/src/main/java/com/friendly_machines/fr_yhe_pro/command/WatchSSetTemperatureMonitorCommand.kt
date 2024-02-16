@@ -4,12 +4,19 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchGGetManualModeStatusCommand : WatchCommand(WatchOperation.GGetManualModeStatus, ByteArray(0)) {
+// interval is a multiple of 10
+class WatchSSetTemperatureMonitorCommand(enable: Boolean, interval: Byte) : WatchCommand(
+    WatchOperation.SSetTemperatureMonitor, byteArrayOf(
+        when (enable) {
+            true -> 1
+            false -> 0
+        }, interval
+    )
+) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
-                return Response(status = status)
+                return Response(status = buf.get())
             }
         }
     }

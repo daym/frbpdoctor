@@ -4,12 +4,11 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchGGetManualModeStatusCommand : WatchCommand(WatchOperation.GGetManualModeStatus, ByteArray(0)) {
-    data class Response(val status: Byte) : WatchResponse() {
+class WatchRGetRespirationCommand : WatchCommand(WatchOperation.RRespiration, byteArrayOf()) {
+    data class Response(val respirationRate: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
-                return Response(status = status)
+                return Response(buf.get())
             }
         }
     }
