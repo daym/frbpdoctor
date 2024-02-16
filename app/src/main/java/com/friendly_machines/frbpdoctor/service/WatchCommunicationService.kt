@@ -2,11 +2,17 @@ package com.friendly_machines.frbpdoctor.service
 
 import android.Manifest
 import android.app.Service
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.media.RingtoneManager
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.os.IBinder
+import android.service.notification.NotificationListenerService
 import android.telecom.TelecomManager
 import android.util.Log
 import android.view.KeyEvent
@@ -141,13 +147,46 @@ class WatchCommunicationService : Service(), IWatchListener {
     }
 
     override fun onWatchMusicControl(control: WatchMusicControlAnswer) {
-        when (control) {
-            WatchMusicControlAnswer.PlayPause -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
-            WatchMusicControlAnswer.NextSong -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_NEXT)
-            WatchMusicControlAnswer.PreviousSong -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
-            WatchMusicControlAnswer.IncreaseVolume -> injectKeyboardKey(KeyEvent.KEYCODE_VOLUME_UP)
-            WatchMusicControlAnswer.DecreaseVolume -> injectKeyboardKey(KeyEvent.KEYCODE_VOLUME_DOWN)
-            WatchMusicControlAnswer.Unknown -> {
+        if (control == WatchMusicControlAnswer.IncreaseVolume || control == WatchMusicControlAnswer.DecreaseVolume) {
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            when (control) {
+                WatchMusicControlAnswer.IncreaseVolume -> audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND)
+                WatchMusicControlAnswer.DecreaseVolume -> audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND)
+                else -> {
+                }
+            }
+        } else {
+            val mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+            val mediaControllers = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListenerService::class.java))
+            for (controller in mediaControllers) {
+                if (controller.playbackState?.state == PlaybackState.STATE_PLAYING) {
+                    when (control) {
+                        WatchMusicControlAnswer.PlayPause -> controller.transportControls.pause()
+                        WatchMusicControlAnswer.NextSong -> controller.transportControls.skipToNext()
+                        WatchMusicControlAnswer.PreviousSong -> controller.transportControls.skipToPrevious()
+                        WatchMusicControlAnswer.IncreaseVolume -> {
+                        }
+                        WatchMusicControlAnswer.DecreaseVolume -> {
+                        }
+                        WatchMusicControlAnswer.Unknown -> {
+                        }
+                    }
+                    return
+                }
+            }
+            for (controller in mediaControllers) {
+                when (control) {
+                    WatchMusicControlAnswer.PlayPause -> controller.transportControls.play()
+                    WatchMusicControlAnswer.NextSong -> controller.transportControls.skipToNext()
+                    WatchMusicControlAnswer.PreviousSong -> controller.transportControls.skipToPrevious()
+                    WatchMusicControlAnswer.IncreaseVolume -> {
+                    }
+                    WatchMusicControlAnswer.DecreaseVolume -> {
+                    }
+                    WatchMusicControlAnswer.Unknown -> {
+                    }
+                }
+                return
             }
         }
     }
@@ -162,18 +201,20 @@ class WatchCommunicationService : Service(), IWatchListener {
             WatchCameraControlAnswer.Shoot -> {
                 // TODO
             }
+
             WatchCameraControlAnswer.Unknown -> {
             }
         }
     }
 
     override fun onWatchInitiateSos() {
-    // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        val emergencyNumber = "911" // TODO: check using TelephonyManager.isEmergencyNumber; .getEmergencyNumberList()
 //        val intent = Intent(Intent.ACTION_CALL_EMERGENCY)
 //        intent.data = Uri.parse("tel:$emergencyNumber")
 //        startActivity(intent)
     }
+
     override fun onWatchFindMobilePhone() {
         // TODO take out of mute if necessary
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
