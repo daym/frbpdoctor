@@ -1,10 +1,8 @@
 package com.friendly_machines.fr_yhe_med.bluetooth
 
-import android.bluetooth.le.ScanFilter
-import android.companion.BluetoothLeDeviceFilter
-import android.companion.DeviceFilter
 import android.os.Binder
 import android.util.Log
+import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -15,6 +13,8 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.decodeBigMessage
@@ -27,7 +27,7 @@ import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.encodeMidd
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.writingPortCharacteristic
 import com.friendly_machines.fr_yhe_med.command.WatchBindCommand
-import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction
+import com.friendly_machines.fr_yhe_api.commondata.WatchChangeAlarmAction
 import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmCommand
 import com.friendly_machines.fr_yhe_med.command.WatchCommand
 import com.friendly_machines.fr_yhe_med.command.WatchDeviceInfoCommand
@@ -45,6 +45,7 @@ import com.friendly_machines.fr_yhe_med.command.WatchSetMessageCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetProfileCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetStepGoalCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetTimeCommand
+import com.friendly_machines.fr_yhe_med.command.WatchSetWatchFaceCommand
 import com.friendly_machines.fr_yhe_med.command.WatchSetWeatherCommand
 import com.friendly_machines.fr_yhe_med.command.WatchUnbindCommand
 import com.friendly_machines.fr_yhe_med.notification.WatchNotificationFromWatch
@@ -226,6 +227,7 @@ public class WatchCommunicator : IWatchCommunicator {
         Log.d(TAG, "-> decoded: $response")
         listeners.forEach {
             it.onWatchResponse(response)
+            // TODO onMusicControl maybe ?
             if (response is WatchNotificationFromWatch) {
                 if (response.eventCode == WatchNotificationFromWatch.EVENT_CODE_ANSWER_PHONE_CALL) {
                     it.onWatchPhoneCallControl(WatchPhoneCallControlAnswer.Accept)
@@ -491,8 +493,8 @@ public class WatchCommunicator : IWatchCommunicator {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
 //        }
-        override fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte) {
-            enqueueCommand(WatchSetProfileCommand(height, weight, sex, age))
+        override fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?) {
+            enqueueCommand(WatchSetProfileCommand(height.toByte(), weight.toByte(), sex, age))
         }
 
         override fun setWeather(
@@ -544,7 +546,9 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getRawBpData(startTime: Int, endTime: Int) = enqueueCommand(WatchGetRawBpDataCommand(startTime, endTime))
         override fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
         override fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
-        override fun getWatchFace() = enqueueCommand(WatchGetWatchFaceCommand())
+        override fun getWatchDial() = enqueueCommand(WatchGetWatchFaceCommand())
+        override fun selectWatchDial(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
+
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
 
@@ -636,8 +640,68 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+
+                WatchResponseType.GetAlarms -> {
+                    return if (response is WatchGetAlarmCommand.Response) { // Err... not that great since the real data comes with a big response.
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetDndSettings -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWatchWearingArm -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWatchTimeLayout -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.GetWatchDials -> {
+                    return if (response is WatchGetWatchFaceCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.ChangeWatchDial -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) { // FIXME!!!!
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
             }
         }
+
+        override fun getFileCount() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun getFileList() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+
+        override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun getGDeviceInfo() {
+        }
+
+        override fun getMainTheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun setMainTheme(index: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
         // FIXME
         fun removeListener(that: IWatchListener) {

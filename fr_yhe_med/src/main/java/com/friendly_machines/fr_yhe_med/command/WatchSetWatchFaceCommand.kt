@@ -5,9 +5,9 @@ import com.friendly_machines.fr_yhe_med.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchSetWatchFaceCommand(dialPos: Int) : WatchCommand(WatchOperation.SetWatchFace, run {
+class WatchSetWatchFaceCommand(id: Int) : WatchCommand(WatchOperation.SetWatchFace, run {
     val buf = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN)
-    buf.putInt(dialPos)
+    buf.putInt(id)
     buf.array()
 }) {
     data class Response(val status: Byte) : // verified

@@ -1,5 +1,6 @@
 package com.friendly_machines.fr_yhe_med.command
 
+import com.friendly_machines.fr_yhe_api.commondata.WatchChangeAlarmAction
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_med.WatchOperation
 import java.nio.ByteBuffer
@@ -13,7 +14,12 @@ class WatchChangeAlarmCommand(
          * repeats: multiselect {Mon, Tue, Wed, Thu, Fri, Sat, Sun}
          */
         val buf = ByteBuffer.allocate(1 + 4 + 1 + 1 + 1 + 1 + repeats.size).order(ByteOrder.BIG_ENDIAN)
-        buf.put(action.code)
+        buf.put(
+            when (action) {
+                WatchChangeAlarmAction.Edit -> 0
+                WatchChangeAlarmAction.Add -> 1
+            }
+        )
         buf.putInt(id)
         buf.put(
             if (enabled) {
