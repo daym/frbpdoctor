@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_pro.bluetooth
 
 import android.os.Binder
 import android.util.Log
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -11,19 +12,47 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
-import com.friendly_machines.fr_yhe_pro.Crc16rev
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
+import com.friendly_machines.fr_yhe_pro.Crc16
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.bigIndicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.indicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.writingPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetElectrodeLocationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetEventReminderInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetMacAddressCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetManualModeStatusCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealBloodOxygenCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
+import com.friendly_machines.fr_yhe_pro.indication.DCameraControl
+import com.friendly_machines.fr_yhe_pro.indication.DFindMobile
+import com.friendly_machines.fr_yhe_pro.indication.DMusicControl
 import com.friendly_machines.fr_yhe_pro.indication.DPhoneCallControl
+import com.friendly_machines.fr_yhe_pro.indication.DSos
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
@@ -116,7 +145,7 @@ class WatchCommunicator : IWatchCommunicator {
         buf.order(ByteOrder.LITTLE_ENDIAN)
         buf.putShort(payloadLength)
         buf.put(payload)
-        return Crc16rev.crc16(buf.array()).toShort()
+        return Crc16.crc16(buf.array()).toShort()
     }
 
     //private var receivingBuffers = ConcurrentHashMap<Int, Pair<Int, ByteArrayOutputStream>>() // packet_0_serial -> (current_serial, buffer)
@@ -140,6 +169,14 @@ class WatchCommunicator : IWatchCommunicator {
             if (response is DPhoneCallControl) {
                 // FIXME check if (response.answer == answer call)
                 it.onWatchPhoneCallControl(WatchPhoneCallControlAnswer.Accept)
+            } else if (response is DMusicControl) {
+                it.onWatchMusicControl(response.control)
+            } else if (response is DCameraControl) {
+                it.onWatchCameraControl(response.control)
+            } else if (response is DFindMobile) {
+                it.onWatchFindMobilePhone()
+            } else if (response is DSos) {
+                it.onWatchInitiateSos()
             }
         }
     }
@@ -151,7 +188,7 @@ class WatchCommunicator : IWatchCommunicator {
         buffer.putShort((2 + 2 + arguments.size + 2).toShort())
         buffer.put(arguments)
         val rawBuffer0 = buffer.array()
-        val crc = Crc16rev.crc16(rawBuffer0) // FIXME
+        val crc = Crc16.crc16(rawBuffer0) // FIXME
         // Note: for GetTemp crc should be 0x58, 0xdf.toByte()
         buffer = ByteBuffer.allocate(buffer.limit() + 2).order(ByteOrder.LITTLE_ENDIAN)
         buffer.put(rawBuffer0)
@@ -283,13 +320,25 @@ class WatchCommunicator : IWatchCommunicator {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
 //        }
-        override fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte) {
-            // FIXME enqueueCommand(WatchSSetProfileCommand(height, weight, sex, age))
+        override fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?) {
+            enqueueCommand(
+                WatchSSetWatchWearingArmCommand(
+                    arm ?: WatchWearingArm.Left
+                )
+            )
+            enqueueCommand(
+                WatchSSetUserInfoCommand(
+                    height, weight, when (sex) {
+                        WatchProfileSex.Female -> 0 // FIXME test.
+                        WatchProfileSex.Male -> 1
+                    }, age
+                )
+            )
         }
 
         override fun setWeather(
             weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
-        ) = enqueueCommand(WatchASetTodayWeatherCommand("FIXME", "FIXME", "FIXME", 42/*FIXME*/))
+        ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", 42/*FIXME*/))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
             WatchANotificationPushCommand(type.code /* FIXME */, title, content)
@@ -308,7 +357,7 @@ class WatchCommunicator : IWatchCommunicator {
             val hour = calendar[Calendar.HOUR].toByte()
             val minute = calendar[Calendar.MINUTE].toByte()
             val second = calendar[Calendar.SECOND].toByte()
-            val weekDay = calendar[Calendar.DAY_OF_WEEK].toByte() // FIXME shuffle so monday is 0
+            val weekDay = ((calendar[Calendar.DAY_OF_WEEK] - 2) % 7).toByte() // shuffle so monday is 0
             enqueueCommand(
                 WatchSSetTimeCommand(year, month, day, hour, minute, second, weekDay)
             )
@@ -318,9 +367,7 @@ class WatchCommunicator : IWatchCommunicator {
             // FIXME
         }
 
-        override fun getAlarm() {
-            enqueueCommand(WatchSGetAllAlarmsCommand())
-        }
+        override fun getAlarm() = enqueueCommand(WatchSGetAllAlarmsCommand())
 
         override fun addAlarm(
             id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
@@ -342,15 +389,10 @@ class WatchCommunicator : IWatchCommunicator {
             // FIXME
         }
 
+        // TODO: WatchGGetUserConfigCommand instead ??
         override fun getDeviceConfig() = enqueueCommand(WatchGGetDeviceInfoCommand())
-        override fun getBpData() {
-            // FIXME
-        }
-
-        override fun getSleepData(startTime: Int, endTime: Int) {
-            // FIXME
-        }
-
+        override fun getBpData() = enqueueCommand(WatchHGetBloodHistoryCommand())
+        override fun getSleepData(startTime: Int, endTime: Int) = enqueueCommand(WatchHGetSleepHistoryCommand()) // FIXME: Add times.
         override fun getRawBpData(startTime: Int, endTime: Int) {
             // FIXME
         }
@@ -359,14 +401,39 @@ class WatchCommunicator : IWatchCommunicator {
             // FIXME
         }
 
-        override fun getHeatData() {
-            // FIXME
+        override fun getHeatData() = enqueueCommand(WatchHGetTemperatureHistoryCommand())
+        override fun getWatchDial() = enqueueCommand(WatchWGetWatchDialInfoCommand())
+        override fun selectWatchDial(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
+
+        override fun getSportData() = enqueueCommand(WatchHGetSportHistoryCommand())
+        override fun getFileCount() = enqueueCommand(WatchCGetFileCountCommand())
+        override fun getFileList() = enqueueCommand(WatchCGetFileListCommand(1, 2)) // FIXME
+
+        override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchSSetWatchWearingArmCommand(arm))
+        override fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort) = enqueueCommand(WatchSSetTimeLayoutCommand(watchTimePosition, rgb565Color))
+        override fun getGDeviceInfo() {
+            enqueueCommand(WatchGGetDeviceInfoCommand())
+            enqueueCommand(WatchGGetDeviceNameCommand())
+            enqueueCommand(WatchGGetScreenInfoCommand())
+            enqueueCommand(WatchGGetElectrodeLocationCommand())
+            enqueueCommand(WatchGGetEventReminderInfoCommand())
+            enqueueCommand(WatchGGetMacAddressCommand())
+            enqueueCommand(WatchGGetManualModeStatusCommand())
+            enqueueCommand(WatchGGetRealBloodOxygenCommand())
+            enqueueCommand(WatchGGetRealTemperatureCommand())
+            enqueueCommand(WatchGGetScreenParametersCommand())
+            enqueueCommand(WatchGGetUserConfigCommand()) // this one encompasses a lot!
         }
 
-        override fun getWatchFace() = enqueueCommand(WatchWGetWatchDialInfoCommand())
-        override fun getSportData() {
-            // FIXME
+        override fun getMainTheme() {
+            enqueueCommand(WatchGGetMainThemeCommand())
         }
+
+        override fun setMainTheme(index: Byte) {
+            enqueueCommand(WatchSSetMainThemeCommand(index))
+        }
+
+        override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
         override fun setStepGoal(steps: Int) {
             // FIXME
@@ -386,7 +453,125 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult {
             // FIXME
-            return WatchResponseAnalysisResult.Err
+            when (expectedResponseType) {
+                WatchResponseType.SetMessage -> {
+                    return if (response is WatchANotificationPushCommand.Response) {
+                        if (response.dummy == 0.toByte()) {
+                            WatchResponseAnalysisResult.Ok
+                        } else {
+                            WatchResponseAnalysisResult.Err
+                        }
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+//                WatchResponseType.ChangeAlarm -> {
+//                    return if (response is WatchSAddAlarmCommand.Response) {
+//                        if (response.status == 0.toByte()) {
+//                            WatchResponseAnalysisResult.Ok
+//                        } else {
+//                            WatchResponseAnalysisResult.Err
+//                        }
+//                    } else {
+//                        WatchResponseAnalysisResult.Mismatch
+//                    }
+//                }
+//
+//                WatchResponseType.SetStepGoal -> {
+//                    return if (response is WatchSetStepGoalCommand.Response) {
+//                        if (response.status == 0.toByte()) {
+//                            WatchResponseAnalysisResult.Ok
+//                        } else {
+//                            WatchResponseAnalysisResult.Err
+//                        }
+//                    } else {
+//                        WatchResponseAnalysisResult.Mismatch
+//                    }
+//                }
+//
+//                WatchResponseType.Unbind -> {
+//                    return if (response is WatchUnbindCommand.Response) {
+//                        if (response.status == 0.toByte()) {
+//                            WatchResponseAnalysisResult.Ok
+//                        } else {
+//                            WatchResponseAnalysisResult.Err
+//                        }
+//                    } else {
+//                        WatchResponseAnalysisResult.Mismatch
+//                    }
+//                }
+//
+//                WatchResponseType.Bind -> {
+//                    return if (response is WatchBindCommand.Response) {
+//                        if (response.status == 0.toByte()) {
+//                            WatchResponseAnalysisResult.Ok
+//                        } else {
+//                            WatchResponseAnalysisResult.Err
+//                        }
+//                    } else {
+//                        WatchResponseAnalysisResult.Mismatch
+//                    }
+//                }
+//
+                WatchResponseType.SetProfile -> {
+                    return if (response is WatchSSetUserInfoCommand.Response) {
+                        if (response.status == 0.toByte()) {
+                            WatchResponseAnalysisResult.Ok
+                        } else {
+                            WatchResponseAnalysisResult.Err
+                        }
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.GetAlarms -> {
+                    return if (response is WatchSGetAllAlarmsCommand.Response) { // Err... not that great since the real data comes with a big response.
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetDndSettings -> { // dummy
+                    return if (response is WatchSSetDndModeCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWatchWearingArm -> { // dummy
+                    return if (response is WatchSSetWatchWearingArmCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.ChangeWatchDial -> {
+                    return if (response is WatchWSetCurrentWatchDialCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+
+                }
+
+                WatchResponseType.GetWatchDials -> {
+                    return if (response is WatchWGetWatchDialInfoCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                else -> {
+                    TODO("Not implemented")
+                    return WatchResponseAnalysisResult.Err
+                }
+            }
         }
 
         // FIXME
