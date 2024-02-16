@@ -5,19 +5,24 @@ import android.app.Service
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.os.IBinder
 import android.telecom.TelecomManager
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchCameraControlAnswer
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMusicControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import java.security.MessageDigest
+
 
 /** Note: This service will accept calls when user clicks the respective button on the watch. */
 class WatchCommunicationService : Service(), IWatchListener {
@@ -126,11 +131,60 @@ class WatchCommunicationService : Service(), IWatchListener {
         }
     }
 
+    private fun injectKeyboardKey(keyCode: Int) {
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+        })
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
+        })
+    }
+
+    override fun onWatchMusicControl(control: WatchMusicControlAnswer) {
+        when (control) {
+            WatchMusicControlAnswer.PlayPause -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
+            WatchMusicControlAnswer.NextSong -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_NEXT)
+            WatchMusicControlAnswer.PreviousSong -> injectKeyboardKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+            WatchMusicControlAnswer.IncreaseVolume -> injectKeyboardKey(KeyEvent.KEYCODE_VOLUME_UP)
+            WatchMusicControlAnswer.DecreaseVolume -> injectKeyboardKey(KeyEvent.KEYCODE_VOLUME_DOWN)
+            WatchMusicControlAnswer.Unknown -> {
+            }
+        }
+    }
+
+    override fun onWatchCameraControl(control: WatchCameraControlAnswer) {
+        when (control) {
+            WatchCameraControlAnswer.Prepare -> injectKeyboardKey(KeyEvent.KEYCODE_CAMERA)
+            WatchCameraControlAnswer.Exit -> {
+                // TODO
+            }
+
+            WatchCameraControlAnswer.Shoot -> {
+                // TODO
+            }
+            WatchCameraControlAnswer.Unknown -> {
+            }
+        }
+    }
+
+    override fun onWatchInitiateSos() {
+    // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//        val emergencyNumber = "911" // TODO: check using TelephonyManager.isEmergencyNumber; .getEmergencyNumberList()
+//        val intent = Intent(Intent.ACTION_CALL_EMERGENCY)
+//        intent.data = Uri.parse("tel:$emergencyNumber")
+//        startActivity(intent)
+    }
+    override fun onWatchFindMobilePhone() {
+        // TODO take out of mute if necessary
+        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
+        ringtone.play()
+    }
+
     override fun onResetSequenceNumbers() {
         val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val key = AppSettings.getWatchKey(this, sharedPreferences)
         if (key != null) {
-            // TODO use value corresponding to KEY_USER_ID
             // Note: If you say the exact right things, this will return status=0. Otherwise, it will never respond.
             communicator?.binder?.bindWatch(4711, key)
         }

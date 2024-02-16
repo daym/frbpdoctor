@@ -10,7 +10,10 @@ import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -18,11 +21,16 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
+import com.friendly_machines.frbpdoctor.ui.customization.CustomizationActivity
+import com.friendly_machines.frbpdoctor.ui.health.HealthActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
+import com.friendly_machines.frbpdoctor.ui.weather.WeatherActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 
 
 class MainActivity : AppCompatActivity(), IWatchListener {
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var handler: Handler
     private lateinit var binding: ActivityMainBinding
 
@@ -38,10 +46,42 @@ class MainActivity : AppCompatActivity(), IWatchListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        this.drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+
+        //val navController = findNavController(R.id.nav_host_fragment_activity_main)
         //setupActionBarWithNavController(this, navController)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
-        NavigationUI.setupWithNavController(bottomNavigationView, navController)
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        //NavigationUI.setupWithNavController(bottomNavigationView, navController)
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.healthActivity -> {
+                    startActivity(Intent(this, HealthActivity::class.java))
+                    true
+                }
+                R.id.weatherActivity -> {
+                    startActivity(Intent(this, WeatherActivity::class.java))
+                    true
+                }
+                R.id.customizationActivity -> {
+                    startActivity(Intent(this, CustomizationActivity::class.java))
+                    true
+                }
+                // Add more menu items as needed
+                else -> false
+            }
+        }
+
+        val actionBarDrawerToggle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        drawerLayout.addDrawerListener(actionBarDrawerToggle)
+        actionBarDrawerToggle.syncState()
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
 
         handler = Handler(Looper.getMainLooper())
     }
@@ -58,6 +98,14 @@ class MainActivity : AppCompatActivity(), IWatchListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START)
+                }
+                true
+            }
             R.id.action_settings -> {
                 val settingsIntent = Intent(this, SettingsActivity::class.java)
                 // close all other activities.

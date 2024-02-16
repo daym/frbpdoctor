@@ -5,7 +5,12 @@ import android.content.SharedPreferences
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -14,15 +19,22 @@ import javax.crypto.spec.GCMParameterSpec
 
 object AppSettings {
     const val KEY_WATCH_COMMUNICATOR_CLASS = "watchCommunicatorClass"
-    const val KEY_USER_ID = "userId"
-    const val KEY_USER_WEIGHT = "userWeight"
-    const val KEY_USER_HEIGHT = "userHeight"
-    const val KEY_USER_SEX = "userSex"
-    const val KEY_USER_BIRTHDAY = "userBirthday"
+    private const val KEY_USER_ID = "userId"
+    private const val KEY_USER_WEIGHT = "userWeight"
+    private const val KEY_USER_HEIGHT = "userHeight"
+    private const val KEY_USER_SEX = "userSex"
+    private const val KEY_USER_BIRTHDAY = "userBirthday"
+    private const val KEY_USER_WATCH_WEARING_ARM = "userWatchWearingArm"
+    // TODO watchDndMode
+    private const val KEY_WATCH_DND_START_TIME = "watchDndStartTime"
+    private const val KEY_WATCH_DND_END_TIME = "watchDndEndTime"
+    private const val KEY_WATCH_TIME_POSITION = "watchTimePosition"
+    private const val KEY_WATCH_TIME_COLOR = "watchTimeColor"
+
     private const val KEY_WATCH_KEY = "watchKey" // invisible to the user
     const val KEY_WATCH_MAC_ADDRESS = "watchMacAddress"
 
-    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_COMMUNICATOR_CLASS, KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY)
+    private val MANDATORY_SETTINGS = listOf(KEY_WATCH_COMMUNICATOR_CLASS, KEY_WATCH_MAC_ADDRESS, KEY_WATCH_KEY, KEY_USER_ID, KEY_USER_WEIGHT, KEY_USER_HEIGHT, KEY_USER_SEX, KEY_USER_BIRTHDAY, KEY_USER_WATCH_WEARING_ARM)
 
     private const val AndroidKeyStore = "AndroidKeyStore"
     private const val MAIN_KEY_ALIAS = "FpBpDoctor"
@@ -102,17 +114,17 @@ object AppSettings {
         sharedPreferences.edit().clear().apply()
     }
 
-    private fun getWeight(sharedPreferences: SharedPreferences): Byte? {
-        val result = sharedPreferences.getInt(KEY_USER_WEIGHT, 0).toByte()
-        return if (result == 0.toByte())
+    private fun getWeight(sharedPreferences: SharedPreferences): Int? {
+        val result = sharedPreferences.getInt(KEY_USER_WEIGHT, 0)
+        return if (result == 0)
             null
         else
             result
     }
 
-    private fun getHeight(sharedPreferences: SharedPreferences): Byte? {
-        val result = sharedPreferences.getInt(KEY_USER_HEIGHT, 0).toByte()
-        return if (result == 0.toByte())
+    private fun getHeight(sharedPreferences: SharedPreferences): Int? {
+        val result = sharedPreferences.getInt(KEY_USER_HEIGHT, 0)
+        return if (result == 0)
             null
         else
             result
@@ -131,11 +143,19 @@ object AppSettings {
             null
         }
     }
+    fun getUserWatchWearingArm(sharedPreferences: SharedPreferences): WatchWearingArm? {
+        val watchWearingArmString = sharedPreferences.getString(KEY_USER_WATCH_WEARING_ARM, "")
+        return if (!watchWearingArmString.isNullOrEmpty()) {
+            WatchWearingArm.valueOf(watchWearingArmString)
+        } else {
+            null
+        }
+    }
 
-    data class Profile(val height: Byte, val weight: Byte, val birthdayString: String, val sex: WatchProfileSex)
+    data class Profile(val height: Int, val weight: Int, val birthdayString: String, val sex: WatchProfileSex, val arm: WatchWearingArm?)
 
     fun isProfileSetting(key: String): Boolean {
-        return key == KEY_USER_HEIGHT || key == KEY_USER_WEIGHT || key == KEY_USER_SEX || key == KEY_USER_BIRTHDAY
+        return key == KEY_USER_HEIGHT || key == KEY_USER_WEIGHT || key == KEY_USER_SEX || key == KEY_USER_BIRTHDAY || key == KEY_USER_WATCH_WEARING_ARM
     }
 
     fun getProfileSettings(sharedPreferences: SharedPreferences): Profile? {
@@ -143,8 +163,63 @@ object AppSettings {
         val height = getHeight(sharedPreferences)
         val birthday = getBirthday(sharedPreferences)
         val sex = getSex(sharedPreferences)
+        val arm = getUserWatchWearingArm(sharedPreferences)
         if (!birthday.isNullOrEmpty() && sex != null && weight != null && height != null) {
-            return Profile(height = height, weight = weight, birthdayString = birthday, sex = sex)
+            return Profile(height = height, weight = weight, birthdayString = birthday, sex = sex, arm = arm)
+        }
+        return null
+    }
+
+    fun isDndSetting(key: String): Boolean {
+        return key == KEY_WATCH_DND_END_TIME || key == KEY_WATCH_DND_START_TIME
+    }
+
+    data class DndTime(val hour: Byte, val minute: Byte)
+    fun getDndStartTime(sharedPreferences: SharedPreferences): DndTime? {
+        val timeString = sharedPreferences.getString(KEY_WATCH_DND_START_TIME, "")
+        if (timeString.isNullOrEmpty()) {
+            return null
+        }
+        val parts = timeString.split(":")
+        val hour = parts[0].toByte()
+        val minute = parts[1].toByte()
+        return DndTime(hour = hour, minute = minute)
+    }
+    fun getDndEndTime(sharedPreferences: SharedPreferences): DndTime? {
+        val timeString = sharedPreferences.getString(KEY_WATCH_DND_END_TIME, "")
+        if (timeString.isNullOrEmpty()) {
+            return null
+        }
+        val parts = timeString.split(":")
+        val hour = parts[0].toByte()
+        val minute = parts[1].toByte()
+        return DndTime(hour = hour, minute = minute)
+    }
+
+    fun isUserWatchWearingArmSetting(key: String): Boolean {
+        return key == KEY_USER_WATCH_WEARING_ARM
+    }
+    fun isWatchTimeLayout(key: String): Boolean {
+        return key == KEY_WATCH_TIME_POSITION || key == KEY_WATCH_TIME_COLOR
+    }
+    fun getWatchTimePosition(sharedPreferences: SharedPreferences): WatchTimePosition? {
+        val watchTimePositionString = sharedPreferences.getString(KEY_WATCH_TIME_POSITION, "")
+        return if (!watchTimePositionString.isNullOrEmpty()) {
+            WatchTimePosition.valueOf(watchTimePositionString)
+        } else {
+            null
+        }
+    }
+
+    fun getWatchTimeColor(sharedPreferences: SharedPreferences): UShort? {
+        val watchTimeColorString = sharedPreferences.getString(KEY_WATCH_TIME_COLOR, "")
+        if (!watchTimeColorString.isNullOrEmpty()) {
+            android.graphics.Color.parseColor(watchTimeColorString)?.let { color ->
+                val red5 = color.red ushr (8 - 5)
+                val green6 = color.green ushr (8 - 6)
+                val blue5 = color.blue ushr (8 - 5)
+                return ((red5 shl (5 + 6)) or (green6 shl 5) or (blue5 shl 0)).toUShort()
+            }
         }
         return null
     }

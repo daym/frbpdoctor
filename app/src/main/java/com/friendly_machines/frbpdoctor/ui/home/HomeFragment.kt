@@ -23,39 +23,10 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private lateinit var svgImageView: ImageView // SubsamplingScaleImageView
 
-    private fun loadAndDisplaySVG(context: Context) {
-        try {
-            val inputStream: InputStream = requireContext().assets.open("clock.svg")
-            val svg = SVG.getFromInputStream(inputStream)
-//            val bitmap = Bitmap.createBitmap(svg.documentWidth.toInt(), svg.documentHeight.toInt(), Bitmap.Config.ARGB_8888)
-//            val canvas = Canvas(bitmap)
-//            svg.renderToCanvas(canvas)
-//            svgImageView.setImageBitmap(bitmap)
-            svgImageView.setImageDrawable(SvgDrawable(svg, svgImageView.width, svgImageView.height))
-
-        } catch (e: SVGParseException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        svgImageView = view.findViewById(R.id.clockView)
-
-        // Use OnPreDrawListener to wait until the ImageView is measured
-        svgImageView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                // Remove the listener to avoid multiple calls
-                svgImageView.viewTreeObserver.removeOnPreDrawListener(this)
-
-                loadAndDisplaySVG(requireContext())
-                return true
-            }
-        })
     }
 
     override fun onCreateView(
@@ -64,15 +35,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-//        val textView: TextView = binding.textHome
-//        homeViewModel.text.observe(viewLifecycleOwner) {
-//            textView.text = it
-//        }
-
-        //val view = inflater.inflate(R.layout.fragment_home, container, false)
-        //svgImageView = view.findViewById(R.id.clockView)
-        //loadAndDisplaySVG(requireContext())
 
         return binding.root
     }

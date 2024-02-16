@@ -1,0 +1,167 @@
+<!-- res/layout/custom_device_info_dialog.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Information"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/> <!-- Add margin between headline and content -->
+
+        <!-- TextViews with labels to display device information -->
+        <TextView
+            android:id="@+id/text_info_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Info:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Name:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_screen_info_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Screen Info:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_screen_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_electrode_location_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Electrode Location:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_electrode_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_event_reminder_info_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Reminder Info:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_event_reminder_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_mac_address_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAC Address:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_mac_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_main_theme_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Main Theme:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_main_theme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_manual_mode_status_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manual Mode Status:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_manual_mode_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_real_blood_oxygen_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Real Blood Oxygen:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_real_blood_oxygen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_real_temperature_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Real Temperature:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_real_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_screen_parameters_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Screen Parameters:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_screen_parameters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_user_config_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Config:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_user_config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

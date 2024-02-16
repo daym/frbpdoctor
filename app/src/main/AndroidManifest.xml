@@ -22,6 +22,10 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
 
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -33,6 +37,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FrBpDoctor"
         tools:targetApi="33">
+
         <service
             android:name=".service.WatchCommunicationService"
             android:enabled="true"
@@ -56,8 +61,12 @@
             android:name=".ui.health.HealthActivity"
             android:exported="false"
             android:label="@string/title_activity_health"
-            android:theme="@style/Theme.FrBpDoctor.NoActionBar" />
-
+             />
+        <activity
+            android:name=".ui.customization.CustomizationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_customization"
+             />
         <activity
             android:name=".ui.home.MainActivity"
             android:exported="true">

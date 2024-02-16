@@ -8,15 +8,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.flask.colorpicker.ColorPickerView
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.frbpdoctor.AppSettings
+import com.friendly_machines.frbpdoctor.DeviceGInfoFragment
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
@@ -25,6 +31,7 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.Executor
 import kotlin.system.exitProcess
+
 
 // FIXME Android has an actual "Settings Fragment" in the menu
 
@@ -60,10 +67,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
-        if (age <= 0 || age >= 256)
-            throw RuntimeException("profile age is invalid")
+        if (age <= 0 || age >= 256) throw RuntimeException("profile age is invalid")
         WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetProfile) {
-            it.setProfile(profile.height, profile.weight, profile.sex, age.toByte())
+            it.setProfile(profile.height, profile.weight, profile.sex, age.toByte(), profile.arm)
         }
     }
 
@@ -142,31 +148,29 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         val associationRequest = watchDrivers.fold(AssociationRequest.Builder().setDeviceProfile(AssociationRequest.DEVICE_PROFILE_WATCH)) { builder, watchDriver ->
             builder.addDeviceFilter(watchDriver.deviceFilter)
         }.build()
-        deviceManager.associate(associationRequest,
-            watchChoosingExecutor,
-            object : CompanionDeviceManager.Callback() {
-                override fun onAssociationPending(intentSender: IntentSender) {
-                    // Called when a device is found. Launch the IntentSender so the user can select the device they want to pair with.
-                    if (intentSender != null) {
-                        // Doesn't work
+        deviceManager.associate(associationRequest, watchChoosingExecutor, object : CompanionDeviceManager.Callback() {
+            override fun onAssociationPending(intentSender: IntentSender) {
+                // Called when a device is found. Launch the IntentSender so the user can select the device they want to pair with.
+                if (intentSender != null) {
+                    // Doesn't work
 //                        val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
 //                          onActivityResult(SELECT_DEVICE_REQUEST_CODE, result.resultCode, result.data)
 //                        }
 //                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
-                        // The selection dialog is intentSender. Start it.
-                        startIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null)
-                    }
+                    // The selection dialog is intentSender. Start it.
+                    startIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null)
                 }
+            }
 
-                override fun onAssociationCreated(associationInfo: AssociationInfo) {
-                    // associationInfo.getAssociatedDevice missing in android 33
-                    associationInfo.deviceMacAddress
-                }
+            override fun onAssociationCreated(associationInfo: AssociationInfo) {
+                // associationInfo.getAssociatedDevice missing in android 33
+                associationInfo.deviceMacAddress
+            }
 
-                override fun onFailure(errorMessage: CharSequence?) {
-                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
-                }
-            })
+            override fun onFailure(errorMessage: CharSequence?) {
+                Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
@@ -176,6 +180,37 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val f: DialogFragment
                 f = DatePreferenceDialogFragment.newInstance(preference.getKey())
                 f.setTargetFragment(this, 0) // TODO
+                f.show(parentFragmentManager, null)
+            }
+
+            is TimePreference -> {
+                val f: DialogFragment
+                f = TimePreferenceDialogFragment.newInstance(preference.getKey())
+                f.setTargetFragment(this, 0) // TODO
+                f.show(parentFragmentManager, null)
+            }
+
+            is ColorPreference -> {
+                val color = preference.text?.let { Color.parseColor(it) }
+                ColorPickerDialogBuilder
+                    .with(context)
+                    .setTitle("Choose color for time display")
+                    .initialColor(color ?: 0xFFFFFF)
+                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                    .density(12)
+                    .setOnColorSelectedListener { selectedColor ->
+                        preference.text = "#" + Integer.toHexString(selectedColor and 0x00FFFFFF)
+                    }
+                    .setPositiveButton("ok") { dialog, selectedColor, allColors -> }
+                    .setNegativeButton("cancel") { dialog, which -> }
+                    .build()
+                    .show()
+            }
+
+            is DeviceGInfoPreference -> {
+                val f: DialogFragment
+                f = DeviceGInfoFragment.newInstance()
+                //f.setTargetFragment(this, 0) // TODO
                 f.show(parentFragmentManager, null)
             }
 
@@ -218,6 +253,31 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     } catch (e: RuntimeException) {
                         Toast.makeText(requireContext(), "Error setting profile: $e", Toast.LENGTH_LONG).show()
                     }
+                }
+            } else if (AppSettings.isDndSetting(key)) {
+                val startTime = AppSettings.getDndStartTime(sharedPreferences)
+                val endTime = AppSettings.getDndEndTime(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetDndSettings) {
+                    if (startTime != null && endTime != null) {
+                        it.setDndSettings(1/*FIXME*/, startTime.hour, startTime.minute, endTime.hour, endTime.minute)
+                    } else {
+                        it.setDndSettings(0/*FIXME*/, 0, 0, 0, 0)
+                    }
+                }
+            } else if (AppSettings.isUserWatchWearingArmSetting(key)) {
+                val wearingArm = AppSettings.getUserWatchWearingArm(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchWearingArm) {
+                    it.setWatchWearingArm(wearingArm ?: WatchWearingArm.Left)
+                }
+            } else if (AppSettings.isWatchTimeLayout(key)) {
+                val timePosition = AppSettings.getWatchTimePosition(sharedPreferences)
+                val rgb565Color = AppSettings.getWatchTimeColor(sharedPreferences)
+                try {
+                    WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchTimeLayout) {
+                        it.setWatchTimeLayout(timePosition ?: WatchTimePosition.Middle, rgb565Color ?: 0xFFFF.toUShort())
+                    }
+                } catch (e: RuntimeException) {
+                    Toast.makeText(requireContext(), "Error setting profile: $e", Toast.LENGTH_LONG).show()
                 }
             }
         }

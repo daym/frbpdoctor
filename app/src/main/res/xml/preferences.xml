@@ -1,50 +1,111 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <EditTextPreference
-        android:key="userId"
-        android:title="User ID"
-        android:inputType="number"
-        android:digits="0123456789"
-        app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory
+        android:key="watch_selection"
+        android:title="Watch selection">
 
-    <com.friendly_machines.frbpdoctor.ui.settings.RxBleDevicePreference
-        android:key="watchMacAddress"
-        android:title="Watch"
-        android:dialogTitle="Select your watch"
-        app:useSimpleSummaryProvider="true" />
+        <com.friendly_machines.frbpdoctor.ui.settings.RxBleDevicePreference
+            android:dialogTitle="Select your watch"
+            android:key="watchMacAddress"
+            android:title="Watch"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
 
-    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
-        android:key="userWeight"
-        android:title="Weight"
-        android:inputType="number"
-        app:unit="kg" />
+    <PreferenceCategory
+        android:key="user_profile"
+        android:title="User info">
+        <EditTextPreference
+            android:digits="0123456789"
+            android:inputType="number"
+            android:key="userId"
+            android:title="User ID"
+            app:useSimpleSummaryProvider="true" />
 
-    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
-        android:key="userHeight"
-        android:title="Height"
-        android:inputType="number"
-        app:unit="cm" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userWeight"
+            android:title="Weight"
+            app:unit="kg" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userHeight"
+            android:title="Height"
+            app:unit="cm" />
+
+        <ListPreference
+            android:dialogTitle="Select your sex"
+            android:entries="@array/sex_options"
+            android:entryValues="@array/sex_values"
+            android:key="userSex"
+            android:title="Sex"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.DatePreference
+            android:key="userBirthday"
+            android:title="Birthday"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
 
     <ListPreference
-        android:key="userSex"
-        android:title="Sex"
-        android:dialogTitle="Select your sex"
-        android:entries="@array/sex_options"
-        android:entryValues="@array/sex_values"
+        android:dialogTitle="Select the arm you wear your watch one"
+        android:entries="@array/arm_options"
+        android:entryValues="@array/arm_values"
+        android:key="userWatchWearingArm"
+        android:title="Watch arm"
         app:useSimpleSummaryProvider="true" />
 
-    <com.friendly_machines.frbpdoctor.ui.settings.DatePreference
-        android:title="Birthday"
-        android:key="userBirthday"
-        app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory
+        android:key="watch_time_layout"
+        android:title="Watch Time Layout">
 
-    <Preference
-        android:key="clear_preferences"
-        android:title="Clear Preferences and unbind watch" />
+        <ListPreference
+            android:dialogTitle="Select where the time goes on the watch"
+            android:entries="@array/time_position_options"
+            android:entryValues="@array/time_position_values"
+            android:key="watchTimePosition"
+            android:title="Watch time position"
+            app:useSimpleSummaryProvider="true" />
 
-    <Preference
-        android:key="set_time_on_watch"
-        android:title="Set time on watch (to current time)" />
+        <com.friendly_machines.frbpdoctor.ui.settings.ColorPreference
+            android:key="watchTimeColor"
+            android:title="Watch time color"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="watch_do_not_disturb"
+        android:title="Watch Do Not Disturb">
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="watchDndStartTime"
+            android:title="Do not disturb: start time"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="watchDndEndTime"
+            android:title="Do not disturb: end time"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="watch_actions"
+        android:title="Watch actions">
+
+        <Preference
+            android:key="clear_preferences"
+            android:title="Clear Preferences and unbind watch" />
+
+        <Preference
+            android:key="set_time_on_watch"
+            android:title="Set time on watch (to current time)" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.DeviceGInfoPreference
+            android:key="get_watch_g_info"
+            android:title="Get watch device info"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -1,4 +1,4 @@
-package com.friendly_machines.frbpdoctor.ui.health
+package com.friendly_machines.frbpdoctor.ui.customization
 
 import android.app.AlertDialog
 import android.app.TimePickerDialog
@@ -11,12 +11,13 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.friendly_machines.fr_yhe_api.commondata.WatchChangeAlarmAction
 import com.friendly_machines.frbpdoctor.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-class EditAlarmDialog(private val action: com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction) : DialogFragment() {
+class EditAlarmDialog(private val action: WatchChangeAlarmAction) : DialogFragment() {
     private lateinit var timeEditText: EditText
     private lateinit var dayCheckBoxes: List<CheckBox>
 
@@ -68,8 +69,8 @@ class EditAlarmDialog(private val action: com.friendly_machines.fr_yhe_med.comma
 
         builder.setPositiveButton(
             when (action) {
-                com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Add -> "Add Alarm"
-                com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmAction.Edit -> "Change Alarm"
+                WatchChangeAlarmAction.Add -> "Add Alarm"
+                WatchChangeAlarmAction.Edit -> "Change Alarm"
             }
         ) { _, _ ->
             val timeString = timeEditText.text.toString()

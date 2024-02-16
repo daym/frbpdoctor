@@ -11,6 +11,36 @@
         <item>Female</item>
         <item>Male</item>
     </string-array>
+    <string-array name="arm_options">
+        <item>Left</item>
+        <item>Right</item>
+    </string-array>
+    <string-array name="arm_values">
+        <item>Left</item>
+        <item>Right</item>
+    </string-array>
+    <string-array name="time_position_options">
+        <item>Top</item>
+        <item>Bottom</item>
+        <item>Left</item>
+        <item>Right</item>
+        <item>LeftTop</item>
+        <item>RightTop</item>
+        <item>LeftBottom</item>
+        <item>RightBottom</item>
+        <item>Middle</item>
+    </string-array>
+    <string-array name="time_position_values">
+        <item>Top</item>
+        <item>Bottom</item>
+        <item>Left</item>
+        <item>Right</item>
+        <item>LeftTop</item>
+        <item>RightTop</item>
+        <item>LeftBottom</item>
+        <item>RightBottom</item>
+        <item>Middle</item>
+    </string-array>
     <string name="userWeight">weight</string>
     <string name="userHeight">height</string>
     <string name="userBirthday">birthday</string>
@@ -131,5 +161,11 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="AddWatchDial">Add Watch Dial...</string>
+    <string name="ChooseWatchDial">Choose Watch Dial</string>
+    <string name="title_customization">Customize Watch</string>
+    <string name="title_activity_customization">Customization</string>
+    <string name="navigation_drawer_open">Open navigation</string>
+    <string name="navigation_drawer_close">Close navigation</string>
 
 </resources>

@@ -12,10 +12,17 @@ class WeatherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val navController = findNavController(R.id.nav_host_fragment_activity_weather)
         //setupActionBarWithNavController(this, navController)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        // onBackPressed()
+        return true
     }
 
 }

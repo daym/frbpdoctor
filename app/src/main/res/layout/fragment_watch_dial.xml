@@ -11,11 +11,19 @@
         android:layout_height="match_parent" />
 
     <Button
-        android:id="@+id/addAlarmButton"
+        android:id="@+id/addWatchDialButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_marginEnd="16dp"
-        android:text="@string/AddAlarm" />
+        android:text="@string/AddWatchDial" />
+
+    <Button
+        android:id="@+id/chooseWatchDialButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:text="@string/ChooseWatchDial" />
 
 </FrameLayout>

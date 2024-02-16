@@ -1,4 +1,4 @@
-package com.friendly_machines.frbpdoctor.ui.health
+package com.friendly_machines.frbpdoctor.ui.customization
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
