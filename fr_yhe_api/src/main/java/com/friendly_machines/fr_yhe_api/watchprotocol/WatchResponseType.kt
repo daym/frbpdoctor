@@ -7,4 +7,10 @@ enum class WatchResponseType {
     Unbind,
     Bind,
     SetProfile,
+    SetDndSettings,
+    GetAlarms,
+    SetWatchWearingArm,
+    SetWatchTimeLayout,
+    GetWatchDials,
+    ChangeWatchDial,
 }

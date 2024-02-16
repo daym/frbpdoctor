@@ -1,9 +1,11 @@
 package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
+import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 
 interface IWatchBinder : IBinder {
-    fun setProfile(height: Byte, weight: Byte, sex: WatchProfileSex, age: Byte)
+    fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?)
     fun setWeather(
         weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
     )
@@ -29,11 +31,22 @@ interface IWatchBinder : IBinder {
     fun getRawBpData(startTime: Int, endTime: Int)
     fun getStepData()
     fun getHeatData()
-    fun getWatchFace()
+    fun getWatchDial()
+    fun selectWatchDial(id: Int)
     fun getSportData()
     fun setStepGoal(steps: Int)
     fun addListener(watchListener: IWatchListener): IWatchBinder
     fun removeListener(it: IWatchBinder)
     fun resetSequenceNumbers()
     fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult
+
+    fun getFileCount()
+    fun getFileList()
+    fun setWatchWearingArm(arm: WatchWearingArm)
+    fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte)
+    fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort)
+
+    fun getGDeviceInfo()
+    fun getMainTheme() // not sure that's materially different from getWatchDial
+    fun setMainTheme(index: Byte) // not sure that's materially different from selectWatchDial
 }

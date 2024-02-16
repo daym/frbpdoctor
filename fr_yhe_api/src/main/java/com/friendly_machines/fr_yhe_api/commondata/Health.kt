@@ -3,9 +3,9 @@ package com.friendly_machines.fr_yhe_api.commondata
 import java.nio.ByteBuffer
 
 data class HSportDataBlock(
-    val startTime: Int,
-    val endTime: Int,
-    val steps: Short,
+    val startTime: UInt,
+    val endTime: UInt,
+    val steps: UShort,
     val distance: Short,
     val calories: Short
 ) {
@@ -14,9 +14,9 @@ data class HSportDataBlock(
 
         fun parsePro(buf: ByteBuffer): HSportDataBlock {
             return HSportDataBlock(
-                startTime = buf.int,
-                endTime = buf.int,
-                steps = buf.short,
+                startTime = buf.int.toUInt(),
+                endTime = buf.int.toUInt(),
+                steps = buf.short.toUShort(),
                 distance = buf.short,
                 calories = buf.short
             )
@@ -55,21 +55,22 @@ data class HHeartDataBlock(
 }
 
 data class HBloodDataBlock(
-    val bloodStartTime: Int,
+    val bloodStartTime: UInt,
     val isInflated: Byte,
-    val bloodSbp: Byte,
-    val bloodDbp: Byte
+    val bloodSystolicPressure: UByte,
+    val bloodDiastolicPressure: UByte,
+    val reserved: Byte
 ) {
     companion object {
         const val SIZE: Int = 4 + 1 + 1 + 1 + 1
 
         fun parsePro(buf: ByteBuffer): HBloodDataBlock {
-            // FIXME parse one more dummy byte
             return HBloodDataBlock(
-                bloodStartTime = buf.int,
+                bloodStartTime = buf.int.toUInt(),
                 isInflated = buf.get(),
-                bloodSbp = buf.get(),
-                bloodDbp = buf.get()
+                bloodSystolicPressure = buf.get().toUByte(),
+                bloodDiastolicPressure = buf.get().toUByte(),
+                reserved = buf.get() // ...
             )
         }
     }
@@ -164,7 +165,7 @@ data class HTemperatureAndHumidityDataBlock(
 
 
 data class HTemperatureDataBlock(
-    val startTime: Int,
+    val startTime: UInt,
     val type: Byte,
     val valueInt: Byte,
     val valueFloat: Byte
@@ -174,7 +175,7 @@ data class HTemperatureDataBlock(
 
         fun parsePro(buf: ByteBuffer): HTemperatureDataBlock {
             return HTemperatureDataBlock(
-                startTime = buf.int,
+                startTime = buf.int.toUInt(),
                 type = buf.get(),
                 valueInt = buf.get(),
                 valueFloat = buf.get()

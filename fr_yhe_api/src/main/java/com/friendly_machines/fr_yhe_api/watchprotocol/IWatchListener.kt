@@ -27,4 +27,20 @@ interface IWatchListener {
     fun onResetSequenceNumbers() {
 
     }
+
+    fun onWatchMusicControl(control: WatchMusicControlAnswer) {
+
+    }
+
+    fun onWatchCameraControl(control: WatchCameraControlAnswer) {
+
+    }
+
+    fun onWatchFindMobilePhone() {
+
+    }
+
+    fun onWatchInitiateSos() {
+
+    }
 }
