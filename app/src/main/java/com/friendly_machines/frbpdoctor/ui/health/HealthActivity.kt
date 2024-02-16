@@ -177,7 +177,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
 
             // UNSAFE since we don't know the response. It will keep the listener alive forever.
             WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this@HealthActivity, WatchResponseType.SetProfile) { binder ->
-                binder.getFileCount()
+                binder.setMainTheme(1)
             }
         }
 

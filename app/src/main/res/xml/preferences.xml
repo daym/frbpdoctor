@@ -106,6 +106,10 @@
             android:key="get_watch_g_info"
             android:title="Get watch device info"
             app:useSimpleSummaryProvider="true" />
+        <com.friendly_machines.frbpdoctor.ui.settings.DeviceFilesPreference
+            android:key="get_device_files"
+            android:title="Show files that are on the device"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>

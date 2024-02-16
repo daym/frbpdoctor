@@ -22,7 +22,6 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.frbpdoctor.AppSettings
-import com.friendly_machines.frbpdoctor.DeviceGInfoFragment
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
@@ -208,9 +207,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             }
 
             is DeviceGInfoPreference -> {
-                val f: DialogFragment
-                f = DeviceGInfoFragment.newInstance()
-                //f.setTargetFragment(this, 0) // TODO
+                val f = DeviceGInfoFragment.newInstance()
+                f.show(parentFragmentManager, null)
+            }
+
+            is DeviceFilesPreference -> {
+                val f = DeviceFilesFragment.newInstance()
                 f.show(parentFragmentManager, null)
             }
 

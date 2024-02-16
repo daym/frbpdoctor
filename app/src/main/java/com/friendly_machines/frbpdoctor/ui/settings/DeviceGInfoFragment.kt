@@ -1,4 +1,4 @@
-package com.friendly_machines.frbpdoctor
+package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -21,6 +21,8 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
+import com.friendly_machines.frbpdoctor.R
+import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 
 class DeviceGInfoFragment : DialogFragment() {
     private lateinit var handler: Handler
@@ -36,32 +38,19 @@ class DeviceGInfoFragment : DialogFragment() {
         WatchCommunicationClientShorthand.bindPeriodic(handler, 2000, this.requireContext(), object : IWatchListener {
             override fun onWatchResponse(response: WatchResponse) {
                 view?.let { view ->
-                    // FIXME
-                    val textInfo = view.findViewById<TextView>(R.id.text_info)
-                    val textName = view.findViewById<TextView>(R.id.text_name)
-                    val textScreenInfo = view.findViewById<TextView>(R.id.text_screen_info)
-                    val textElectrodeLocation = view.findViewById<TextView>(R.id.text_electrode_location)
-                    val textEventReminderInfo = view.findViewById<TextView>(R.id.text_event_reminder_info)
-                    val textMacAddress = view.findViewById<TextView>(R.id.text_mac_address)
-                    val textMainTheme = view.findViewById<TextView>(R.id.text_main_theme)
-                    val textManualModeStatus = view.findViewById<TextView>(R.id.text_manual_mode_status)
-                    val textRealBloodOxygen = view.findViewById<TextView>(R.id.text_real_blood_oxygen)
-                    val textRealTemperature = view.findViewById<TextView>(R.id.text_real_temperature)
-                    val textScreenParameters = view.findViewById<TextView>(R.id.text_screen_parameters)
-                    val textUserConfig = view.findViewById<TextView>(R.id.text_user_config)
                     when (response) {
-                        is WatchGGetDeviceInfoCommand.Response -> textInfo.text = "$response"
-                        is WatchGGetDeviceNameCommand.Response -> textName.text = "$response"
-                        is WatchGGetScreenInfoCommand.Response -> textScreenInfo.text = "$response"
-                        is WatchGGetElectrodeLocationCommand.Response -> textElectrodeLocation.text = "$response"
-                        is WatchGGetEventReminderInfoCommand.Response -> textEventReminderInfo.text = "$response"
-                        is WatchGGetMacAddressCommand.Response -> textMacAddress.text = "$response"
-                        is WatchGGetMainThemeCommand.Response -> textMainTheme.text = "$response"
-                        is WatchGGetManualModeStatusCommand.Response -> textManualModeStatus.text = "$response"
-                        is WatchGGetRealBloodOxygenCommand.Response -> textRealBloodOxygen.text = "$response"
-                        is WatchGGetRealTemperatureCommand.Response -> textRealTemperature.text = "$response"
-                        is WatchGGetScreenParametersCommand.Response -> textScreenParameters.text = "$response"
-                        is WatchGGetUserConfigCommand.Response -> textUserConfig.text = "$response"
+                        is WatchGGetDeviceInfoCommand.Response -> view.findViewById<TextView>(R.id.text_info).text = "$response"
+                        is WatchGGetDeviceNameCommand.Response -> view.findViewById<TextView>(R.id.text_name).text = "$response"
+                        is WatchGGetScreenInfoCommand.Response -> view.findViewById<TextView>(R.id.text_screen_info).text = "$response"
+                        is WatchGGetElectrodeLocationCommand.Response -> view.findViewById<TextView>(R.id.text_electrode_location).text = "$response"
+                        is WatchGGetEventReminderInfoCommand.Response -> view.findViewById<TextView>(R.id.text_event_reminder_info).text = "$response"
+                        is WatchGGetMacAddressCommand.Response -> view.findViewById<TextView>(R.id.text_mac_address).text = "$response"
+                        is WatchGGetMainThemeCommand.Response -> view.findViewById<TextView>(R.id.text_main_theme).text = "$response"
+                        is WatchGGetManualModeStatusCommand.Response -> view.findViewById<TextView>(R.id.text_manual_mode_status).text = "$response"
+                        is WatchGGetRealBloodOxygenCommand.Response -> view.findViewById<TextView>(R.id.text_real_blood_oxygen).text = "$response"
+                        is WatchGGetRealTemperatureCommand.Response -> view.findViewById<TextView>(R.id.text_real_temperature).text = "$response"
+                        is WatchGGetScreenParametersCommand.Response -> view.findViewById<TextView>(R.id.text_screen_parameters).text = "$response"
+                        is WatchGGetUserConfigCommand.Response -> view.findViewById<TextView>(R.id.text_user_config).text = "$response"
                     }
                 }
                 super.onWatchResponse(response)
