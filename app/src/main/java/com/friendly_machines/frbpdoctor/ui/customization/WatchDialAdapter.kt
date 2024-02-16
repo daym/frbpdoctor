@@ -18,21 +18,25 @@ class WatchDialAdapter(private val data: List<com.friendly_machines.fr_yhe_api.c
         private val canDeleteCheckbox: CheckBox = itemView.findViewById(R.id.canDeleteCheckBox)
         private val versionTextView: TextView = itemView.findViewById(R.id.versionTextView)
 
-        fun getSelectedIndex(): Int? {
-            val position = absoluteAdapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                return position
-            }
-            return null
-        }
+//        fun getSelectedIndex(): Int? {
+//            val position = absoluteAdapterPosition
+//            if (position != RecyclerView.NO_POSITION) {
+//                return position
+//            }
+//            return null
+//        }
 
         init {
             itemView.setOnClickListener {
-                val position = adapterPosition
+                val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val item = data[position]
-                    //listener.onItemClick(position, item)
+//                    val previousSelectedItem = selectedItemPosition
+//                    selectedItemPosition = position
+//                    notifyItemChanged(previousSelectedItem)
+//                    notifyItemChanged(selectedItemPosition)
                     setSelectedItemId(item.id)
+                    notifyDataSetChanged()
                 }
             }
         }
@@ -42,6 +46,15 @@ class WatchDialAdapter(private val data: List<com.friendly_machines.fr_yhe_api.c
             blockNumberTextView.text = item.blockNumber.toString()
             canDeleteCheckbox.isChecked = item.canDelete
             versionTextView.text = item.version.toString()
+            if (item.id == selectedItemId) {
+                //itemView.setBackgroundColor()
+                itemView.setBackgroundResource(R.drawable.selected_item_background)
+                itemView.isSelected = true
+            } else {
+                //itemView.setBackgroundResource(android.R.color.transparent)
+                itemView.setBackgroundResource(R.drawable.selected_item_background)
+                itemView.isSelected = false
+            }
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchDialViewHolder {
