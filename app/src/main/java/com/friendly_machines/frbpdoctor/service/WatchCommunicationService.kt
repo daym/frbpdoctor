@@ -13,11 +13,9 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.IBinder
-import android.provider.MediaStore
 import android.service.notification.NotificationListenerService
 import android.telecom.TelecomManager
 import android.util.Log
-import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
@@ -140,15 +138,6 @@ class WatchCommunicationService : Service(), IWatchListener {
         }
     }
 
-    private fun injectKeyboardKey(keyCode: Int) {
-        sendBroadcast(Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
-        })
-        sendBroadcast(Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-            putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, keyCode))
-        })
-    }
-
     override fun onWatchMusicControl(control: WatchMusicControlAnswer) {
         if (control == WatchMusicControlAnswer.IncreaseVolume || control == WatchMusicControlAnswer.DecreaseVolume) {
             val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -159,6 +148,7 @@ class WatchCommunicationService : Service(), IWatchListener {
                 }
             }
         } else {
+            // Older: Just val mediaController = MediaControllerCompat.getMediaController(this)
             val mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
             val mediaControllers = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListenerService::class.java))
             for (controller in mediaControllers) {
