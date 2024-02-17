@@ -11,7 +11,9 @@ import android.media.AudioManager
 import android.media.RingtoneManager
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.net.Uri
 import android.os.IBinder
+import android.provider.MediaStore
 import android.service.notification.NotificationListenerService
 import android.telecom.TelecomManager
 import android.util.Log
@@ -26,6 +28,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMusicControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
 import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
+import com.friendly_machines.frbpdoctor.ui.camera.CameraActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import java.security.MessageDigest
 
@@ -166,14 +169,17 @@ class WatchCommunicationService : Service(), IWatchListener {
                         WatchMusicControlAnswer.PreviousSong -> controller.transportControls.skipToPrevious()
                         WatchMusicControlAnswer.IncreaseVolume -> {
                         }
+
                         WatchMusicControlAnswer.DecreaseVolume -> {
                         }
+
                         WatchMusicControlAnswer.Unknown -> {
                         }
                     }
                     return
                 }
             }
+            // TODO: Prioritize
             for (controller in mediaControllers) {
                 when (control) {
                     WatchMusicControlAnswer.PlayPause -> controller.transportControls.play()
@@ -181,8 +187,10 @@ class WatchCommunicationService : Service(), IWatchListener {
                     WatchMusicControlAnswer.PreviousSong -> controller.transportControls.skipToPrevious()
                     WatchMusicControlAnswer.IncreaseVolume -> {
                     }
+
                     WatchMusicControlAnswer.DecreaseVolume -> {
                     }
+
                     WatchMusicControlAnswer.Unknown -> {
                     }
                 }
@@ -191,20 +199,22 @@ class WatchCommunicationService : Service(), IWatchListener {
         }
     }
 
+
     override fun onWatchCameraControl(control: WatchCameraControlAnswer) {
-        when (control) {
-            WatchCameraControlAnswer.Prepare -> injectKeyboardKey(KeyEvent.KEYCODE_CAMERA)
-            WatchCameraControlAnswer.Exit -> {
-                // TODO
+        val intent = Intent(this, CameraActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            action = when (control) {
+                WatchCameraControlAnswer.Prepare -> CameraActivity.PREPARE_CAMERA
+                WatchCameraControlAnswer.Shoot -> CameraActivity.SHOOT_CAMERA
+                WatchCameraControlAnswer.Exit -> CameraActivity.EXIT_CAMERA
+                WatchCameraControlAnswer.Unknown -> {
+                    return
+                }
             }
-
-            WatchCameraControlAnswer.Shoot -> {
-                // TODO
-            }
-
-            WatchCameraControlAnswer.Unknown -> {
-            }
+            data = Uri.parse("package:$packageName")
         }
+
+        startActivity(intent)
     }
 
     override fun onWatchInitiateSos() {

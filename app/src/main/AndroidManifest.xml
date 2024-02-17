@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Camera -->
+
+<!--    <uses-permission android:name="android.permission.CAMERA" />-->
+<!--    <uses-feature android:name="android.hardware.camera.any" />-->
+<!--    <uses-feature android:name="android.hardware.camera.autofocus" />-->
+<!--    <uses-feature android:name="android.hardware.camera.flash" />-->
+<!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -9,6 +18,7 @@
         android:name="android.software.companion_device_setup"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
         android:name="android.permission.BLUETOOTH"
@@ -37,11 +47,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FrBpDoctor"
         tools:targetApi="33">
+        <activity
+            android:name=".ui.camera.CameraActivity"
+            android:exported="false" />
 
         <service
             android:name=".service.WatchCommunicationService"
             android:enabled="true"
             android:exported="false"
+            android:foregroundServiceType="camera"
             android:label="@string/watch_communication_service" />
         <service
             android:name=".service.NotificationListener"
@@ -60,13 +74,11 @@
         <activity
             android:name=".ui.health.HealthActivity"
             android:exported="false"
-            android:label="@string/title_activity_health"
-             />
+            android:label="@string/title_activity_health" />
         <activity
             android:name=".ui.customization.CustomizationActivity"
             android:exported="false"
-            android:label="@string/title_activity_customization"
-             />
+            android:label="@string/title_activity_customization" />
         <activity
             android:name=".ui.home.MainActivity"
             android:exported="true">
