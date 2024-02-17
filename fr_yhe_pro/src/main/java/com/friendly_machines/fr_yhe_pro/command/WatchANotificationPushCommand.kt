@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-class WatchANotificationPushCommand(val type: Byte, val title: String, val str2: String) : WatchCommand(WatchOperation.ANotificationPush, run {
+class WatchANotificationPushCommand(type: Byte, title: String, str2: String) : WatchCommand(WatchOperation.ANotificationPush, run {
     val titleBytes = title.toByteArray(StandardCharsets.UTF_8)
     val str2Bytes = str2.toByteArray(StandardCharsets.UTF_8)
     val output = ByteArrayOutputStream()

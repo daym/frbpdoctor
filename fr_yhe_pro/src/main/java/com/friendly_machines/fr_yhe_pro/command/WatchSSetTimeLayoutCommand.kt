@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 // only for chipScheme == 3
-class WatchSSetTimeLayoutCommand(val position: WatchTimePosition, val rgb565Color: UShort) : WatchCommand(WatchOperation.SSetTimeLayout, run {
+class WatchSSetTimeLayoutCommand(position: WatchTimePosition, rgb565Color: UShort) : WatchCommand(WatchOperation.SSetTimeLayout, run {
     val buf = ByteBuffer.allocate(7).order(ByteOrder.LITTLE_ENDIAN)
     buf.put(
         when (position) {

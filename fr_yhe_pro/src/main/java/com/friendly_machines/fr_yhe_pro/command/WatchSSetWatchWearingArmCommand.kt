@@ -5,7 +5,7 @@ import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchSSetWatchWearingArmCommand(val arm: WatchWearingArm) : WatchCommand(WatchOperation.SSetWatchWearingArm, byteArrayOf(when(arm) {
+class WatchSSetWatchWearingArmCommand(arm: WatchWearingArm) : WatchCommand(WatchOperation.SSetWatchWearingArm, byteArrayOf(when(arm) {
     WatchWearingArm.Left -> 0
     WatchWearingArm.Right -> 1
 })) {

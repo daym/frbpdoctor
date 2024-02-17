@@ -4,7 +4,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchASetTomorrowWeatherCommand(val str1: String, val str2: String, val str3: String, val weatherCode: Short) : WatchCommand(WatchOperation.ASetTomorrowWeather, run {
+class WatchASetTomorrowWeatherCommand(str1: String, str2: String, str3: String, weatherCode: Short) : WatchCommand(WatchOperation.ASetTomorrowWeather, run {
     val str1Bytes = str1.toByteArray(Charsets.UTF_8)
     val str2Bytes = str2.toByteArray(Charsets.UTF_8)
     val str3Bytes = str3.toByteArray(Charsets.UTF_8)
