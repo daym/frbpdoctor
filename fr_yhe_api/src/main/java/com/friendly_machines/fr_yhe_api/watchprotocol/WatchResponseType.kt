@@ -13,4 +13,6 @@ enum class WatchResponseType {
     SetWatchTimeLayout,
     GetWatchDials,
     ChangeWatchDial,
+    SetSkinColor,
+    SetWatchScheduleEnabled,
 }

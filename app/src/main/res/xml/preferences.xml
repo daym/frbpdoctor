@@ -42,6 +42,14 @@
             android:title="Sex"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            android:dialogTitle="Select your skin color"
+            android:entries="@array/skin_color_options"
+            android:entryValues="@array/skin_color_values"
+            android:key="userSkinColor"
+            android:title="Skin color"
+            app:useSimpleSummaryProvider="true" />
+
         <com.friendly_machines.frbpdoctor.ui.settings.DatePreference
             android:key="userBirthday"
             android:title="Birthday"
@@ -50,7 +58,7 @@
     </PreferenceCategory>
 
     <ListPreference
-        android:dialogTitle="Select the arm you wear your watch one"
+        android:dialogTitle="Select the arm you wear your watch on"
         android:entries="@array/arm_options"
         android:entryValues="@array/arm_values"
         android:key="userWatchWearingArm"
@@ -75,6 +83,8 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <CheckBoxPreference android:title="Schedule Enabled" android:key="watchScheduleEnabled" android:summary="Schedule Enabled" />
+
     <PreferenceCategory
         android:key="watch_do_not_disturb"
         android:title="Watch Do Not Disturb">
@@ -90,18 +100,27 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="watch_actions"
-        android:title="Watch actions">
+    <PreferenceCategory android:key="user_sleep_schedule" android:title="User Sleep Schedule">
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userSleepStartTime"
+            android:title="Sleep: start time"
+            app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference android:title="Mondays" android:key="userSleepMondays" android:summary="Mondays" />
+        <CheckBoxPreference android:title="Tuesdays" android:key="userSleepTuesdays" android:summary="Tuesdays" />
+        <CheckBoxPreference android:title="Wednesdays" android:key="userSleepWednesdays" android:summary="Wednesdays" />
+        <CheckBoxPreference android:title="Thursdays" android:key="userSleepThursdays" android:summary="Thursdays" />
+        <CheckBoxPreference android:title="Fridays" android:key="userSleepFridays" android:summary="Fridays" />
+        <CheckBoxPreference android:title="Saturdays" android:key="userSleepSaturdays" android:summary="Saturdays" />
+        <CheckBoxPreference android:title="Sundays" android:key="userSleepSundays" android:summary="Sundays" />
+    </PreferenceCategory>
 
+    <PreferenceCategory android:key="watch_actions" android:title="Actions">
         <Preference
             android:key="clear_preferences"
-            android:title="Clear Preferences and unbind watch" />
-
+            android:title="Clear cell phone preferences and unbind watch" />
         <Preference
             android:key="set_time_on_watch"
             android:title="Set time on watch (to current time)" />
-
         <com.friendly_machines.frbpdoctor.ui.settings.DeviceGInfoPreference
             android:key="get_watch_g_info"
             android:title="Get watch device info"

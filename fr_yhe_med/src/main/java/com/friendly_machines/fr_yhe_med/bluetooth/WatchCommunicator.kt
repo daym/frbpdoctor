@@ -2,7 +2,7 @@ package com.friendly_machines.fr_yhe_med.bluetooth
 
 import android.os.Binder
 import android.util.Log
-import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
+import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -551,6 +551,11 @@ public class WatchCommunicator : IWatchCommunicator {
 
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
+        override fun setLanguage(language: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+
+        override fun setUserSkinColor(enum: SkinColor) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun addListener(watchListener: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(watchListener)
@@ -658,6 +663,22 @@ public class WatchCommunicator : IWatchCommunicator {
                 }
 
                 WatchResponseType.SetWatchWearingArm -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetSkinColor -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWatchScheduleEnabled -> { // dummy
                     return if (response is WatchGetBatteryStateCommand.Response) {
                         WatchResponseAnalysisResult.Ok
                     } else {

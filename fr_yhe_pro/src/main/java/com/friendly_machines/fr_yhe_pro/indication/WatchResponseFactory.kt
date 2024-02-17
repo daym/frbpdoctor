@@ -49,6 +49,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
@@ -118,6 +119,7 @@ object WatchResponseFactory {
             WatchOperation.SSetWatchWearingArm -> WatchSSetWatchWearingArmCommand.Response.parse(buf)
             WatchOperation.SUserInfo -> WatchSSetUserInfoCommand.Response.parse(buf)
             WatchOperation.SSetTimeLayout -> WatchSSetTimeLayoutCommand.Response.parse(buf)
+            WatchOperation.SSetScheduleSwitch -> WatchSSetScheduleSwitchCommand.Response.parse(buf)
 
             // "Get" section
 

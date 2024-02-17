@@ -19,6 +19,23 @@
         <item>Left</item>
         <item>Right</item>
     </string-array>
+    <string-array name="skin_color_options">
+        <item>White</item>
+        <item>Yellowish</item>
+        <item>Yellow</item>
+        <item>Brownish</item>
+        <item>Brown</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="skin_color_values">
+        <item>White</item>
+        <item>Yellowish</item>
+        <item>Yellow</item>
+        <item>Brownish</item>
+        <item>Brown</item>
+        <item>Black</item>
+    </string-array>
+
     <string-array name="time_position_options">
         <item>Top</item>
         <item>Bottom</item>

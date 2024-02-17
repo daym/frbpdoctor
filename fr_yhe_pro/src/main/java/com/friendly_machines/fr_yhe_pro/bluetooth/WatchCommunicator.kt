@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_pro.bluetooth
 
 import android.os.Binder
 import android.util.Log
+import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
@@ -41,7 +42,11 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryComma
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetSkinColorCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
@@ -336,6 +341,11 @@ class WatchCommunicator : IWatchCommunicator {
             )
         }
 
+        override fun setUserSkinColor(skinColor: SkinColor) = enqueueCommand(WatchSSetSkinColorCommand(skinColor))
+        override fun setUserSleep(startHour: Byte, startMinute: Byte, repeats: UByte) = enqueueCommand(WatchSSetSleepReminderCommand(startHour, startMinute, repeats))
+
+        override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchSSetScheduleSwitchCommand(enabled))
+
         override fun setWeather(
             weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
         ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", 42/*FIXME*/))
@@ -433,6 +443,10 @@ class WatchCommunicator : IWatchCommunicator {
             enqueueCommand(WatchSSetMainThemeCommand(index))
         }
 
+        override fun setLanguage(language: Byte) {
+            enqueueCommand(WatchSSetLanguageCommand(language))
+        }
+
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
         override fun setStepGoal(steps: Int) {
@@ -513,7 +527,15 @@ class WatchCommunicator : IWatchCommunicator {
 //                        WatchResponseAnalysisResult.Mismatch
 //                    }
 //                }
-//
+
+                WatchResponseType.SetSkinColor -> {
+                    return if (response is WatchSSetSkinColorCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
                 WatchResponseType.SetProfile -> {
                     return if (response is WatchSSetUserInfoCommand.Response) {
                         if (response.status == 0.toByte()) {
@@ -561,6 +583,14 @@ class WatchCommunicator : IWatchCommunicator {
 
                 WatchResponseType.GetWatchDials -> {
                     return if (response is WatchWGetWatchDialInfoCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWatchScheduleEnabled -> { // dummy
+                    return if (response is WatchSSetScheduleSwitchCommand.Response) {
                         WatchResponseAnalysisResult.Ok
                     } else {
                         WatchResponseAnalysisResult.Mismatch

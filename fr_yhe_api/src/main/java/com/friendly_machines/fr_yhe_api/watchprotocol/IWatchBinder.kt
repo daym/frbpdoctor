@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
 import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
+import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 
 interface IWatchBinder : IBinder {
@@ -49,4 +50,8 @@ interface IWatchBinder : IBinder {
     fun getGDeviceInfo()
     fun getMainTheme() // not sure that's materially different from getWatchDial
     fun setMainTheme(index: Byte) // not sure that's materially different from selectWatchDial
+    fun setLanguage(language: Byte)
+    fun setUserSkinColor(enum: SkinColor)
+    fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte)
+    fun setScheduleEnabled(enabled: Boolean)
 }

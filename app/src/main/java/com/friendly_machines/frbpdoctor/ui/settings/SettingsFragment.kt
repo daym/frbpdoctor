@@ -17,6 +17,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
@@ -270,6 +271,25 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val wearingArm = AppSettings.getUserWatchWearingArm(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchWearingArm) {
                     it.setWatchWearingArm(wearingArm ?: WatchWearingArm.Left)
+                }
+            } else if (AppSettings.isUserSkinColorSetting(key)) {
+                val skinColor = AppSettings.getUserSkinColor(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetSkinColor) {
+                    it.setUserSkinColor(skinColor ?: SkinColor.Yellow)
+                }
+            } else if (AppSettings.isUserSleepSetting(key)) {
+                val sleep = AppSettings.getUserSleep(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetSkinColor) {
+                    if (sleep != null) {
+                        it.setUserSleep(sleep.hour, sleep.minute, sleep.repeats)
+                    } else {
+                        it.setUserSleep(0, 0, 0.toUByte())
+                    }
+                }
+            } else if (AppSettings.isWatchScheduleEnabledSetting(key)) {
+                val enabled = AppSettings.isWatchScheduleEnabled(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchScheduleEnabled) {
+                    it.setScheduleEnabled(enabled)
                 }
             } else if (AppSettings.isWatchTimeLayout(key)) {
                 val timePosition = AppSettings.getWatchTimePosition(sharedPreferences)

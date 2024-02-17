@@ -4,11 +4,19 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchSSetTemperatureAlarmCommand(flag: Byte, temperature: Byte) : WatchCommand(WatchOperation.SSetTemperatureAlarm, byteArrayOf(flag, temperature, 0)) {
+// FIXME has a lot more parameters (5 total)
+class WatchSSetTemperatureAlarmCommand(enabled: Boolean, temperature: Byte) : WatchCommand(
+    WatchOperation.SSetTemperatureAlarm, byteArrayOf(
+        when (enabled) {
+            true -> 1
+            false -> 0
+        }, temperature, 0
+    )
+) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(buf.get())
+                return Response(status = buf.get())
             }
         }
     }

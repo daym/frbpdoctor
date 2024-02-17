@@ -8,6 +8,7 @@ import android.util.Base64
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
+import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
@@ -25,11 +26,24 @@ object AppSettings {
     private const val KEY_USER_SEX = "userSex"
     private const val KEY_USER_BIRTHDAY = "userBirthday"
     private const val KEY_USER_WATCH_WEARING_ARM = "userWatchWearingArm"
+    private const val KEY_USER_SKIN_COLOR = "userSkinColor"
+
+    private const val KEY_USER_SLEEP_START_TIME = "userSleepStartTime"
+    private const val KEY_USER_SLEEP_MONDAYS = "userSleepMondays"
+    private const val KEY_USER_SLEEP_TUESDAYS = "userSleepTuesdays"
+    private const val KEY_USER_SLEEP_WEDNESDAYS = "userSleepWednesdays"
+    private const val KEY_USER_SLEEP_THURSDAYS = "userSleepThursdays"
+    private const val KEY_USER_SLEEP_FRIDAYS = "userSleepFridays"
+    private const val KEY_USER_SLEEP_SATURDAYS = "userSleepSaturdays"
+    private const val KEY_USER_SLEEP_SUNDAYS = "userSleepSundays"
+
     // TODO watchDndMode
     private const val KEY_WATCH_DND_START_TIME = "watchDndStartTime"
     private const val KEY_WATCH_DND_END_TIME = "watchDndEndTime"
     private const val KEY_WATCH_TIME_POSITION = "watchTimePosition"
     private const val KEY_WATCH_TIME_COLOR = "watchTimeColor"
+
+    private const val KEY_WATCH_SCHEDULE_ENABLED = "watchScheduleEnabled"
 
     private const val KEY_WATCH_KEY = "watchKey" // invisible to the user
     const val KEY_WATCH_MAC_ADDRESS = "watchMacAddress"
@@ -175,6 +189,7 @@ object AppSettings {
     }
 
     data class DndTime(val hour: Byte, val minute: Byte)
+    data class Sleep(val hour: Byte, val minute: Byte, val repeats: UByte)
     fun getDndStartTime(sharedPreferences: SharedPreferences): DndTime? {
         val timeString = sharedPreferences.getString(KEY_WATCH_DND_START_TIME, "")
         if (timeString.isNullOrEmpty()) {
@@ -199,6 +214,9 @@ object AppSettings {
     fun isUserWatchWearingArmSetting(key: String): Boolean {
         return key == KEY_USER_WATCH_WEARING_ARM
     }
+    fun isUserSkinColorSetting(key: String): Boolean {
+        return key == KEY_USER_SKIN_COLOR
+    }
     fun isWatchTimeLayout(key: String): Boolean {
         return key == KEY_WATCH_TIME_POSITION || key == KEY_WATCH_TIME_COLOR
     }
@@ -222,5 +240,46 @@ object AppSettings {
             }
         }
         return null
+    }
+
+    fun getUserSkinColor(sharedPreferences: SharedPreferences): SkinColor? {
+        val userSkinColorString = sharedPreferences.getString(KEY_USER_SKIN_COLOR, "")
+        return if (!userSkinColorString.isNullOrEmpty()) {
+            SkinColor.valueOf(userSkinColorString)
+        } else {
+            null
+        }
+    }
+
+    fun isUserSleepSetting(key: String): Boolean {
+        return setOf(KEY_USER_SLEEP_START_TIME, KEY_USER_SLEEP_MONDAYS, KEY_USER_SLEEP_TUESDAYS, KEY_USER_SLEEP_WEDNESDAYS, KEY_USER_SLEEP_THURSDAYS, KEY_USER_SLEEP_FRIDAYS, KEY_USER_SLEEP_SATURDAYS,  KEY_USER_SLEEP_SUNDAYS).contains(key)
+    }
+    fun getUserSleep(sharedPreferences: SharedPreferences): Sleep? {
+        val timeString = sharedPreferences.getString(KEY_USER_SLEEP_START_TIME, "")
+        if (timeString.isNullOrEmpty()) {
+            return null
+        }
+        val parts = timeString.split(":")
+        val hour = parts[0].toByte()
+        val minute = parts[1].toByte()
+
+        var repeats = 0
+        // FIXME test
+        for (key in arrayOf(KEY_USER_SLEEP_MONDAYS, KEY_USER_SLEEP_TUESDAYS, KEY_USER_SLEEP_WEDNESDAYS, KEY_USER_SLEEP_THURSDAYS, KEY_USER_SLEEP_FRIDAYS, KEY_USER_SLEEP_SATURDAYS, KEY_USER_SLEEP_SUNDAYS)) {
+            val s = sharedPreferences.getBoolean(key, false)
+            repeats = repeats * 2 + when (s) {
+                true -> 1
+                false -> 0
+            }
+        }
+
+        return Sleep(hour = hour, minute = minute, repeats = repeats.toUByte())
+    }
+
+    fun isWatchScheduleEnabledSetting(key: String): Boolean {
+        return key == KEY_WATCH_SCHEDULE_ENABLED
+    }
+    fun isWatchScheduleEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_WATCH_SCHEDULE_ENABLED, true)
     }
 }
