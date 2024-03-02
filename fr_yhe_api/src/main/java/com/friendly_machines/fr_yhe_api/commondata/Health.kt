@@ -2,6 +2,10 @@ package com.friendly_machines.fr_yhe_api.commondata
 
 import java.nio.ByteBuffer
 
+fun decodeIntegerDouble(integerPart: Byte, floatPart: Byte): Double {
+    return String.format("%d.%d", integerPart, floatPart).toDouble()
+}
+
 data class HSportDataBlock(
     val startTime: UInt,
     val endTime: UInt,
