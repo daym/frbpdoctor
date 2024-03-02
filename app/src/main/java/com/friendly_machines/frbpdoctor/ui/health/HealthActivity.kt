@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.HealthConnectClient
@@ -25,11 +24,11 @@ import androidx.health.connect.client.units.Pressure
 import androidx.health.connect.client.units.Temperature
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
 import com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock
 import com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock
 import com.friendly_machines.fr_yhe_api.commondata.SportDataBlock
+import com.friendly_machines.fr_yhe_api.commondata.decodeIntegerDouble
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
@@ -45,7 +44,6 @@ import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -256,8 +254,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                 }
                 try {
                     insertHealthRecords(response.items.map {
-                        // FIXME valueFloat
-                        BodyTemperatureRecord(time = instantFromUnix(it.startTime), zoneOffset = null, temperature = Temperature.celsius(it.valueInt.toDouble())) // FIXME zoneOffset, measurementLocation
+                        BodyTemperatureRecord(time = instantFromUnix(it.startTime), zoneOffset = null, temperature = Temperature.celsius(decodeIntegerDouble(it.valueInt, it.valueFloat))) // FIXME zoneOffset, measurementLocation
                     })
                     // TODO delete from watch maybe
                 } catch (e: RuntimeException) {
