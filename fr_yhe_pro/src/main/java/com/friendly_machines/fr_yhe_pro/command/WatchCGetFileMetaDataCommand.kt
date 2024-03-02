@@ -1,6 +1,5 @@
 package com.friendly_machines.fr_yhe_pro.command
 
-import com.friendly_machines.fr_yhe_api.commondata.FileVerification
 import com.friendly_machines.fr_yhe_api.commondata.FileVerification2
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation

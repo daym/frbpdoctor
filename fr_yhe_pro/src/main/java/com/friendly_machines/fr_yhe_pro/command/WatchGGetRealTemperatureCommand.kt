@@ -10,7 +10,6 @@ class WatchGGetRealTemperatureCommand : WatchCommand(WatchOperation.GGetRealTemp
             fun parse(buf: ByteBuffer): Response {
                 val valueInteger = buf.get()
                 val valueFloat = buf.get()
-                assert(!buf.hasRemaining())
                 return Response(valueInteger, valueFloat)
             }
         }

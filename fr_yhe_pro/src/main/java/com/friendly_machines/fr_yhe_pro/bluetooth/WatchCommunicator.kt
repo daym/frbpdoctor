@@ -266,6 +266,9 @@ class WatchCommunicator : IWatchCommunicator {
                             } catch (e: BufferUnderflowException) {
                                 notifyListenersOfException(e)
                                 Log.e(TAG, "Exception: $e")
+                            } catch (e:  WatchMessageDecodingException) {
+                                notifyListenersOfException(e)
+                                Log.e(TAG, "Exception: $e")
                             }
                         }
                         setupIndications(bigIndicationPortCharacteristic) { input ->
@@ -274,6 +277,9 @@ class WatchCommunicator : IWatchCommunicator {
                             try {
                                 onIndicationReceived(buf)
                             } catch (e: BufferUnderflowException) {
+                                notifyListenersOfException(e)
+                                Log.e(TAG, "Exception: $e")
+                            } catch (e:  WatchMessageDecodingException) {
                                 notifyListenersOfException(e)
                                 Log.e(TAG, "Exception: $e")
                             }

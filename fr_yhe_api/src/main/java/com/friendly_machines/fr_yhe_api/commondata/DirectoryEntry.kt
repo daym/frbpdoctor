@@ -4,6 +4,8 @@ import java.nio.ByteBuffer
 
 data class DirectoryEntry(val name: String, val size: Int, val checksum: Int) {
     companion object {
+        val SIZE: Int = (16 + 4 + 4) // B
+
         fun parsePro(buf: ByteBuffer): DirectoryEntry {
             val name = ByteArray(16)
             buf.get(name)

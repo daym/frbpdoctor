@@ -111,7 +111,7 @@ object WatchResponseFactory {
             return WatchUnknownResponse(code, b)
         }
         buf.order(ByteOrder.LITTLE_ENDIAN)
-        return when (operation) {
+        val result = when (operation) {
             // "Settings" section
 
             WatchOperation.SSetMainTheme -> WatchSSetMainThemeCommand.Response.parse(buf)
@@ -219,5 +219,9 @@ object WatchResponseFactory {
                 WatchUnknownResponse(operation.code, b)
             }
         }
+        if(buf.hasRemaining()) {
+            throw WatchMessageDecodingException("$operation: response has junk in the back")
+        }
+        return result
     }
 }
