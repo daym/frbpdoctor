@@ -54,7 +54,7 @@ class CameraActivity : AppCompatActivity() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             val requestPermissionActivityContract = ActivityResultContracts.RequestMultiplePermissions()
             val launcher = registerForActivityResult(requestPermissionActivityContract) { granted ->
-                if (granted.values.all { it == true }) {
+                if (granted.values.all { it }) {
                     handleIntent()
                 }
             }
