@@ -3,6 +3,9 @@ package com.friendly_machines.fr_yhe_api.commondata
 import java.nio.ByteBuffer
 
 fun decodeIntegerDouble(integerPart: Byte, floatPart: Byte): Double {
+    if (floatPart >= 10) {
+        throw RuntimeException("safety triggered because floatPart >= 10")
+    }
     return String.format("%d.%d", integerPart, floatPart).toDouble()
 }
 const val B: Int = 1 // "Byte" unit
