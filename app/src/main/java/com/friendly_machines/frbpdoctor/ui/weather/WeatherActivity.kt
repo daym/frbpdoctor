@@ -22,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.TimeZone
@@ -89,7 +90,8 @@ class WeatherActivity : AppCompatActivity() {
         lifecycleScope.launch {
             if (requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 val locationClient = LocationServices.getFusedLocationProviderClient(this@WeatherActivity)
-                val location = locationClient.lastLocation.result
+                var locationX = locationClient.lastLocation
+                val location = locationX.await()
                 val weather = getWeatherFromOnline(location)
                 sendWeatherToWatch(weather)
             } else {
@@ -101,7 +103,7 @@ class WeatherActivity : AppCompatActivity() {
     private suspend fun getWeatherFromOnline(location: Location): WeatherResponse {
         return withContext(Dispatchers.IO) {
             val timezoneString = TimeZone.getDefault().id
-            WeatherRetrofitClient.instance.getWeather(latitude = location.latitude, longitude = location.longitude, timeFormat = WeatherTimeFormat.UNIXTIME, timezone = timezoneString, forecastDays = 2, current = listOf("temperature_2m"), daily = listOf("rain_sum", "temperature_2m_max", "temperature_2m_min", "showers_sum", "weather_code", "wind_speed_10m_max", "rain_sum"))
+            WeatherRetrofitClient.instance.getWeather(latitude = location.latitude, longitude = location.longitude, elevation = location.altitude, timeFormat = WeatherTimeFormat.UNIXTIME, timezone = timezoneString, forecastDays = 2, current = listOf("temperature_2m"), daily = listOf("rain_sum", "temperature_2m_max", "temperature_2m_min", "showers_sum", "weather_code", "wind_speed_10m_max", "rain_sum"))
         }
     }
 
