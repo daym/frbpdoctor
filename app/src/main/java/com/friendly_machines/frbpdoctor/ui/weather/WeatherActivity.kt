@@ -2,11 +2,13 @@ package com.friendly_machines.frbpdoctor.ui.weather
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -28,14 +30,14 @@ import java.util.Calendar
 import java.util.TimeZone
 
 class WeatherActivity : AppCompatActivity() {
-    private suspend fun requestPermission(permission: String): Boolean {
-        val requestPermissionActivityContract = ActivityResultContracts.RequestPermission()
-        if (ContextCompat.checkSelfPermission(
-                this,
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            return true
+    private fun hasPermissions(context: Context, permissions: Set<String>): Boolean = permissions.all {
+        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private suspend fun requestPermissions(permissions: Set<String>): Map<String, Boolean> {
+        val requestPermissionActivityContract = ActivityResultContracts.RequestMultiplePermissions()
+        if (hasPermissions(this, permissions)) {
+            return permissions.associateWith { true }
         }
         return suspendCancellableCoroutine { continuation ->
             val launcher = registerForActivityResult(requestPermissionActivityContract) { granted ->
@@ -47,7 +49,7 @@ class WeatherActivity : AppCompatActivity() {
                     // FIXME cancellation cleanup
                 }
             }
-            launcher.launch(permission)
+            launcher.launch(permissions.toTypedArray())
             continuation.invokeOnCancellation {
                 launcher.unregister()
             }
@@ -88,7 +90,7 @@ class WeatherActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
         lifecycleScope.launch {
-            if (requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (requestPermissions(setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION)).values.all { it }) {
                 val locationClient = LocationServices.getFusedLocationProviderClient(this@WeatherActivity)
                 val locationTask = locationClient.lastLocation
                 val location = locationTask.await()
