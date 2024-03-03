@@ -4,6 +4,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingExcept
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchUnknownResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
+import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetSummaryCommand
@@ -22,6 +23,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetAllHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetAmbientLightHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBackgroundReminderRecordHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodOxygenHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveMeasurementDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetFallHistoryCommand
@@ -30,7 +32,6 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetHeartHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureAndHumidityHistoryCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetAmbientLightCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetBloodOxygenCommand
@@ -47,6 +48,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchRGetRunCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
@@ -120,6 +122,7 @@ object WatchResponseFactory {
             WatchOperation.SUserInfo -> WatchSSetUserInfoCommand.Response.parse(buf)
             WatchOperation.SSetTimeLayout -> WatchSSetTimeLayoutCommand.Response.parse(buf)
             WatchOperation.SSetScheduleSwitch -> WatchSSetScheduleSwitchCommand.Response.parse(buf)
+            WatchOperation.SAlarm -> WatchSGetAllAlarmsCommand.Response.parse(buf) // FIXME that's not unique
 
             // "Get" section
 
@@ -170,11 +173,11 @@ object WatchResponseFactory {
             WatchOperation.HGetSportHistory -> WatchHGetSportHistoryCommand.Response.parse(buf)
             WatchOperation.HGetSleepHistory -> WatchHGetSleepHistoryCommand.Response.parse(buf)
             WatchOperation.HGetHeartHistory -> WatchHGetHeartHistoryCommand.Response.parse(buf)
-            //WatchOperation.HGetBloodHistory -> WatchHGetBloodHistoryCommand.Response.parse(buf)
+            WatchOperation.HGetBloodHistory -> WatchHGetBloodHistoryCommand.Response.parse(buf)
             WatchOperation.HGetAllHistory -> WatchHGetAllHistoryCommand.Response.parse(buf)
             WatchOperation.HGetBloodOxygenHistory -> WatchHGetBloodOxygenHistoryCommand.Response.parse(buf)
             WatchOperation.HGetTemperatureAndHumidityHistory -> WatchHGetTemperatureAndHumidityHistoryCommand.Response.parse(buf)
-            WatchOperation.HGetTemperatureHistory -> WatchHGetTemperatureHistoryCommand.Response.parse(buf)
+            //WatchOperation.HGetTemperatureHistory -> WatchHGetTemperatureHistoryCommand.Response.parse(buf)
             WatchOperation.HGetAmbientLightHistory -> WatchHGetAmbientLightHistoryCommand.Response.parse(buf)
             WatchOperation.HGetFallHistory -> WatchHGetFallHistoryCommand.Response.parse(buf)
             WatchOperation.HGetHealthMonitoringHistory -> WatchHGetHealthMonitoringHistoryCommand.Response.parse(buf)
@@ -204,6 +207,10 @@ object WatchResponseFactory {
 
             WatchOperation.WSetCurrentWatchDial -> WatchWSetCurrentWatchDialCommand.Response.parse(buf)
             WatchOperation.WGetWatchDialInfo -> WatchWGetWatchDialInfoCommand.Response.parse(buf)
+
+            // "Weather" section
+            WatchOperation.ASetTodayWeather -> WatchASetTodayWeatherCommand.Response.parse(buf)
+            //WatchOperation.ASetTomorrowWeather -> WatchASetTomorrowWeatherCommand.Response.parse(buf) // TODO
 
             // "Others" section
 

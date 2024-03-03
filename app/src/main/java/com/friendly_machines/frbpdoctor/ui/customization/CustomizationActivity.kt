@@ -7,7 +7,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_med.WatchBigResponseMed
@@ -16,7 +15,6 @@ import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityCustomizationBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -116,7 +114,7 @@ class CustomizationActivity : AppCompatActivity(), IWatchListener, MedBigRespons
 
             is WatchWGetWatchDialInfoCommand.Response -> {
                 supportFragmentManager.fragments.filterIsInstance<WatchDialFragment>().forEach { fragment ->
-                    fragment.setData(response.entries)
+                    fragment.setData(response.items)
                 }
             }
         }

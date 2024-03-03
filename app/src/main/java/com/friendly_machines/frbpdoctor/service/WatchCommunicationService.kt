@@ -227,6 +227,7 @@ class WatchCommunicationService : Service(), IWatchListener {
         val key = AppSettings.getWatchKey(this, sharedPreferences)
         if (key != null) {
             // Note: If you say the exact right things, this will return status=0. Otherwise, it will never respond.
+            //val userId = AppSettings.get???(this, sharedPreferences) // TODO get watch user id or something
             communicator?.binder?.bindWatch(4711, key)
         }
     }

@@ -32,6 +32,11 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
 
+    <!-- Weather -->
+
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>

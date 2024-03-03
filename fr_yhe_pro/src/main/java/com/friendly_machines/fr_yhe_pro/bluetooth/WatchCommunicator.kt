@@ -36,6 +36,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveMeasurementDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
@@ -353,7 +354,7 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchSSetScheduleSwitchCommand(enabled))
 
         override fun setWeather(
-            weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
+            weatherType: Int, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
         ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", 42/*FIXME*/))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
@@ -407,7 +408,7 @@ class WatchCommunicator : IWatchCommunicator {
 
         // TODO: WatchGGetUserConfigCommand instead ??
         override fun getDeviceConfig() = enqueueCommand(WatchGGetDeviceInfoCommand())
-        override fun getBpData() = enqueueCommand(WatchHGetBloodHistoryCommand())
+        override fun getBpData() = enqueueCommand(WatchHGetComprehensiveMeasurementDataCommand()) // WatchHGetBloodHistoryCommand()
         override fun getSleepData(startTime: Int, endTime: Int) = enqueueCommand(WatchHGetSleepHistoryCommand()) // FIXME: Add times.
         override fun getRawBpData(startTime: Int, endTime: Int) {
             // FIXME
@@ -597,6 +598,14 @@ class WatchCommunicator : IWatchCommunicator {
 
                 WatchResponseType.SetWatchScheduleEnabled -> { // dummy
                     return if (response is WatchSSetScheduleSwitchCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWeather -> {
+                    return if (response is WatchASetTodayWeatherCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
                     } else {
                         WatchResponseAnalysisResult.Mismatch

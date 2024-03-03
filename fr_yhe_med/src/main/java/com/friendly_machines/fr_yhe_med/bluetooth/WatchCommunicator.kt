@@ -498,8 +498,8 @@ public class WatchCommunicator : IWatchCommunicator {
         }
 
         override fun setWeather(
-            weatherType: Short, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
-        ) = enqueueCommand(WatchSetWeatherCommand(weatherType, temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, WatchCharacteristic.encodeWatchString(location)))
+            weatherType: Int, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
+        ) = enqueueCommand(WatchSetWeatherCommand(weatherType.toShort(), temp, maxTemp, minTemp, dummy, month, dayOfMonth, dayOfWeekMondayBased, WatchCharacteristic.encodeWatchString(location)))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
             WatchSetMessageCommand(
@@ -704,6 +704,22 @@ public class WatchCommunicator : IWatchCommunicator {
 
                 WatchResponseType.ChangeWatchDial -> { // dummy
                     return if (response is WatchGetBatteryStateCommand.Response) { // FIXME!!!!
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.GetFileList -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetWeather -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
                     } else {
                         WatchResponseAnalysisResult.Mismatch

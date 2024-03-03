@@ -9,6 +9,7 @@ class WatchSGetAllAlarmsCommand : WatchCommand(WatchOperation.SAlarm, ByteArray(
     data class Response(val dummy: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
+                // [0, 10, 0]
                 val dummy = buf.get() // FIXME
                 return Response(dummy = dummy)
             }

@@ -15,4 +15,6 @@ enum class WatchResponseType {
     ChangeWatchDial,
     SetSkinColor,
     SetWatchScheduleEnabled,
+    GetFileList,
+    SetWeather,
 }

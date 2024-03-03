@@ -20,6 +20,7 @@ class WatchCGetFileMetaDataCommand(name: String, x: Int) : WatchCommand(WatchOpe
         companion object {
             fun parse(buf: ByteBuffer): Response {
                 val entries = mutableListOf<FileVerification2>()
+                // FIXME count is wrong?
                 while (buf.remaining() >= 4 + 4 + 2) {
                     entries.add(FileVerification2.parsePro(buf))
                 }

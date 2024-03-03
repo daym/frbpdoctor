@@ -73,6 +73,8 @@ data class HBloodDataBlock(
         const val SIZE: Int = (4 + 1 + 1 + 1 + 1)*B
 
         fun parsePro(buf: ByteBuffer): HBloodDataBlock {
+            // Attempt 1: [96, 1, 16, 0], [0], [0, 0, 11], [0, 0]
+            // Attempt 2: [97, 1, 17, 0], [0], [0, 8, 11], [0, 0]
             return HBloodDataBlock(
                 bloodStartTime = buf.int.toUInt(),
                 isInflated = buf.get(),
