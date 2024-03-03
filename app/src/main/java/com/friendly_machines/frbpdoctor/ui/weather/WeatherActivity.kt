@@ -90,8 +90,8 @@ class WeatherActivity : AppCompatActivity() {
         lifecycleScope.launch {
             if (requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 val locationClient = LocationServices.getFusedLocationProviderClient(this@WeatherActivity)
-                var locationX = locationClient.lastLocation
-                val location = locationX.await()
+                val locationTask = locationClient.lastLocation
+                val location = locationTask.await()
                 val weather = getWeatherFromOnline(location)
                 sendWeatherToWatch(weather)
             } else {
