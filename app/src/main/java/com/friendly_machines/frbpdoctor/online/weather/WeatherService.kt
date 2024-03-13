@@ -11,7 +11,7 @@ interface WeatherService {
         @Query("elevation") elevation: Double? = null,
         @Query("current") current: List<String>?,
         @Query("daily") daily: List<String>?,
-        @Query("timeformat") timeFormat: WeatherTimeFormat = WeatherTimeFormat.UNIXTIME,
+        @Query("timeformat") timeFormat: WeatherTimeFormat = WeatherTimeFormat.unixtime,
         @Query("timezone") timezone: String = "auto", // example: Europe/Berlin
         @Query("forecast_days") forecastDays: Int?,
         @Query("temperature_unit") temperatureUnit: String = "celsius",
