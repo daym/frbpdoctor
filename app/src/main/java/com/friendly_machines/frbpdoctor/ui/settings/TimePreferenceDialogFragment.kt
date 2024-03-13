@@ -18,7 +18,7 @@ class TimePreferenceDialogFragment : PreferenceDialogFragmentCompat() {
     }
 
     private fun getMinute(dateString: String?): Int {
-        val datePieces = dateString!!.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val datePieces = dateString!!.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         return datePieces[1].toInt()
     }
 
