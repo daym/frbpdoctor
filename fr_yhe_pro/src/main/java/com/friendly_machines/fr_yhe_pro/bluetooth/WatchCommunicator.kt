@@ -83,6 +83,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.time.ZonedDateTime
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -381,15 +382,14 @@ class WatchCommunicator : IWatchCommunicator {
         )
 
         override fun setTime() {
-            val calendar = Calendar.getInstance()
-            calendar.time = Date()
-            val year = calendar[Calendar.YEAR].toShort()
-            val month = calendar[Calendar.MONTH].toByte()
-            val day = calendar[Calendar.DAY_OF_MONTH].toByte()
-            val hour = calendar[Calendar.HOUR].toByte()
-            val minute = calendar[Calendar.MINUTE].toByte()
-            val second = calendar[Calendar.SECOND].toByte()
-            val weekDay = ((calendar[Calendar.DAY_OF_WEEK] - 2) % 7).toByte() // shuffle so monday is 0
+            val dateTime = ZonedDateTime.now()
+            val year = dateTime.year.toShort()
+            val month = dateTime.month.value.toByte() // FIXME see if 1-based is okay
+            val day = dateTime.dayOfMonth.toByte()
+            val hour = dateTime.hour.toByte()
+            val minute = dateTime.minute.toByte()
+            val second = dateTime.second.toByte()
+            val weekDay = (dateTime.dayOfWeek.value - 1).toByte() // shuffle so monday is 0
             enqueueCommand(
                 WatchSSetTimeCommand(year, month, day, hour, minute, second, weekDay)
             )
