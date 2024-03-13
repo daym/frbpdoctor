@@ -65,6 +65,12 @@
         android:title="Watch arm"
         app:useSimpleSummaryProvider="true" />
 
+    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+        android:inputType="number"
+        android:key="watchScreenLitTime"
+        android:title="Watch screen: Time lit"
+        app:unit="FIXME" />
+
     <PreferenceCategory
         android:key="watch_time_layout"
         android:title="Watch Time Layout">
@@ -83,6 +89,7 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <CheckBoxPreference android:title="Accident Monitoring Enabled" android:key="userAccidentMonitoringEnabled" android:summary="Accident Monitoring Enable" />
     <CheckBoxPreference android:title="Schedule Enabled" android:key="watchScheduleEnabled" android:summary="Schedule Enabled" />
 
     <PreferenceCategory
@@ -112,6 +119,100 @@
         <CheckBoxPreference android:title="Fridays" android:key="userSleepFridays" android:summary="Fridays" />
         <CheckBoxPreference android:title="Saturdays" android:key="userSleepSaturdays" android:summary="Saturdays" />
         <CheckBoxPreference android:title="Sundays" android:key="userSleepSundays" android:summary="Sundays" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="user_regular_reminder" android:title="Regular Reminder">
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userRegularReminderStartTime"
+            android:title="Reminder: start time"
+            app:useSimpleSummaryProvider="true" />
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userRegularReminderEndTime"
+            android:title="Reminder: end time"
+            app:useSimpleSummaryProvider="true" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userRegularReminderInterval"
+            android:title="Reminder: Interval"
+            app:unit="min" />
+        <EditTextPreference
+            android:key="userRegularReminderMessage"
+            android:title="Reminder: Message"
+            app:useSimpleSummaryProvider="false" />
+        <CheckBoxPreference android:title="Mondays" android:key="userRegularReminderMondays" android:summary="Mondays" />
+        <CheckBoxPreference android:title="Tuesdays" android:key="userRegularReminderTuesdays" android:summary="Tuesdays" />
+        <CheckBoxPreference android:title="Wednesdays" android:key="userRegularReminderWednesdays" android:summary="Wednesdays" />
+        <CheckBoxPreference android:title="Thursdays" android:key="userRegularReminderThursdays" android:summary="Thursdays" />
+        <CheckBoxPreference android:title="Fridays" android:key="userRegularReminderFridays" android:summary="Fridays" />
+        <CheckBoxPreference android:title="Saturdays" android:key="userRegularReminderSaturdays" android:summary="Saturdays" />
+        <CheckBoxPreference android:title="Sundays" android:key="userRegularReminderSundays" android:summary="Sundays" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="user_heart_monitoring" android:title="Heart Monitoring">
+        <CheckBoxPreference android:title="Heart Monitoring Enabled" android:key="userHeartMonitoringEnabled" android:summary="Heart Monitoring Enable" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userHeartMonitoringInterval"
+            android:title="Heart monitoring: Interval"
+            app:unit="FIXME" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userHeartMonitoringMaxValue2"
+            android:title="Heart monitoring: Max value"
+            app:unit="FIXME" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="user_temperature_monitoring" android:title="Temperature Monitoring">
+        <CheckBoxPreference android:title="Temperature Monitoring Enabled" android:key="userTemperatureMonitoringEnabled" android:summary="Temperature Monitoring Enable" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userTemperatureMonitoringInterval"
+            android:title="Temperature monitoring: Interval"
+            app:unit="FIXME" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userTemperatureMonitoringMaxValue"
+            android:title="Temperature monitoring: Max value"
+            app:unit="FIXME" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="user_long_sitting"
+        android:title="User Long Sitting">
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userLongSitting1StartTime"
+            android:title="Long sitting 1: start time"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userLongSitting1StartTime"
+            android:title="Long sitting 1: end time"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userLongSitting2StartTime"
+            android:title="Long sitting 2: start time"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
+            android:key="userLongSitting2EndTime"
+            android:title="Long sitting 2: end time"
+            app:useSimpleSummaryProvider="true" />
+
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userLongSittingInterval"
+            android:title="Long sitting: Interval"
+            app:unit="FIXME" />
+
+        <CheckBoxPreference android:title="Mondays" android:key="userLongSittingMondays" android:summary="Mondays" />
+        <CheckBoxPreference android:title="Tuesdays" android:key="userLongSittingTuesdays" android:summary="Tuesdays" />
+        <CheckBoxPreference android:title="Wednesdays" android:key="userLongSittingWednesdays" android:summary="Wednesdays" />
+        <CheckBoxPreference android:title="Thursdays" android:key="userLongSittingThursdays" android:summary="Thursdays" />
+        <CheckBoxPreference android:title="Fridays" android:key="userLongSittingFridays" android:summary="Fridays" />
+        <CheckBoxPreference android:title="Saturdays" android:key="userLongSittingSaturdays" android:summary="Saturdays" />
+        <CheckBoxPreference android:title="Sundays" android:key="userLongSittingSundays" android:summary="Sundays" />
     </PreferenceCategory>
 
     <PreferenceCategory android:key="watch_actions" android:title="Actions">

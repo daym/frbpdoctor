@@ -40,7 +40,15 @@ interface IWatchListener {
 
     }
 
-    fun onWatchInitiateSos() {
+    fun onWatchHeartAlarm() {
+
+    }
+
+    fun onWatchRegularReminder() {
+
+    }
+
+    fun onWatchSleepReminder() {
 
     }
 }

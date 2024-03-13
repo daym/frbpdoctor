@@ -35,19 +35,27 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveMeasurementDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSGetChipSchemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartMonitorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetLongSittingCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetSkinColorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetSleepReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureAlarmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureMonitorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
@@ -58,6 +66,8 @@ import com.friendly_machines.fr_yhe_pro.indication.DCameraControl
 import com.friendly_machines.fr_yhe_pro.indication.DFindMobile
 import com.friendly_machines.fr_yhe_pro.indication.DMusicControl
 import com.friendly_machines.fr_yhe_pro.indication.DPhoneCallControl
+import com.friendly_machines.fr_yhe_pro.indication.DRegularReminder
+import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSos
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import com.polidea.rxandroidble3.RxBleConnection
@@ -182,7 +192,12 @@ class WatchCommunicator : IWatchCommunicator {
             } else if (response is DFindMobile) {
                 it.onWatchFindMobilePhone()
             } else if (response is DSos) {
-                it.onWatchInitiateSos()
+                it.onWatchHeartAlarm()
+            } else if (response is DRegularReminder) {
+                // TODO: handle message text
+                it.onWatchRegularReminder()
+            } else if (response is DSleepReminder) {
+                it.onWatchSleepReminder()
             }
         }
     }
@@ -355,7 +370,7 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setWeather(
             weatherType: Int, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
-        ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", 42/*FIXME*/))
+        ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", weatherType.toShort()/*FIXME*/))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
             WatchANotificationPushCommand(type.code /* FIXME */, title, content)
@@ -455,6 +470,24 @@ class WatchCommunicator : IWatchCommunicator {
         }
 
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
+
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(startHour, startMinute, endHour, endMinute, weekPattern, intervalInMinutes, message))
+        override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) {
+            enqueueCommand((WatchSSetHeartAlarmCommand(enabled, maxValue)))
+            // FIXME this is not safe.
+            enqueueCommand((WatchSSetHeartMonitorCommand(1, interval)))
+        }
+
+        override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchSSetAccidentMonitoringCommand(enabled))
+        override fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) {
+            enqueueCommand((WatchSSetTemperatureAlarmCommand(enabled, maxValue)))
+            // FIXME this is not safe.
+            enqueueCommand((WatchSSetTemperatureMonitorCommand(1, interval)))
+        }
+
+        override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, repeats, interval))
+        override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchSSetScreenLitTimeCommand(screenTimeLit))
+        override fun getChipScheme() = enqueueCommand(WatchSGetChipSchemeCommand())
 
         override fun setStepGoal(steps: Int) {
             // FIXME
@@ -571,6 +604,14 @@ class WatchCommunicator : IWatchCommunicator {
                     }
                 }
 
+                WatchResponseType.SetRegularReminder -> { // dummy
+                    return if (response is WatchSSetRegularReminderCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
                 WatchResponseType.SetWatchWearingArm -> { // dummy
                     return if (response is WatchSSetWatchWearingArmCommand.Response) {
                         WatchResponseAnalysisResult.Ok
@@ -612,6 +653,29 @@ class WatchCommunicator : IWatchCommunicator {
                     }
                 }
 
+                WatchResponseType.SetHeartMonitoring -> {
+                    return if (response is WatchSSetHeartMonitorCommand.Response) { // FIXME what about SSetHeartAlarmCommand ?
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetTemperatureMonitoring -> {
+                    return if (response is WatchSSetTemperatureMonitorCommand.Response) { // FIXME what about SSetTemperatureAlarmCommand ?
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetAccidentMonitoringEnabled -> {
+                    return if (response is WatchSSetAccidentMonitoringCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
                 else -> {
                     TODO("Not implemented")
                     return WatchResponseAnalysisResult.Err

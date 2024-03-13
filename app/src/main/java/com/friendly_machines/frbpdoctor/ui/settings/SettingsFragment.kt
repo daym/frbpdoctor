@@ -286,10 +286,51 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                         it.setUserSleep(0, 0, 0.toUByte())
                     }
                 }
+            } else if (AppSettings.isUserRegularReminderSetting(key)) {
+                val regularReminder = AppSettings.getUserRegularReminder(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetRegularReminder) {
+                    if (regularReminder != null) {
+                        it.setRegularReminder(regularReminder.startHour, regularReminder.startMinute, regularReminder.endHour, regularReminder.endMinute, regularReminder.repeats, regularReminder.interval, regularReminder.message)
+                    } else {
+                        it.setRegularReminder(0, 0, 0, 0, 0.toUByte(), 0, null)
+                    }
+                }
+            } else if (AppSettings.isUserLongSittingSetting(key)) {
+                val longSitting = AppSettings.getUserLongSitting(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetRegularReminder) {
+                    if (longSitting != null) {
+                        it.setLongSitting(longSitting.startHour1, longSitting.startMinute1, longSitting.endHour1, longSitting.endMinute1, longSitting.startHour2, longSitting.startMinute2, longSitting.endHour2, longSitting.endMinute2, longSitting.repeats, longSitting.interval)
+                    } else {
+                        it.setLongSitting(0, 0, 0, 0, 0, 0, 0, 0, 0.toUByte(), 0)
+                    }
+                }
+            } else if (AppSettings.isUserHeartMonitoringSetting(key)) {
+                val heartMonitoring = AppSettings.getUserHeartMonitoring(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetHeartMonitoring) {
+                    if (heartMonitoring != null) {
+                        it.setHeartMonitoring(heartMonitoring.enabled, heartMonitoring.interval, heartMonitoring.maxValue)
+                    } else {
+                        it.setHeartMonitoring(false, 0, 0.toUByte())
+                    }
+                }
+            } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
+                val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetTemperatureMonitoring) {
+                    if (temperatureMonitoring != null) {
+                        it.setTemperatureMonitoring(temperatureMonitoring.enabled, temperatureMonitoring.interval, temperatureMonitoring.maxValue)
+                    } else {
+                        it.setTemperatureMonitoring(false, 0, 0.toUByte())
+                    }
+                }
             } else if (AppSettings.isWatchScheduleEnabledSetting(key)) {
                 val enabled = AppSettings.isWatchScheduleEnabled(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchScheduleEnabled) {
                     it.setScheduleEnabled(enabled)
+                }
+            } else if (AppSettings.isUserAccidentMonitoringEnabledSetting(key)) {
+                val enabled = AppSettings.isUserAccidentMonitoringEnabled(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetAccidentMonitoringEnabled) {
+                    it.setAccidentMonitoringEnabled(enabled)
                 }
             } else if (AppSettings.isWatchTimeLayout(key)) {
                 val timePosition = AppSettings.getWatchTimePosition(sharedPreferences)
@@ -300,6 +341,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     }
                 } catch (e: RuntimeException) {
                     Toast.makeText(requireContext(), "Error setting profile: $e", Toast.LENGTH_LONG).show()
+                }
+            } else if (AppSettings.isWatchScreenTimeLitSetting(key)) {
+                val screenTimeLit = AppSettings.getWatchScreenTimeLit(sharedPreferences)
+                try {
+                    WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetWatchTimeLayout) {
+                        it.setScreenTimeLit(screenTimeLit)
+                    }
+                } catch (e: RuntimeException) {
+                    Toast.makeText(requireContext(), "Error setting screen time lit: $e", Toast.LENGTH_LONG).show()
                 }
             }
         }

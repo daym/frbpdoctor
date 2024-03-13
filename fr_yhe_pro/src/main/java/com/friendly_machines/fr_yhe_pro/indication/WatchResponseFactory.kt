@@ -48,10 +48,23 @@ import com.friendly_machines.fr_yhe_pro.command.WatchRGetRunCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSGetChipSchemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartMonitorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetLongSittingCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetNotificationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
@@ -123,6 +136,19 @@ object WatchResponseFactory {
             WatchOperation.SSetTimeLayout -> WatchSSetTimeLayoutCommand.Response.parse(buf)
             WatchOperation.SSetScheduleSwitch -> WatchSSetScheduleSwitchCommand.Response.parse(buf)
             WatchOperation.SAlarm -> WatchSGetAllAlarmsCommand.Response.parse(buf) // FIXME that's not unique
+            WatchOperation.SSetSleepReminder -> WatchSSetSleepReminderCommand.Response.parse(buf)
+            WatchOperation.SSetRegularReminder -> WatchSSetRegularReminderCommand.Response.parse(buf)
+            WatchOperation.SHeartAlarm -> WatchSSetHeartAlarmCommand.Response.parse(buf)
+            WatchOperation.SHeartMonitor -> WatchSSetHeartMonitorCommand.Response.parse(buf)
+            WatchOperation.SSetAccidentMonitoring -> WatchSSetAccidentMonitoringCommand.Response.parse(buf)
+            WatchOperation.SSetEventReminder -> WatchSSetEventReminderCommand.Response.parse(buf)
+            WatchOperation.SSetEventReminderMode -> WatchSSetEventReminderModeCommand.Response.parse(buf)
+            WatchOperation.SFindPhone -> WatchSFindPhoneCommand.Response.parse(buf)
+            WatchOperation.SSetLongSitting -> WatchSSetLongSittingCommand.Response.parse(buf)
+            WatchOperation.SNotification -> WatchSSetNotificationCommand.Response.parse(buf)
+            WatchOperation.SSetScreenLitTime -> WatchSSetScreenLitTimeCommand.Response.parse(buf)
+            WatchOperation.SSetSchedule -> WatchSSetScheduleCommand.Response.parse(buf)
+            WatchOperation.SGetChipScheme -> WatchSGetChipSchemeCommand.Response.parse(buf)
 
             // "Get" section
 
@@ -151,17 +177,17 @@ object WatchResponseFactory {
             WatchOperation.DPhoneCallControl -> DPhoneCallControl.parse(buf)
             WatchOperation.DPhotoControl -> DCameraControl.parse(buf)
             WatchOperation.DMusicControl -> DMusicControl.parse(buf)
-            WatchOperation.DSos -> DSos.parse(buf)
-            WatchOperation.DDrinking -> DDrinking.parse(buf)
+            WatchOperation.DHeartAlarm -> DSos.parse(buf)
+            WatchOperation.DRegularReminder -> DRegularReminder.parse(buf)
             WatchOperation.DConnectOrDisconnect -> DConnectOrDisconnect.parse(buf)
             WatchOperation.DSportMode -> DSportMode.parse(buf)
             WatchOperation.DSyncContacts -> DSyncContacts.parse(buf)
-            WatchOperation.DRest -> DRest.parse(buf)
+            WatchOperation.DSleepReminder -> DSleepReminder.parse(buf)
             WatchOperation.DEndEcg -> DEndEcg.parse(buf)
             WatchOperation.DSportModeControl -> DSportModeControl.parse(buf)
             WatchOperation.DSwitchDial -> DSwitchDial.parse(buf)
             WatchOperation.DMeasurementResult -> DMeasurementResult.parse(buf)
-            WatchOperation.DAlarmData -> DAlarmData.parse(buf)
+            WatchOperation.DAlarmData -> DAlarm.parse(buf)
             WatchOperation.DInflatedBloodMeasurementResult -> DInflatedBloodMeasurementResult.parse(buf)
             WatchOperation.DUpgradeResult -> DUpgradeResult.parse(buf)
             WatchOperation.DPpiData -> DPpiData.parse(buf)
@@ -226,7 +252,7 @@ object WatchResponseFactory {
                 WatchUnknownResponse(operation.code, b)
             }
         }
-        if(buf.hasRemaining()) {
+        if (buf.hasRemaining()) {
             throw WatchMessageDecodingException("$operation: response has junk in the back")
         }
         return result

@@ -556,6 +556,14 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setUserSkinColor(enum: SkinColor) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getChipScheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+
+        override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun addListener(watchListener: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(watchListener)
@@ -662,6 +670,14 @@ public class WatchCommunicator : IWatchCommunicator {
                     }
                 }
 
+                WatchResponseType.SetRegularReminder -> { // dummy
+                    return if (response is WatchGetBatteryStateCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
                 WatchResponseType.SetWatchWearingArm -> { // dummy
                     return if (response is WatchGetBatteryStateCommand.Response) {
                         WatchResponseAnalysisResult.Ok
@@ -719,6 +735,30 @@ public class WatchCommunicator : IWatchCommunicator {
                 }
 
                 WatchResponseType.SetWeather -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetHeartMonitoring -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetTemperatureMonitoring -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetAccidentMonitoringEnabled -> {
                     return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
                     } else {

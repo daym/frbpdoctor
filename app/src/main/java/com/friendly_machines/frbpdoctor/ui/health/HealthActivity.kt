@@ -37,7 +37,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.indication.DInflatedBloodMeasurementResult
-import com.friendly_machines.fr_yhe_pro.indication.DRest
+import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSportMode
 import com.friendly_machines.fr_yhe_pro.indication.DSportModeControl
 import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
@@ -299,7 +299,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
             is DInflatedBloodMeasurementResult -> {
                 // TODO
             }
-            is DRest -> {
+            is DSleepReminder -> {
                 // TODO
             }
             is DSportMode -> {

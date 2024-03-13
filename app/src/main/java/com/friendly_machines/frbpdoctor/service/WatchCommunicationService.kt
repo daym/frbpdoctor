@@ -207,7 +207,7 @@ class WatchCommunicationService : Service(), IWatchListener {
         startActivity(intent)
     }
 
-    override fun onWatchInitiateSos() {
+    override fun onWatchHeartAlarm() {
         // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        val emergencyNumber = "911" // TODO: check using TelephonyManager.isEmergencyNumber; .getEmergencyNumberList()
 //        val intent = Intent(Intent.ACTION_CALL_EMERGENCY)
@@ -218,6 +218,20 @@ class WatchCommunicationService : Service(), IWatchListener {
     override fun onWatchFindMobilePhone() {
         // TODO take out of mute if necessary
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
+        ringtone.play()
+    }
+
+    override fun onWatchRegularReminder() {
+        // TODO just send a notification
+        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
+        ringtone.play()
+    }
+
+    override fun onWatchSleepReminder() {
+        // TODO just send a notification
+        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
         ringtone.play()
     }

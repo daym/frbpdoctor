@@ -1,13 +1,14 @@
 package com.friendly_machines.frbpdoctor
 
 import android.app.Application
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.friendly_machines.frbpdoctor.service.NotificationListener
@@ -81,7 +82,24 @@ class MyApplication : Application() {
         )
 
         tryEnableNotifications()
+        tryDisableBatteryOptimizations()
         registerPackageChangeReceiver()
+    }
+
+    private fun tryDisableBatteryOptimizations() {
+        val packageName = packageName
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            val intent = Intent().apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        }
+        val sendIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
+//        val mediaPlayers = this.packageManager.queryBroadcastReceivers(sendIntent, 0)
+//        System.out.println(mediaPlayers)
     }
 
     override fun onTerminate() {

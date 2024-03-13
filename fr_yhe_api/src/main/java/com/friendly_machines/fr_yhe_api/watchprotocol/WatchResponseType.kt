@@ -17,4 +17,8 @@ enum class WatchResponseType {
     SetWatchScheduleEnabled,
     GetFileList,
     SetWeather,
+    SetRegularReminder,
+    SetHeartMonitoring,
+    SetAccidentMonitoringEnabled,
+    SetTemperatureMonitoring,
 }

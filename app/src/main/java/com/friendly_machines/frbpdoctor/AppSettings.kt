@@ -9,9 +9,9 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchProfileSex
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
-import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -37,6 +37,41 @@ object AppSettings {
     private const val KEY_USER_SLEEP_SATURDAYS = "userSleepSaturdays"
     private const val KEY_USER_SLEEP_SUNDAYS = "userSleepSundays"
 
+    private const val KEY_USER_REGULAR_REMINDER_START_TIME = "userRegularReminderStartTime"
+    private const val KEY_USER_REGULAR_REMINDER_END_TIME = "userRegularReminderEndTime"
+    private const val KEY_USER_REGULAR_REMINDER_INTERVAL = "userRegularReminderInterval"
+    private const val KEY_USER_REGULAR_REMINDER_MESSAGE = "userRegularReminderMessage"
+    private const val KEY_USER_REGULAR_REMINDER_MONDAYS = "userRegularReminderMondays"
+    private const val KEY_USER_REGULAR_REMINDER_TUESDAYS = "userRegularReminderTuesdays"
+    private const val KEY_USER_REGULAR_REMINDER_WEDNESDAYS = "userRegularReminderWednesdays"
+    private const val KEY_USER_REGULAR_REMINDER_THURSDAYS = "userRegularReminderThursdays"
+    private const val KEY_USER_REGULAR_REMINDER_FRIDAYS = "userRegularReminderFridays"
+    private const val KEY_USER_REGULAR_REMINDER_SATURDAYS = "userRegularReminderSaturdays"
+    private const val KEY_USER_REGULAR_REMINDER_SUNDAYS = "userRegularReminderSundays"
+
+    private const val KEY_USER_HEART_MONITORING_ENABLED = "userHeartMonitoringEnabled"
+    private const val KEY_USER_HEART_MONITORING_INTERVAL = "userHeartMonitoringInterval"
+    private const val KEY_USER_HEART_MONITORING_MAX_VALUE = "userHeartMonitoringMaxValue2"
+
+    private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
+    private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
+    private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
+
+    private const val KEY_USER_ACCIDENT_MONITORING_ENABLED = "userAccidentMonitoringEnabled"
+
+    private const val KEY_USER_LONG_SITTING_1_START_TIME = "userLongSitting1StartTime"
+    private const val KEY_USER_LONG_SITTING_1_END_TIME = "userLongSitting1EndTime"
+    private const val KEY_USER_LONG_SITTING_2_START_TIME = "userLongSitting2StartTime"
+    private const val KEY_USER_LONG_SITTING_2_END_TIME = "userLongSitting2EndTime"
+    private const val KEY_USER_LONG_SITTING_INTERVAL = "userLongSittingInterval"
+    private const val KEY_USER_LONG_SITTING_MONDAYS = "userLongSittingMondays"
+    private const val KEY_USER_LONG_SITTING_TUESDAYS = "userLongSittingTuesdays"
+    private const val KEY_USER_LONG_SITTING_WEDNESDAYS = "userLongSittingWednesdays"
+    private const val KEY_USER_LONG_SITTING_THURSDAYS = "userLongSittingThursdays"
+    private const val KEY_USER_LONG_SITTING_FRIDAYS = "userLongSittingFridays"
+    private const val KEY_USER_LONG_SITTING_SATURDAYS = "userLongSittingSaturdays"
+    private const val KEY_USER_LONG_SITTING_SUNDAYS = "userLongSittingSundays"
+
     // TODO watchDndMode
     private const val KEY_WATCH_DND_START_TIME = "watchDndStartTime"
     private const val KEY_WATCH_DND_END_TIME = "watchDndEndTime"
@@ -44,6 +79,8 @@ object AppSettings {
     private const val KEY_WATCH_TIME_COLOR = "watchTimeColor"
 
     private const val KEY_WATCH_SCHEDULE_ENABLED = "watchScheduleEnabled"
+
+    private const val KEY_WATCH_SCREEN_TIME_LIT = "watchScreenLitTime"
 
     private const val KEY_WATCH_KEY = "watchKey" // invisible to the user
     const val KEY_WATCH_MAC_ADDRESS = "watchMacAddress"
@@ -157,6 +194,7 @@ object AppSettings {
             null
         }
     }
+
     fun getUserWatchWearingArm(sharedPreferences: SharedPreferences): WatchWearingArm? {
         val watchWearingArmString = sharedPreferences.getString(KEY_USER_WATCH_WEARING_ARM, "")
         return if (!watchWearingArmString.isNullOrEmpty()) {
@@ -190,6 +228,8 @@ object AppSettings {
 
     data class DndTime(val hour: Byte, val minute: Byte)
     data class Sleep(val hour: Byte, val minute: Byte, val repeats: UByte)
+    data class RegularReminder(val startHour: Byte, val startMinute: Byte, val endHour: Byte, val endMinute: Byte, val repeats: UByte, val interval: Byte, val message: String?)
+
     fun getDndStartTime(sharedPreferences: SharedPreferences): DndTime? {
         val timeString = sharedPreferences.getString(KEY_WATCH_DND_START_TIME, "")
         if (timeString.isNullOrEmpty()) {
@@ -200,6 +240,7 @@ object AppSettings {
         val minute = parts[1].toByte()
         return DndTime(hour = hour, minute = minute)
     }
+
     fun getDndEndTime(sharedPreferences: SharedPreferences): DndTime? {
         val timeString = sharedPreferences.getString(KEY_WATCH_DND_END_TIME, "")
         if (timeString.isNullOrEmpty()) {
@@ -214,12 +255,15 @@ object AppSettings {
     fun isUserWatchWearingArmSetting(key: String): Boolean {
         return key == KEY_USER_WATCH_WEARING_ARM
     }
+
     fun isUserSkinColorSetting(key: String): Boolean {
         return key == KEY_USER_SKIN_COLOR
     }
+
     fun isWatchTimeLayout(key: String): Boolean {
         return key == KEY_WATCH_TIME_POSITION || key == KEY_WATCH_TIME_COLOR
     }
+
     fun getWatchTimePosition(sharedPreferences: SharedPreferences): WatchTimePosition? {
         val watchTimePositionString = sharedPreferences.getString(KEY_WATCH_TIME_POSITION, "")
         return if (!watchTimePositionString.isNullOrEmpty()) {
@@ -252,8 +296,9 @@ object AppSettings {
     }
 
     fun isUserSleepSetting(key: String): Boolean {
-        return setOf(KEY_USER_SLEEP_START_TIME, KEY_USER_SLEEP_MONDAYS, KEY_USER_SLEEP_TUESDAYS, KEY_USER_SLEEP_WEDNESDAYS, KEY_USER_SLEEP_THURSDAYS, KEY_USER_SLEEP_FRIDAYS, KEY_USER_SLEEP_SATURDAYS,  KEY_USER_SLEEP_SUNDAYS).contains(key)
+        return setOf(KEY_USER_SLEEP_START_TIME, KEY_USER_SLEEP_MONDAYS, KEY_USER_SLEEP_TUESDAYS, KEY_USER_SLEEP_WEDNESDAYS, KEY_USER_SLEEP_THURSDAYS, KEY_USER_SLEEP_FRIDAYS, KEY_USER_SLEEP_SATURDAYS, KEY_USER_SLEEP_SUNDAYS).contains(key)
     }
+
     fun getUserSleep(sharedPreferences: SharedPreferences): Sleep? {
         val timeString = sharedPreferences.getString(KEY_USER_SLEEP_START_TIME, "")
         if (timeString.isNullOrEmpty()) {
@@ -272,14 +317,166 @@ object AppSettings {
                 false -> 0
             }
         }
+        repeats = repeats * 2 + 1 // warn // FIXME setting
 
         return Sleep(hour = hour, minute = minute, repeats = repeats.toUByte())
+    }
+
+    fun isUserRegularReminderSetting(key: String): Boolean {
+        return setOf(KEY_USER_REGULAR_REMINDER_START_TIME, KEY_USER_REGULAR_REMINDER_END_TIME, KEY_USER_REGULAR_REMINDER_INTERVAL, KEY_USER_REGULAR_REMINDER_MESSAGE, KEY_USER_REGULAR_REMINDER_MONDAYS, KEY_USER_REGULAR_REMINDER_TUESDAYS, KEY_USER_REGULAR_REMINDER_WEDNESDAYS, KEY_USER_REGULAR_REMINDER_THURSDAYS, KEY_USER_REGULAR_REMINDER_FRIDAYS, KEY_USER_REGULAR_REMINDER_SATURDAYS, KEY_USER_REGULAR_REMINDER_SUNDAYS).contains(key)
+    }
+
+    fun getUserRegularReminder(sharedPreferences: SharedPreferences): RegularReminder? {
+        val startTimeString = sharedPreferences.getString(KEY_USER_REGULAR_REMINDER_START_TIME, "")
+        val endTimeString = sharedPreferences.getString(KEY_USER_REGULAR_REMINDER_END_TIME, "")
+        val interval = sharedPreferences.getInt(KEY_USER_REGULAR_REMINDER_INTERVAL, -1).toByte()
+        if (startTimeString.isNullOrEmpty() || endTimeString.isNullOrEmpty() || interval == (-1).toByte()) {
+            return null
+        }
+        val startTimeParts = startTimeString.split(":")
+        val startHour = startTimeParts[0].toByte()
+        val startMinute = startTimeParts[1].toByte()
+
+        val endTimeParts = endTimeString.split(":")
+        val endHour = endTimeParts[0].toByte()
+        val endMinute = endTimeParts[1].toByte()
+
+        var repeats = 0
+        // FIXME test
+        for (key in arrayOf(KEY_USER_REGULAR_REMINDER_MONDAYS, KEY_USER_REGULAR_REMINDER_TUESDAYS, KEY_USER_REGULAR_REMINDER_WEDNESDAYS, KEY_USER_REGULAR_REMINDER_THURSDAYS, KEY_USER_REGULAR_REMINDER_FRIDAYS, KEY_USER_REGULAR_REMINDER_SATURDAYS, KEY_USER_REGULAR_REMINDER_SUNDAYS)) {
+            val s = sharedPreferences.getBoolean(key, false)
+            repeats = repeats * 2 + when (s) {
+                true -> 1
+                false -> 0
+            }
+        }
+        repeats = repeats * 2 + 1 // warn // FIXME setting
+
+        val message = sharedPreferences.getString(KEY_USER_REGULAR_REMINDER_MESSAGE, "")
+        return RegularReminder(startHour = startHour, startMinute = startMinute, endHour = endHour, endMinute = endMinute, interval = interval, message = message, repeats = repeats.toUByte())
+    }
+
+    data class HeartMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
+
+    fun isUserHeartMonitoringSetting(key: String): Boolean {
+        return setOf(KEY_USER_HEART_MONITORING_ENABLED, KEY_USER_HEART_MONITORING_INTERVAL, KEY_USER_HEART_MONITORING_MAX_VALUE).contains(key)
+    }
+
+    fun getUserHeartMonitoring(sharedPreferences: SharedPreferences): HeartMonitoring? {
+        val enabled = sharedPreferences.getBoolean(KEY_USER_HEART_MONITORING_ENABLED, false)
+        if (!enabled) {
+            return null
+        }
+        val interval = sharedPreferences.getInt(KEY_USER_HEART_MONITORING_INTERVAL, -1).toByte()
+        if (interval == (-1).toByte()) {
+            return null
+        }
+        val maxValue = sharedPreferences.getInt(KEY_USER_HEART_MONITORING_MAX_VALUE, 0).toUByte()
+        if (maxValue == 0.toUByte()) {
+            return null
+        }
+        return HeartMonitoring(enabled = enabled, interval = interval, maxValue = maxValue)
+    }
+
+    data class TemperatureMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
+
+    fun isUserTemperatureMonitoringSetting(key: String): Boolean {
+        return setOf(KEY_USER_TEMPERATURE_MONITORING_ENABLED, KEY_USER_TEMPERATURE_MONITORING_INTERVAL, KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE).contains(key)
+    }
+
+    fun getUserTemperatureMonitoring(sharedPreferences: SharedPreferences): TemperatureMonitoring? {
+        val enabled = sharedPreferences.getBoolean(KEY_USER_TEMPERATURE_MONITORING_ENABLED, false)
+        if (!enabled) {
+            return null
+        }
+        val interval = sharedPreferences.getInt(KEY_USER_TEMPERATURE_MONITORING_INTERVAL, -1).toByte()
+        if (interval == (-1).toByte()) {
+            return null
+        }
+        val maxValue = sharedPreferences.getInt(KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE, 0).toUByte()
+        if (maxValue == 0.toUByte()) {
+            return null
+        }
+        return TemperatureMonitoring(enabled = enabled, interval = interval, maxValue = maxValue)
     }
 
     fun isWatchScheduleEnabledSetting(key: String): Boolean {
         return key == KEY_WATCH_SCHEDULE_ENABLED
     }
+
     fun isWatchScheduleEnabled(sharedPreferences: SharedPreferences): Boolean {
         return sharedPreferences.getBoolean(KEY_WATCH_SCHEDULE_ENABLED, true)
+    }
+
+    fun isUserAccidentMonitoringEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_USER_ACCIDENT_MONITORING_ENABLED, true)
+    }
+
+    fun isUserAccidentMonitoringEnabledSetting(key: String): Boolean {
+        return key == KEY_USER_ACCIDENT_MONITORING_ENABLED
+    }
+
+    fun isUserLongSittingSetting(key: String): Boolean {
+        return setOf(
+            KEY_USER_LONG_SITTING_1_START_TIME,
+            KEY_USER_LONG_SITTING_1_END_TIME,
+            KEY_USER_LONG_SITTING_2_START_TIME,
+            KEY_USER_LONG_SITTING_2_END_TIME,
+            KEY_USER_LONG_SITTING_INTERVAL,
+            KEY_USER_LONG_SITTING_MONDAYS,
+            KEY_USER_LONG_SITTING_TUESDAYS,
+            KEY_USER_LONG_SITTING_WEDNESDAYS,
+            KEY_USER_LONG_SITTING_THURSDAYS,
+            KEY_USER_LONG_SITTING_FRIDAYS,
+            KEY_USER_LONG_SITTING_SATURDAYS,
+            KEY_USER_LONG_SITTING_SUNDAYS
+        ).contains(key)
+    }
+    data class UserLongSitting(val startHour1: Byte, val startMinute1: Byte, val endHour1: Byte, val endMinute1: Byte, val startHour2: Byte, val startMinute2: Byte, val endHour2: Byte, val endMinute2: Byte, val interval: Byte, val repeats: UByte)
+    fun getUserLongSitting(sharedPreferences: SharedPreferences): UserLongSitting? {
+        val startTime1String = sharedPreferences.getString(KEY_USER_LONG_SITTING_1_START_TIME, "")
+        val endTime1String = sharedPreferences.getString(KEY_USER_LONG_SITTING_1_END_TIME, "")
+        val startTime2String = sharedPreferences.getString(KEY_USER_LONG_SITTING_2_START_TIME, "")
+        val endTime2String = sharedPreferences.getString(KEY_USER_LONG_SITTING_2_END_TIME, "")
+
+        val interval = sharedPreferences.getInt(KEY_USER_REGULAR_REMINDER_INTERVAL, -1).toByte()
+        if (startTime1String.isNullOrEmpty() || endTime1String.isNullOrEmpty() || startTime2String.isNullOrEmpty() || endTime2String.isNullOrEmpty() || interval == (-1).toByte()) {
+            return null
+        }
+        val startTimeParts1 = startTime1String.split(":")
+        val startHour1 = startTimeParts1[0].toByte()
+        val startMinute1 = startTimeParts1[1].toByte()
+
+        val endTimeParts1 = endTime1String.split(":")
+        val endHour1 = endTimeParts1[0].toByte()
+        val endMinute1 = endTimeParts1[1].toByte()
+
+        val startTimeParts2 = startTime1String.split(":")
+        val startHour2 = startTimeParts2[0].toByte()
+        val startMinute2 = startTimeParts2[1].toByte()
+
+        val endTimeParts2 = endTime1String.split(":")
+        val endHour2 = endTimeParts2[0].toByte()
+        val endMinute2 = endTimeParts2[1].toByte()
+
+        var repeats = 0
+        // FIXME test
+        for (key in arrayOf(KEY_USER_LONG_SITTING_MONDAYS, KEY_USER_LONG_SITTING_TUESDAYS, KEY_USER_LONG_SITTING_WEDNESDAYS, KEY_USER_LONG_SITTING_THURSDAYS, KEY_USER_LONG_SITTING_FRIDAYS, KEY_USER_LONG_SITTING_SATURDAYS, KEY_USER_LONG_SITTING_SUNDAYS)) {
+            val s = sharedPreferences.getBoolean(key, false)
+            repeats = repeats * 2 + when (s) {
+                true -> 1
+                false -> 0
+            }
+        }
+        repeats = repeats * 2 + 1 // warn // FIXME setting
+
+        return UserLongSitting(startHour1 = startHour1, startMinute1 = startMinute1, endHour1 = endHour1, endMinute1 = endMinute1, startHour2 = startHour2, startMinute2 = startMinute2, endHour2 = endHour2, endMinute2 = endMinute2,  interval = interval, repeats = repeats.toUByte())
+    }
+
+    fun isWatchScreenTimeLitSetting(key: String): Boolean {
+        return key == KEY_WATCH_SCREEN_TIME_LIT
+    }
+    fun getWatchScreenTimeLit(sharedPreferences: SharedPreferences): Byte {
+        return sharedPreferences.getInt(KEY_WATCH_SCREEN_TIME_LIT, 30).toByte()
     }
 }

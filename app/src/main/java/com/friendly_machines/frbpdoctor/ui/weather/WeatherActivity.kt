@@ -6,10 +6,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -21,6 +21,7 @@ import com.friendly_machines.frbpdoctor.online.weather.WeatherRetrofitClient
 import com.friendly_machines.frbpdoctor.online.weather.WeatherTimeFormat
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -67,7 +68,7 @@ class WeatherActivity : AppCompatActivity() {
             calendar.timeInMillis = unixTimestamp * 1000 // Convert seconds to milliseconds
             val month = calendar.get(Calendar.MONTH) + 1 // Months are 0-based, so we add 1
             val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-            val dayOfWeekMondayBased = (calendar.get(Calendar.DAY_OF_WEEK) + 5) % 7 // Convert to Monday-based (0-indexed) // FIXME
+            val dayOfWeekMondayBased = (calendar.get(Calendar.DAY_OF_WEEK) - 2) % 7 // Convert to Monday-based (0-indexed) // FIXME
             val dummy = 0.toByte() // FIXME
             val temp = weather.current.temperature_2m.toInt().toByte()
             val location = timezone // "latitude: $latitude, longitude: $longitude"
@@ -89,8 +90,12 @@ class WeatherActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
-        lifecycleScope.launch {
-            if (requestPermissions(setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION)).values.all { it }) {
+        val handler = CoroutineExceptionHandler { _, exception ->
+            Toast.makeText(this, exception.toString(), Toast.LENGTH_LONG).show()
+        }
+
+        lifecycleScope.launch(handler) {
+            if (requestPermissions(setOf(Manifest.permission.ACCESS_COARSE_LOCATION))[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
                 val locationClient = LocationServices.getFusedLocationProviderClient(this@WeatherActivity)
                 val locationTask = locationClient.lastLocation
                 val location = locationTask.await()
@@ -105,7 +110,7 @@ class WeatherActivity : AppCompatActivity() {
     private suspend fun getWeatherFromOnline(location: Location): WeatherResponse {
         return withContext(Dispatchers.IO) {
             val timezoneString = TimeZone.getDefault().id
-            WeatherRetrofitClient.instance.getWeather(latitude = location.latitude, longitude = location.longitude, elevation = location.altitude, timeFormat = WeatherTimeFormat.UNIXTIME, timezone = timezoneString, forecastDays = 2, current = listOf("temperature_2m"), daily = listOf("rain_sum", "temperature_2m_max", "temperature_2m_min", "showers_sum", "weather_code", "wind_speed_10m_max", "rain_sum"))
+            WeatherRetrofitClient.instance.getWeather(latitude = location.latitude, longitude = location.longitude, elevation = location.altitude, timeFormat = WeatherTimeFormat.unixtime, timezone = timezoneString, forecastDays = 2, current = listOf("temperature_2m"), daily = listOf("rain_sum", "temperature_2m_max", "temperature_2m_min", "showers_sum", "weather_code", "wind_speed_10m_max", "rain_sum"))
         }
     }
 

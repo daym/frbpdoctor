@@ -8,7 +8,8 @@ class WatchSSetSleepReminderCommand(startHour: Byte, startMinute: Byte, daysOfWe
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(buf.get())
+                val status = buf.get() // can be -4
+                return Response(status = status)
             }
         }
     }

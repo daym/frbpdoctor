@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 class WatchRGetEventReminderCommand : WatchCommand(WatchOperation.REventReminder, byteArrayOf()) {
     data class Response(
         val index: Byte,
-        val switch: Byte,
+        val enabled: Byte,
         val type: Byte,
         val hour: Byte,
         val min: Byte,
@@ -18,7 +18,7 @@ class WatchRGetEventReminderCommand : WatchCommand(WatchOperation.REventReminder
             fun parse(buf: ByteBuffer): Response {
                 return Response(
                     index = buf.get(),
-                    switch = buf.get(),
+                    enabled = buf.get(),
                     type = buf.get(),
                     hour = buf.get(),
                     min = buf.get(),

@@ -167,7 +167,8 @@ class WatchGGetUserConfigCommand : WatchCommand(WatchOperation.GGetUserConfig, "
             }
 
             fun parse(buf: ByteBuffer): Response {
-                return Response(
+                val version = buf.remaining()
+                val result = Response(
                     targetSteps = read24BitLeInt(buf),
                     targetCalories = read24BitLeInt(buf),
                     targetDistance = read24BitLeInt(buf),
@@ -215,15 +216,22 @@ class WatchGGetUserConfigCommand : WatchCommand(WatchOperation.GGetUserConfig, "
                     dndBeginMinute = buf.get(),
                     dndEndHour = buf.get(),
                     dndEndMinute = buf.get(),
+                    // TODO: If version >= 65, continue
                     sleepSwitch = buf.get(),
                     sleepBeginHour = buf.get(),
-                    sleepBeginMinute = buf.get(),
+                    sleepBeginMinute = buf.get(), // definitely wrong (-20)
                     scheduleSwitch = buf.get(),
                     eventSwitch = buf.get(),
                     accidentSwitch = buf.get(),
                     temperatureSwitch = buf.get()
                 )
-                // Note: should be 61 B
+                val a0 = buf.get() // 5
+                val a1 = buf.get() // 0
+                val a2 = buf.get() // 0
+                val a3 = buf.get() // 0
+                val a4 = buf.get() // 2
+                // Note: should be 66 B
+                return result
             }
         }
     }

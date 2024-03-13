@@ -10,7 +10,9 @@ enum class WatchOperation(val code: Short) {
 
     // Settings
 
-    SSetTime(0x0100), SAlarm(0x0101), SGoal(0x0102), SUserInfo(0x0103), SUnit(0x0104), SSetWatchWearingArm(0x0108), SNotification(0x010A), SFindPhone(0x010D), SRestoreFactory(0x010E), SSetDnd(0x010F), SSetLanguage(0x0112), SRaiseScreen(0x0113), SDisplayBrightness(0x0114), SSetSkin(0x0115), SSetMainTheme(0x0119), SSetSleepReminder(0x011A), SGetChipScheme(0x011B), SSetData(0x011E), SSetTemperatureAlarm(0x011F), SSetTemperatureMonitor(0x0120), SSetScheduleSwitch(0x0129), SSetStepCountingTime(0x012A), SSetUploadReminder(0x012B), SRegularReminder(0x013D), SSetTimeLayout(0x0141),
+    SSetTime(0x0100), SAlarm(0x0101), SGoal(0x0102), SUserInfo(0x0103), SUnit(0x0104), SSetLongSitting(0x0105), SSetWatchWearingArm(0x0108), SNotification(0x010A), SHeartAlarm(0x010B), SHeartMonitor(0x10C), SFindPhone(0x010D), SRestoreFactory(0x010E), SSetDnd(0x010F), SSetLanguage(0x0112), SRaiseScreen(0x0113), SDisplayBrightness(0x0114), SSetSkin(0x0115), SSetDeviceName(0x0117), SSetMainTheme(0x0119), SSetSleepReminder(0x011A), SGetChipScheme(0x011B), SSetData(0x011E), SSetTemperatureAlarm(0x011F), SSetTemperatureMonitor(0x0120), SSetScreenLitTime(0x0121), SSetAccidentMonitoring(0x0124), SSetSchedule(0x0127), SSetScheduleSwitch(0x0129), SSetStepCountingTime(0x012A), SSetUploadReminder(0x012B), SSetEventReminder(0x012F), SSetEventReminderMode(0x0130), SSetDeviceMacAddress(0x0134), SSetSosMode(0x0136), SSetRegularReminder(0x013D),
+    /* TODO: 0x0140: Automatic Measurement Time */
+    SSetTimeLayout(0x0141),
 
     // "Get"
 
@@ -42,7 +44,7 @@ enum class WatchOperation(val code: Short) {
 
     // Dev Control (we just send back that we heard it)
 
-    DFindMobile(0x0400), DLostReminder(0x0401), DPhoneCallControl(0x0402), DPhotoControl(0x0403), DMusicControl(0x0404), DSos(0x0405), DDrinking(0x0406), DConnectOrDisconnect(0x0407), DSportMode(0x0408), DSyncContacts(0x0409), DRest(0x040A), DEndEcg(0x040B), DSportModeControl(0x040C), DSwitchDial(0x040D), DMeasurementResult(0x040E), DAlarmData(0x040F), DInflatedBloodMeasurementResult(0x0410), DUpgradeResult(0x0411), DPpiData(0x0412), DMeasurementStatusAndResult(0x0413), DDynamicCode(0x0415),
+    DFindMobile(0x0400), DLostReminder(0x0401), DPhoneCallControl(0x0402), DPhotoControl(0x0403), DMusicControl(0x0404), DHeartAlarm(0x0405), DRegularReminder(0x0406), DConnectOrDisconnect(0x0407), DSportMode(0x0408), DSyncContacts(0x0409), DSleepReminder(0x040A), DEndEcg(0x040B), DSportModeControl(0x040C), DSwitchDial(0x040D), DMeasurementResult(0x040E), DAlarmData(0x040F), DInflatedBloodMeasurementResult(0x0410), DUpgradeResult(0x0411), DPpiData(0x0412), DMeasurementStatusAndResult(0x0413), DDynamicCode(0x0415),
 
     // Real Data
 

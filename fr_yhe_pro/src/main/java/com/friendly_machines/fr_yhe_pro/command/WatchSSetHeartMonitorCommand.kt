@@ -4,14 +4,13 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchSGetChipSchemeCommand : WatchCommand(WatchOperation.SGetChipScheme, ByteArray(0)) {
-    data class Response(val scheme: Byte) : WatchResponse() { // scheme: example: 1
+class WatchSSetHeartMonitorCommand(val type: Byte, val interval: Byte): WatchCommand(WatchOperation.SHeartMonitor, byteArrayOf(type, interval)) {
+    data class Response(val dummy: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val scheme = buf.get()
-                return Response(scheme = scheme)
+                val status = buf.get() // FIXME
+                return Response(dummy = status)
             }
         }
     }
-
 }
