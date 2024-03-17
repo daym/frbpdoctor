@@ -44,7 +44,7 @@ enum class WatchOperation(val code: Short) {
 
     // Dev Control (we just send back that we heard it)
 
-    DFindMobile(0x0400), DLostReminder(0x0401), DPhoneCallControl(0x0402), DPhotoControl(0x0403), DMusicControl(0x0404), DHeartAlarm(0x0405), DRegularReminder(0x0406), DConnectOrDisconnect(0x0407), DSportMode(0x0408), DSyncContacts(0x0409), DSleepReminder(0x040A), DEndEcg(0x040B), DSportModeControl(0x040C), DSwitchDial(0x040D), DMeasurementResult(0x040E), DAlarmData(0x040F), DInflatedBloodMeasurementResult(0x0410), DUpgradeResult(0x0411), DPpiData(0x0412), DMeasurementStatusAndResult(0x0413), DDynamicCode(0x0415),
+    DFindMobile(0x0400), DLostReminder(0x0401), DPhoneCallControl(0x0402), DCameraControl(0x0403), DMusicControl(0x0404), DSos(0x0405), DRegularReminder(0x0406), DConnectOrDisconnect(0x0407), DSportMode(0x0408), DSyncContacts(0x0409), DSleepReminder(0x040A), DEndEcg(0x040B), DSportModeControl(0x040C), DSwitchDial(0x040D), DMeasurementResult(0x040E), DAlarm(0x040F), DInflatedBloodMeasurementResult(0x0410), DUpgradeResult(0x0411), DPpiData(0x0412), DMeasurementStatusAndResult(0x0413), DDynamicCode(0x0415),
 
     // Real Data
 

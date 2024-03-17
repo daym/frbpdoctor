@@ -128,17 +128,23 @@ class WatchCommunicationService : Service(), IWatchListener {
         }
     }
 
-    override fun onWatchPhoneCallControl(answer: WatchPhoneCallControlAnswer) {
+    override fun onWatchPhoneCallControl(answer: WatchPhoneCallControlAnswer): Boolean {
         Toast.makeText(this, "Got notification from watch: ${answer}", Toast.LENGTH_LONG).show()
 
-        when (answer) {
-            WatchPhoneCallControlAnswer.Accept -> acceptIncomingCall()
-            WatchPhoneCallControlAnswer.Reject -> { // FIXME
+        try {
+            when (answer) {
+                WatchPhoneCallControlAnswer.Accept -> acceptIncomingCall()
+                WatchPhoneCallControlAnswer.Reject -> { // FIXME
+                }
             }
+        } catch (e: RuntimeException) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
+            return false
         }
+        return true
     }
 
-    override fun onWatchMusicControl(control: WatchMusicControlAnswer) {
+    override fun onWatchMusicControl(control: WatchMusicControlAnswer): Boolean {
         if (control == WatchMusicControlAnswer.IncreaseVolume || control == WatchMusicControlAnswer.DecreaseVolume) {
             val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
             when (control) {
@@ -147,6 +153,7 @@ class WatchCommunicationService : Service(), IWatchListener {
                 else -> {
                 }
             }
+            return true
         } else {
             // Older: Just val mediaController = MediaControllerCompat.getMediaController(this)
             val mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
@@ -166,7 +173,7 @@ class WatchCommunicationService : Service(), IWatchListener {
                         WatchMusicControlAnswer.Unknown -> {
                         }
                     }
-                    return
+                    return true
                 }
             }
             // TODO: Prioritize
@@ -184,13 +191,14 @@ class WatchCommunicationService : Service(), IWatchListener {
                     WatchMusicControlAnswer.Unknown -> {
                     }
                 }
-                return
+                return true
             }
         }
+        return false
     }
 
 
-    override fun onWatchCameraControl(control: WatchCameraControlAnswer) {
+    override fun onWatchCameraControl(control: WatchCameraControlAnswer): Boolean {
         val intent = Intent(this, CameraActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             action = when (control) {
@@ -198,42 +206,47 @@ class WatchCommunicationService : Service(), IWatchListener {
                 WatchCameraControlAnswer.Shoot -> CameraActivity.SHOOT_CAMERA
                 WatchCameraControlAnswer.Exit -> CameraActivity.EXIT_CAMERA
                 WatchCameraControlAnswer.Unknown -> {
-                    return
+                    return false
                 }
             }
             data = Uri.parse("package:$packageName")
         }
 
         startActivity(intent)
+        return true
     }
 
-    override fun onWatchHeartAlarm() {
+    override fun onWatchHeartAlarm(): Boolean {
         // val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        val emergencyNumber = "911" // TODO: check using TelephonyManager.isEmergencyNumber; .getEmergencyNumberList()
 //        val intent = Intent(Intent.ACTION_CALL_EMERGENCY)
 //        intent.data = Uri.parse("tel:$emergencyNumber")
 //        startActivity(intent)
+        return false
     }
 
-    override fun onWatchFindMobilePhone() {
+    override fun onWatchFindMobilePhone(): Boolean {
         // TODO take out of mute if necessary
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
         ringtone.play()
+        return true
     }
 
-    override fun onWatchRegularReminder() {
+    override fun onWatchRegularReminder(): Boolean {
         // TODO just send a notification
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
         ringtone.play()
+        return true
     }
 
-    override fun onWatchSleepReminder() {
+    override fun onWatchSleepReminder(): Boolean {
         // TODO just send a notification
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val ringtone = RingtoneManager.getRingtone(applicationContext, ringtoneUri)
         ringtone.play()
+        return true
     }
 
     override fun onResetSequenceNumbers() {

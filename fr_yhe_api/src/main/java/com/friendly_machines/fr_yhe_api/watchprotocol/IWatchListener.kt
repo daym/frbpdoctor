@@ -21,34 +21,35 @@ interface IWatchListener {
 
     }
 
-    fun onWatchPhoneCallControl(answer: WatchPhoneCallControlAnswer) {
+    fun onWatchPhoneCallControl(answer: WatchPhoneCallControlAnswer): Boolean {
+        return false
     }
 
     fun onResetSequenceNumbers() {
 
     }
 
-    fun onWatchMusicControl(control: WatchMusicControlAnswer) {
-
+    fun onWatchMusicControl(control: WatchMusicControlAnswer): Boolean {
+        return false
     }
 
-    fun onWatchCameraControl(control: WatchCameraControlAnswer) {
-
+    fun onWatchCameraControl(control: WatchCameraControlAnswer): Boolean {
+        return false
     }
 
-    fun onWatchFindMobilePhone() {
-
+    fun onWatchFindMobilePhone(): Boolean {
+        return false
     }
 
-    fun onWatchHeartAlarm() {
-
+    fun onWatchHeartAlarm(): Boolean {
+        return false
     }
 
-    fun onWatchRegularReminder() {
-
+    fun onWatchRegularReminder(): Boolean {
+        return false
     }
 
-    fun onWatchSleepReminder() {
-
+    fun onWatchSleepReminder(): Boolean {
+        return false
     }
 }

@@ -23,6 +23,13 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDCameraControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDFindMobileCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDMusicControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDPhoneCallControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDRegularReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSleepReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSosCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetElectrodeLocationCommand
@@ -35,7 +42,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveMeasurementDataCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
@@ -84,8 +91,6 @@ import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.ZonedDateTime
-import java.util.Calendar
-import java.util.Date
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -181,7 +186,7 @@ class WatchCommunicator : IWatchCommunicator {
         }
         val buf = ByteBuffer.wrap(payload)
         val response = WatchResponseFactory.parse(code, buf)
-        listeners.forEach {
+        val handled: Boolean = listeners.map {
             it.onWatchResponse(response)
             if (response is DPhoneCallControl) {
                 // FIXME check if (response.answer == answer call)
@@ -199,8 +204,27 @@ class WatchCommunicator : IWatchCommunicator {
                 it.onWatchRegularReminder()
             } else if (response is DSleepReminder) {
                 it.onWatchSleepReminder()
+            } else {
+                return
             }
-        }
+        }.any { x -> x }
+        enqueueCommand(if (response is DPhoneCallControl) {
+            WatchDPhoneCallControlCommand(handled)
+        } else if (response is DMusicControl) {
+            WatchDMusicControlCommand(handled)
+        } else if (response is DCameraControl) {
+            WatchDCameraControlCommand(handled)
+        } else if (response is DFindMobile) {
+            WatchDFindMobileCommand(handled)
+        } else if (response is DSos) {
+            WatchDSosCommand(handled)
+        } else if (response is DRegularReminder) {
+            WatchDRegularReminderCommand(handled)
+        } else if (response is DSleepReminder) {
+            WatchDSleepReminderCommand(handled)
+        } else {
+            return
+        })
     }
 
     private fun encodeMessage(arguments: ByteArray, code: Short): ByteArray {
@@ -423,7 +447,7 @@ class WatchCommunicator : IWatchCommunicator {
 
         // TODO: WatchGGetUserConfigCommand instead ??
         override fun getDeviceConfig() = enqueueCommand(WatchGGetDeviceInfoCommand())
-        override fun getBpData() = enqueueCommand(WatchHGetComprehensiveMeasurementDataCommand()) // WatchHGetBloodHistoryCommand()
+        override fun getBpData() = enqueueCommand(WatchHGetBloodHistoryCommand()) // WatchHGetComprehensiveMeasurementDataCommand() // WatchHGetBloodHistoryCommand()
         override fun getSleepData(startTime: Int, endTime: Int) = enqueueCommand(WatchHGetSleepHistoryCommand()) // FIXME: Add times.
         override fun getRawBpData(startTime: Int, endTime: Int) {
             // FIXME

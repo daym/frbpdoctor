@@ -11,6 +11,7 @@ class WatchHGetComprehensiveMeasurementDataCommand : WatchCommand(WatchOperation
     data class Response(val items: List<HComprehensiveMeasurementDataBlock>) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
+                // FIXME 10 byte here
                 val count = buf.remaining() / HComprehensiveMeasurementDataBlock.SIZE
                 return Response(items = WatchResponseFactory.parseDataBlockArray(count, buf) {
                     HComprehensiveMeasurementDataBlock.parsePro(buf)
