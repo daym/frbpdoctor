@@ -28,6 +28,7 @@ import com.friendly_machines.frbpdoctor.AppSettings
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.camera.CameraActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
+import com.polidea.rxandroidble3.exceptions.BleDisconnectedException
 import java.security.MessageDigest
 
 
@@ -57,28 +58,31 @@ class WatchCommunicationService : Service(), IWatchListener {
         return
     }
 
+    private fun start() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val key = AppSettings.getWatchKey(this, sharedPreferences) ?: return die("Key was null")
+        val keyDigest = MessageDigest.getInstance("MD5").digest(key)
+        val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
+        val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
+        this.communicator?.start(bleDevice, keyDigest)
+    }
     override fun onCreate() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
             return die("No bluetooth LE support in the phone")
         if (!areMandatorySettingsSet())
             return die("settings missing")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val key = AppSettings.getWatchKey(this, sharedPreferences) ?: return die("Key was null")
-        val keyDigest = MessageDigest.getInstance("MD5").digest(key)
-        val watchMacAddress = sharedPreferences.getString(AppSettings.KEY_WATCH_MAC_ADDRESS, "")!!
         val watchCommunicatorClassname = sharedPreferences.getString(AppSettings.KEY_WATCH_COMMUNICATOR_CLASS, "")!!
-        val bleDevice = MyApplication.rxBleClient.getBleDevice(watchMacAddress)
         if (watchCommunicatorClassname == "")
             return die("Unknown watch type")
-
         val communicator = try {
             classLoader.loadClass(watchCommunicatorClassname).newInstance() as IWatchCommunicator
         } catch (e: ClassNotFoundException) {
             return die("Communicator wasn't found: $e")
         }
         communicator.addListener(this)
-        communicator.start(bleDevice, keyDigest)
         this.communicator = communicator
+        start()
     }
 
     override fun onDestroy() {
@@ -267,5 +271,9 @@ class WatchCommunicationService : Service(), IWatchListener {
         super.onException(exception)
         Log.e(TAG, "Error: $exception")
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
+        if (exception is BleDisconnectedException) {
+            // try to reconnect
+            start()
+        }
     }
 }

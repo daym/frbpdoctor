@@ -298,6 +298,7 @@ class WatchCommunicator : IWatchCommunicator {
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
+                        this.connecting = false
                         this.connection = connection
                         setupIndications(indicationPortCharacteristic) { input ->
                             Log.d(TAG, "indication received: ${input.contentToString()}")
@@ -330,6 +331,7 @@ class WatchCommunicator : IWatchCommunicator {
                     }
                 }, { throwable ->
                     run {
+                        this.connecting = false
                         Log.e(TAG, "Connection error: $throwable")
                         notifyListenersOfException(throwable)
                     }
@@ -395,7 +397,7 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setWeather(
             weatherType: Int, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
-        ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", weatherType.toShort()/*FIXME*/))
+        ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", WatchASetTodayWeatherCommand.WeatherCode.Cloudy /* FIXME weatherType.toShort()*//*FIXME*/))
 
         override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
             WatchANotificationPushCommand(type.code /* FIXME */, title, content)
@@ -408,7 +410,7 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setTime() {
             val dateTime = ZonedDateTime.now()
             val year = dateTime.year.toShort()
-            val month = dateTime.month.value.toByte() // FIXME see if 1-based is okay
+            val month = dateTime.month.value.toByte()
             val day = dateTime.dayOfMonth.toByte()
             val hour = dateTime.hour.toByte()
             val minute = dateTime.minute.toByte()

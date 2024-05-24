@@ -72,7 +72,7 @@ class WeatherActivity : AppCompatActivity() {
             val dummy = 0.toByte() // FIXME
             val temp = weather.current.temperature_2m.toInt().toByte()
             val location = timezone // "latitude: $latitude, longitude: $longitude"
-            binder.setWeather(weatherType = weather.daily.weather_code[0], temp = temp, maxTemp = weather.daily.temperature_2m_max[0].toInt().toByte(), minTemp = weather.daily.temperature_2m_min[0].toInt().toByte(), dummy = dummy, month = month.toByte(), dayOfMonth = dayOfMonth.toByte(), dayOfWeekMondayBased = dayOfWeekMondayBased.toByte(), location = location)
+            binder.setWeather(weatherType = 0/*FIXME weather.daily.weather_code[0] ; our 1 is "sunny" */, temp = temp, maxTemp = weather.daily.temperature_2m_max[0].toInt().toByte(), minTemp = weather.daily.temperature_2m_min[0].toInt().toByte(), dummy = dummy, month = month.toByte(), dayOfMonth = dayOfMonth.toByte(), dayOfWeekMondayBased = dayOfWeekMondayBased.toByte(), location = location)
 
             // TODO set tomorrow's weather
         }

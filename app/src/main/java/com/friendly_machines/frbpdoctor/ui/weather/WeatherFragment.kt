@@ -54,8 +54,8 @@ class WeatherFragment : Fragment() {
             val weatherDayOfWeekMondayBased = Integer.parseUnsignedInt(weatherDayOfWeekMondayBasedTextNumber.text.toString()).toByte()
             val weatherLocation = weatherLocationEditView.text.toString()
             WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetMessage) { binder ->
-                //binder.setWeather(weatherType, temp, weatherMaxTemp, weatherMinTemp, dummy, weatherMonth, weatherDayOfMonth, weatherDayOfWeekMondayBased, weatherLocation)
-                binder.setMessage2(dummy, 1705786832, "", "")
+                binder.setWeather(weatherType.toInt(), temp, weatherMaxTemp, weatherMinTemp, dummy, weatherMonth, weatherDayOfMonth, weatherDayOfWeekMondayBased, weatherLocation)
+                //binder.setMessage2(dummy, 1705786832, "", "")
                 weatherDummyTextNumber.setText((dummy + 1).toString())
             }
         }

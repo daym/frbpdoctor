@@ -432,6 +432,7 @@ public class WatchCommunicator : IWatchCommunicator {
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
+                        this.connecting = false
                         this.connection = connection
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
@@ -451,6 +452,7 @@ public class WatchCommunicator : IWatchCommunicator {
                     }
                 }, { throwable ->
                     run {
+                        this.connecting = false
                         Log.e(TAG, "Connection error: $throwable")
                         notifyListenersOfException(throwable)
                     }
