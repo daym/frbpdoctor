@@ -7,7 +7,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchCGetSummaryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCGetByIndexCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCVerifyFileCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
@@ -242,7 +242,7 @@ object WatchResponseFactory {
 
             // "Others" section
 
-            WatchOperation.CGetSummary -> WatchCGetSummaryCommand.Response.parse(buf)
+            //WatchOperation.CGetByIndex -> WatchCGetByIndexCommand.Response.parse(buf)
             WatchOperation.CGetFileCount -> WatchCGetFileCountCommand.Response.parse(buf)
             WatchOperation.CGetFileList -> WatchCGetFileListCommand.Response.parse(buf)
             WatchOperation.CVerifyFile -> WatchCVerifyFileCommand.Response.parse(buf)

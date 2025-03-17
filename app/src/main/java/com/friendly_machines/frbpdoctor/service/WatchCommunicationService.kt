@@ -25,6 +25,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchCameraControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMusicControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
 import com.friendly_machines.frbpdoctor.AppSettings
+import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.camera.CameraActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
@@ -69,6 +70,8 @@ class WatchCommunicationService : Service(), IWatchListener {
     override fun onCreate() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
             return die("No bluetooth LE support in the phone")
+        if (!BluetoothPermissionHandler.checkPermissions(this))
+            return die("No bluetooth permissions granted");
         if (!areMandatorySettingsSet())
             return die("settings missing")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)

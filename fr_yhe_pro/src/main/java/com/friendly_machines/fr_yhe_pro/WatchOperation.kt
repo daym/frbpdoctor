@@ -34,11 +34,11 @@ enum class WatchOperation(val code: Short) {
     // Health
 
     HGetSportHistory(0x0502), HGetSleepHistory(0x0504), HGetHeartHistory(0x0506), HGetBloodHistory(0x0508), HGetAllHistory(0x0509), HGetBloodOxygenHistory(0x051A), HGetTemperatureAndHumidityHistory(0x051C), HGetTemperatureHistory(0x051E), HGetAmbientLightHistory(0x0520), HGetFallHistory(0x0529), HGetHealthMonitoringHistory(0x052B), HHistorySportMode(0x052D), HGetComprehensiveMeasurementData(0x052F), HGetBackgroundReminderRecordHistory(0x0531), HDeleteSportHistory(0x0540), HDeleteSleepHistory(0x0541), HDeleteHeartHistory(0x0542), HDeleteBloodHistory(0x0543), HDeleteAllHistory(0x0544), HDeleteBloodOxygenHistory(0x0545), HDeleteTemperatureAndHumidityHistory(0x0546), HDeleteTemperatureHistory(0x0547), HDeleteAmbientLightHistory(0x0548), HDeleteFallHistory(0x0549), HDeleteHealthMonitoringHistory(0x054A), HDeleteSportModeHistory(0x054B), HDeleteComprehensiveMeasurementData(0x054C), HDeleteBackgroundReminderRecordHistory(0x054D),
-    // TODO acks (maybe delete!): 0x580 done with (payload: 1 Byte)
+    // TODO acks (maybe delete!): 0x580 done with (payload: 1 Byte; [0])
 
     // We want to control watch
 
-    AFindDevice(0x0300), AHeartTest(0x0301), ABloodTest(0x0302), ABloodTest2(0x0303), AAppExit(0x0304), ABindDevice(0x0306), AUnbindDevice(0x0307), ANotificationPush(0x0308), ARealData(0x0309), AQuerySampleRate(0x030A), AWaveUpload(0x030B), ASetRunMode(0x030C), ATakePhoto(0x030e), ASetTodayWeather(0x0312), ASetTomorrowWeather(0x0313), AEcgRealStatus(0x0314), AShutdown(0x0316), ATemperatureCorrect(0x0317), ATemperatureMeasurementControl(0x0318), AEmoticonIndex(0x0319), AUserInfo(0x031C), APushCallState(0x032B), // etc
+    AFindDevice(0x0300), AHeartTest(0x0301), ABloodTest(0x0302), ABloodTest2(0x0303), AAppExit(0x0304), ABindDevice(0x0306), AUnbindDevice(0x0307), ANotificationPush(0x0308), ARealData(0x0309), AQuerySampleRate(0x030A), AWaveUpload(0x030B), ASetRunMode(0x030C), ATakePhoto(0x030e), ASetTodayWeather(0x0312), ASetTomorrowWeather(0x0313), AEcgRealStatus(0x0314), AShutdown(0x0316), ATemperatureCorrect(0x0317), ATemperatureMeasurementControl(0x0318), AEmoticonIndex(0x0319), AUserInfo(0x031C), APushMessage(0x0327), APushCallState(0x032B), // etc
 
     // TODO 0x0330 push specific information (two strings, limit first to 32, limit second to 512)
 
@@ -68,11 +68,16 @@ enum class WatchOperation(val code: Short) {
 
     // TODO: 0x0700: parse: type: Byte, number: Short
 
-    CGetSummary(0x0701),
+    CStart(0x0700), // payload example: [0], or [1], or [x]
+    CGetByIndex(0x0701),
+    CGetByTimestamp(0x0702),
     CGetFileCount(0x0705),
     CGetFileList(0x0706),
     CGetFileMetaData(0x0707),
+    CSyncCheckResult(0x0720), // we send
     CVerifyFile(0x0727),
+    CDeleteByIndex(0x0730),
+    CDeleteByTimestamp(0x0731),
 
     // Watch Dial
 
@@ -84,6 +89,7 @@ enum class WatchOperation(val code: Short) {
     WSetCurrentWatchDial(0x0905);
 
     // TODO 0xd75 start customize data sync (arg: byte 4; or bytes 128, type, 0)
+    // TODO 0xe03
 
     companion object {
         fun parse(code: Short) = values().find { it.code == code } ?: throw WatchMessageDecodingException("unknown command code $code")

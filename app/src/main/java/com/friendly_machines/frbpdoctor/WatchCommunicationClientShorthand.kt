@@ -55,6 +55,7 @@ object WatchCommunicationClientShorthand {
      * Then unbind from the watch communication service again.
      *
      * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
+     * Precondition: Needs BLUETOOTH_CONNECT permission. See BluetoothPermissionHandler for help.
      */
     fun bindExecOneCommandUnbind(context: Context, expectedResponseType: WatchResponseType, callback: (IWatchBinder) -> Unit) {
         bind(context) { _, binder ->
@@ -87,6 +88,7 @@ object WatchCommunicationClientShorthand {
     /**
      * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms. Uses up handler.
      * Return a handle that can be passed to unbindService.
+     * Precondition: Needs BLUETOOTH_CONNECT permission. See BluetoothPermissionHandler for help.
      */
     fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: IWatchListener, callback: (IWatchBinder) -> Unit): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {

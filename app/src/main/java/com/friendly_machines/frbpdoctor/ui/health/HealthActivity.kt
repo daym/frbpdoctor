@@ -1,5 +1,6 @@
 package com.friendly_machines.frbpdoctor.ui.health
 
+import android.annotation.SuppressLint
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
@@ -40,6 +41,7 @@ import com.friendly_machines.fr_yhe_pro.indication.DInflatedBloodMeasurementResu
 import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSportMode
 import com.friendly_machines.fr_yhe_pro.indication.DSportModeControl
+import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
@@ -62,12 +64,15 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     private lateinit var binding: ActivityHealthBinding
 //    private var appBarConfiguration: AppBarConfiguration? = null
 
+    private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 0x100
     private var serviceConnection: ServiceConnection? = null
 
     override fun onStart() {
         super.onStart()
-        this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-            (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+        BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
+            this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
+                (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+            }
         }
     }
 
@@ -173,9 +178,11 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
 
-            // UNSAFE since we don't know the response. It will keep the listener alive forever.
-            WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this@HealthActivity, WatchResponseType.SetProfile) { binder ->
-                binder.setMainTheme(1)
+            BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
+                // UNSAFE since we don't know the response. It will keep the listener alive forever.
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this@HealthActivity, WatchResponseType.SetProfile) { binder ->
+                    binder.setMainTheme(1)
+                }
             }
         }
 
@@ -225,6 +232,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     }
 
     private fun instantFromUnix(time: UInt): Instant = Instant.ofEpochSecond(time.toLong())
+    @SuppressLint("RestrictedApi") // FIXME
     override fun onWatchResponse(response: WatchResponse) {
         super.onWatchResponse(response)
         when (response) {

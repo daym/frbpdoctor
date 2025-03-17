@@ -11,6 +11,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_med.WatchBigResponseMed
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
+import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
@@ -25,6 +26,7 @@ class CustomizationActivity : AppCompatActivity(), IWatchListener, MedBigRespons
         const val TAG: String = "CustomizationActivity"
     }
 
+    private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 0x100
     private lateinit var handler: Handler
     private lateinit var binding: ActivityCustomizationBinding
 
@@ -32,8 +34,10 @@ class CustomizationActivity : AppCompatActivity(), IWatchListener, MedBigRespons
 
     override fun onStart() {
         super.onStart()
-        this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-            (binding.viewPager.adapter as CustomizationViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+        BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
+            this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
+                (binding.viewPager.adapter as CustomizationViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+            }
         }
     }
 

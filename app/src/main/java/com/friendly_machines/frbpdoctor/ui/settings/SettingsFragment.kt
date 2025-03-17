@@ -15,8 +15,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.flask.colorpicker.ColorPickerView
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+//import com.flask.colorpicker.ColorPickerView
+//import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
@@ -192,19 +192,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
             is ColorPreference -> {
                 val color = preference.text?.let { Color.parseColor(it) }
-                ColorPickerDialogBuilder
-                    .with(context)
-                    .setTitle("Choose color for time display")
-                    .initialColor(color ?: 0xFFFFFF)
-                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                    .density(12)
-                    .setOnColorSelectedListener { selectedColor ->
-                        preference.text = "#" + Integer.toHexString(selectedColor and 0x00FFFFFF)
-                    }
-                    .setPositiveButton("ok") { dialog, selectedColor, allColors -> }
-                    .setNegativeButton("cancel") { dialog, which -> }
-                    .build()
-                    .show()
+//                ColorPickerDialogBuilder
+//                    .with(context)
+//                    .setTitle("Choose color for time display")
+//                    .initialColor(color ?: 0xFFFFFF)
+//                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+//                    .density(12)
+//                    .setOnColorSelectedListener { selectedColor ->
+//                        preference.text = "#" + Integer.toHexString(selectedColor and 0x00FFFFFF)
+//                    }
+//                    .setPositiveButton("ok") { dialog, selectedColor, allColors -> }
+//                    .setNegativeButton("cancel") { dialog, which -> }
+//                    .build()
+//                    .show()
             }
 
             is DeviceGInfoPreference -> {

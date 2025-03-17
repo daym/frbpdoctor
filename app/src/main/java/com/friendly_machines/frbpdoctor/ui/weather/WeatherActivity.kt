@@ -95,7 +95,7 @@ class WeatherActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch(handler) {
-            if (requestPermissions(setOf(Manifest.permission.ACCESS_COARSE_LOCATION))[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+            if (requestPermissions(setOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT))[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
                 val locationClient = LocationServices.getFusedLocationProviderClient(this@WeatherActivity)
                 val locationTask = locationClient.lastLocation
                 val location = locationTask.await()

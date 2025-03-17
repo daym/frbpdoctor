@@ -18,6 +18,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
+import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
@@ -27,7 +28,6 @@ import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.friendly_machines.frbpdoctor.ui.weather.WeatherActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-
 
 class MainActivity : AppCompatActivity(), IWatchListener {
     private lateinit var drawerLayout: DrawerLayout
@@ -125,14 +125,17 @@ class MainActivity : AppCompatActivity(), IWatchListener {
         return super.onCreateOptionsMenu(menu)
     }
 
+    private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 0x100
     private var serviceConnection: ServiceConnection? = null
 
     override fun onStart() {
         super.onStart()
-        this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
-            //binder.setTime()
-            //binder.getBatteryState()
-            //binder.getWatchFace() // ok but response is weird
+        BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
+            this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
+                //binder.setTime()
+                //binder.getBatteryState()
+                //binder.getWatchFace() // ok but response is weird
+            }
         }
         // nope. startService(serviceIntent)
     }
