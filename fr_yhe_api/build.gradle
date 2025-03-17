@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.polidea.rxandroidble3:rxandroidble:1.17.2'
+    implementation 'com.polidea.rxandroidble3:rxandroidble:1.19.0'
 //    implementation 'androidx.core:core-ktx:1.8.0'
 //    implementation 'androidx.appcompat:appcompat:1.6.1'
 //    implementation 'com.google.android.material:material:1.11.0'
