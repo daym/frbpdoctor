@@ -67,7 +67,10 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
 import com.friendly_machines.fr_yhe_pro.indication.DCameraControl
 import com.friendly_machines.fr_yhe_pro.indication.DFindMobile
@@ -461,7 +464,12 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun getHeatData() = enqueueCommand(WatchHGetTemperatureHistoryCommand())
         override fun getWatchDial() = enqueueCommand(WatchWGetWatchDialInfoCommand())
-        override fun selectWatchDial(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
+        override fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort) = enqueueCommand(WatchWControlDownloadCommand.start(length = length, dialPlateId = dialPlateId, blockNumber = blockNumber, version = version, crc = crc))
+        override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchWNextDownloadChunkCommand(chunk))
+        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort) = enqueueCommand(WatchWNextDownloadChunkMetaCommand(deltaOffset, packetCount, crc))
+        override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchWControlDownloadCommand.stop(length))
+
+        override fun selectWatchFace(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
 
         override fun getSportData() = enqueueCommand(WatchHGetSportHistoryCommand())
         override fun getFileCount() = enqueueCommand(WatchCGetFileCountCommand())

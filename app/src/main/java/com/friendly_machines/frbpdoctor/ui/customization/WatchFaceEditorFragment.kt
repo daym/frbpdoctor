@@ -33,7 +33,7 @@ class WatchFaceEditorFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            imageUri = it.getParcelable(ARG_IMAGE_URI)
+            imageUri = it.getParcelable(ARG_IMAGE_URI)  // FIXME: Use newer function
         }
     }
 

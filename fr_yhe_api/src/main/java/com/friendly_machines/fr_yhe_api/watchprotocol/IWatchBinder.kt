@@ -1,7 +1,6 @@
 package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
-import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 
@@ -33,7 +32,7 @@ interface IWatchBinder : IBinder {
     fun getStepData()
     fun getHeatData()
     fun getWatchDial()
-    fun selectWatchDial(id: Int)
+    fun selectWatchFace(id: Int)
     fun getSportData()
     fun setStepGoal(steps: Int)
     fun addListener(watchListener: IWatchListener): IWatchBinder
@@ -61,4 +60,9 @@ interface IWatchBinder : IBinder {
     fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte)
     fun setScreenTimeLit(screenTimeLit: Byte)
     fun getChipScheme()
+
+    fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort)
+    fun sendWatchFaceDownloadChunk(chunk: ByteArray)
+    fun nextWatchFaceDownloadChunkMeta(deltaOffset: kotlin.Int, packetCount: kotlin.UShort, crc: kotlin.UShort)
+    fun stopWatchFaceDownload(length: kotlin.UInt)
 }

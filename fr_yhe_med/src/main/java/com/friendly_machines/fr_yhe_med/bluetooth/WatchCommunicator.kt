@@ -549,7 +549,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
         override fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
         override fun getWatchDial() = enqueueCommand(WatchGetWatchFaceCommand())
-        override fun selectWatchDial(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
+        override fun selectWatchFace(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
 
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
@@ -772,6 +772,10 @@ public class WatchCommunicator : IWatchCommunicator {
 
         override fun getFileCount() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun getFileList() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort)  = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
