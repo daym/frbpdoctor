@@ -81,6 +81,9 @@ enum class WatchOperation(val code: Short) {
 
     // Watch Dial
 
+    WControlDownload(0x0900),
+    WNextDownloadChunk(0x0901),
+    WNextDownloadChunkMeta(0x0902), // next()
     // 0x900 send watch face to watch somehow
     // 0x901 send watch face to watch somehow
     // 0x902 send watch face to watch somehow
