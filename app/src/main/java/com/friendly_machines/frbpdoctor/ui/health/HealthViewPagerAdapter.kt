@@ -4,8 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
-import com.friendly_machines.frbpdoctor.ui.customization.AlarmFragment
-import com.friendly_machines.frbpdoctor.ui.customization.WatchDialFragment
 
 class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {

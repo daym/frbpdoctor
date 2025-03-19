@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 
-class WatchDialAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.WatchDialDataBlock>) : RecyclerView.Adapter<WatchDialAdapter.WatchDialViewHolder>() {
+class WatchFaceAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.WatchDialDataBlock>) : RecyclerView.Adapter<WatchFaceAdapter.WatchFaceViewHolder>() {
 
     private var selectedItemId: Int? = null
 
-    inner class WatchDialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class WatchFaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
         private val blockNumberTextView: TextView = itemView.findViewById(R.id.blockNumberTextView)
         private val canDeleteCheckbox: CheckBox = itemView.findViewById(R.id.canDeleteCheckBox)
@@ -57,13 +57,13 @@ class WatchDialAdapter(private val data: List<com.friendly_machines.fr_yhe_api.c
             }
         }
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchDialViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WatchFaceViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_watch_dial, parent, false)
-        return WatchDialViewHolder(itemView)
+        return WatchFaceViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: WatchDialViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WatchFaceViewHolder, position: Int) {
         val item = data[position]
         holder.bind(item)
     }

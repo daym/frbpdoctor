@@ -23,7 +23,6 @@ import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.units.Pressure
 import androidx.health.connect.client.units.Temperature
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
 import com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock
@@ -50,10 +49,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.Instant
-
 
 class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer.IBigResponseListener {
     companion object {
@@ -66,6 +69,11 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
 
     private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 0x100
     private var serviceConnection: ServiceConnection? = null
+    private val healthClient by lazy { HealthConnectClient.getOrCreate(this) }
+    private val healthConnectChannelScope = CoroutineScope(Dispatchers.Main + Job())
+
+    // Channel for queuing health records that need to be inserted
+    private val recordsChannel = Channel<List<Record>>(Channel.BUFFERED)
 
     override fun onStart() {
         super.onStart()
@@ -86,6 +94,8 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     }
 
     override fun onDestroy() {
+        recordsChannel.close()
+        healthConnectChannelScope.cancel()
         handler.removeCallbacksAndMessages(null)
         // Just to make sure
         serviceConnection?.let {
@@ -151,8 +161,55 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
         }
     }
 
+    private suspend fun checkAndRequestPermissions(): Boolean {
+        // Check if we already have permissions
+        val granted = healthClient.permissionController.getGrantedPermissions()
+        if (granted.containsAll(healthPermissions)) {
+            return true
+        }
+
+        // If not, request them
+        return suspendCancellableCoroutine { continuation ->
+            val launcher = registerForActivityResult(
+                PermissionController.createRequestPermissionResultContract()
+            ) { permissions ->
+                continuation.resume(permissions.containsAll(healthPermissions)) { // cancellation
+                    cause -> // FIXME launcher.unregister()
+                }
+            }
+            launcher.launch(healthPermissions)
+            continuation.invokeOnCancellation {
+                launcher.unregister()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Start processing health records
+        healthConnectChannelScope.launch {
+            // First ensure we have permissions
+            val granted = try {
+                checkAndRequestPermissions()
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to get permissions", e)
+                return@launch
+            }
+
+            if (!granted) {
+                Log.e(TAG, "Permissions not granted")
+                return@launch
+            }
+
+            // Then process records as they arrive
+            for (records in recordsChannel) {
+                try {
+                    healthClient.insertRecords(records)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to insert records", e)
+                }
+            }
+        }
 
         bigBuffers.listener = this
 
@@ -218,16 +275,9 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     }
 
     /** Insert RECORDS into the health database on the phone. */
-    private fun insertHealthRecords(records: List<Record>) {
-        val healthConnectClient = HealthConnectClient.getOrCreate(this)
-        // TODO queue somehow
-        lifecycleScope.launch {
-            if (requestHealthPermissions(healthConnectClient, healthPermissions)) {
-                // TODO maybe insertRecords
-                healthConnectClient.updateRecords(records)
-            } else {
-                throw RuntimeException("no permissions")
-            }
+    private fun queueHealthRecordsInsertion(records: List<Record>) {
+        healthConnectChannelScope.launch {
+            recordsChannel.send(records)
         }
     }
 
@@ -245,7 +295,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                     }.toTypedArray())
                 }
                 try {
-                    insertHealthRecords(response.items.map {
+                    queueHealthRecordsInsertion(response.items.map {
                         BloodPressureRecord(time = instantFromUnix(it.bloodStartTime), zoneOffset = null, systolic = Pressure.millimetersOfMercury(it.bloodSystolicPressure.toDouble()), diastolic = Pressure.millimetersOfMercury(it.bloodDiastolicPressure.toDouble())) // FIXME zoneOffset, measurementLocation
                     })
                     // TODO delete from watch maybe
@@ -261,7 +311,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                     }.toTypedArray())
                 }
                 try {
-                    insertHealthRecords(response.items.map {
+                    queueHealthRecordsInsertion(response.items.map {
                         BodyTemperatureRecord(time = instantFromUnix(it.startTime), zoneOffset = null, temperature = Temperature.celsius(decodeIntegerDouble(it.valueInt, it.valueFloat))) // FIXME zoneOffset, measurementLocation
                     })
                     // TODO delete from watch maybe
@@ -277,7 +327,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                     }.toTypedArray())
                 }
                 try {
-                    insertHealthRecords(response.items.map {
+                    queueHealthRecordsInsertion(response.items.map {
                         // FIXME it.distance, it.steps, it.calories
                         ExerciseSessionRecord(startTime = instantFromUnix(it.startTime), endTime = instantFromUnix(it.endTime), exerciseRoute = null, startZoneOffset = null, endZoneOffset = null, exerciseType = 0) // FIXME zoneOffset, exerciseType, title, notes, segments, laps, exerciseRoute.
                     })

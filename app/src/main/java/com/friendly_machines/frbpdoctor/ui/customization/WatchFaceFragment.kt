@@ -14,14 +14,14 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 
-class WatchDialFragment : Fragment() {
+class WatchFaceFragment : Fragment() {
     private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_watch_dial, container, false)
+        return inflater.inflate(R.layout.fragment_watch_face, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,8 +29,8 @@ class WatchDialFragment : Fragment() {
 
         val addWatchDialButton = view.findViewById<Button>(R.id.addWatchDialButton)
         addWatchDialButton.setOnClickListener {
-            val editWatchDialDialog = EditWatchDialDialog(WatchChangeWatchDialAction.Add)
-            editWatchDialDialog.addListener(object : EditWatchDialDialog.OnWatchDialSetListener {
+            val editWatchFaceDialog = EditWatchFaceDialog(WatchChangeWatchDialAction.Add)
+            editWatchFaceDialog.addListener(object : EditWatchFaceDialog.OnWatchDialSetListener {
                 override fun onWatchDialSet() {
                     WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeWatchDial) { binder ->
                         binder.getWatchDial()
@@ -38,7 +38,7 @@ class WatchDialFragment : Fragment() {
                     // TODO refresh watch_dial list maybe
                 }
             })
-            editWatchDialDialog.show(childFragmentManager, "edit_watch_dial_dialog")
+            editWatchFaceDialog.show(childFragmentManager, "edit_watch_dial_dialog")
         }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.list)
@@ -49,9 +49,9 @@ class WatchDialFragment : Fragment() {
         val chooseWatchDialButton = view.findViewById<Button>(R.id.chooseWatchDialButton)
         chooseWatchDialButton.setOnClickListener {
             WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeWatchDial) { binder ->
-                val id = (recyclerView!!.adapter as WatchDialAdapter).getSelectedItemId()
+                val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
                 id?.let {
-                    binder.selectWatchDial(it)
+                    binder.selectWatchFace(it)
                 }
             }
         }
@@ -62,7 +62,7 @@ class WatchDialFragment : Fragment() {
     }
 
     fun setData(data: List<WatchDialDataBlock>) {
-        val adapter = WatchDialAdapter(data.sortedBy { it.id })
+        val adapter = WatchFaceAdapter(data.sortedBy { it.id })
         recyclerView!!.adapter = adapter
         adapter.notifyDataSetChanged()
     }

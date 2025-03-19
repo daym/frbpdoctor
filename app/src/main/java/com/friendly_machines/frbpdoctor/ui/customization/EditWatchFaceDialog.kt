@@ -9,7 +9,7 @@ import androidx.fragment.app.DialogFragment
 import com.friendly_machines.fr_yhe_api.commondata.WatchChangeWatchDialAction
 import com.friendly_machines.frbpdoctor.R
 
-class EditWatchDialDialog(private val action: WatchChangeWatchDialAction) : DialogFragment() {
+class EditWatchFaceDialog(private val action: WatchChangeWatchDialAction) : DialogFragment() {
     private lateinit var timeEditText: EditText
     private lateinit var dayCheckBoxes: List<CheckBox>
 
