@@ -110,11 +110,10 @@ class WatchCommunicationService : Service(), IWatchListener {
         super.onDestroy()
         Log.d(TAG, "Service destroyed")
     }
-//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        Log.d(TAG, "Service started")
-//        // onStartCommand can be called multiple times although the service is already running. Use this.connecting as a proxy for that.
-//        return START_STICKY // TODO opportunistic
-//    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "Service started")
+        return START_STICKY
+    }
 
 
     override fun onBind(intent: Intent): IBinder? {
