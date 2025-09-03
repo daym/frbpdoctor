@@ -30,14 +30,7 @@ import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.camera.CameraActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
 import com.polidea.rxandroidble3.exceptions.BleDisconnectedException
-import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.security.MessageDigest
-import kotlin.math.pow
 
 
 /** Note: This service will accept calls when user clicks the respective button on the watch. */
