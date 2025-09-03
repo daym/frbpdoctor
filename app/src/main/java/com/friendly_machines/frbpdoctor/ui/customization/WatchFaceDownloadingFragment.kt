@@ -185,6 +185,9 @@ class WatchFaceDownloadingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_watch_face_downloading, container, false)
     }
 
+    private fun setProgress(text: String) {
+        // FIXME
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -200,8 +203,8 @@ class WatchFaceDownloadingFragment : Fragment() {
             private var disconnector: IWatchBinder? = null
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 binder = service as IWatchBinder
-                val watchFaceController = WatchFaceController(service as IWatchBinder)
-                disconnector = binder?.addListener(watchFaceController!!)
+                val watchFaceController = WatchFaceController(service as IWatchBinder, this@WatchFaceDownloadingFragment::setProgress)
+                disconnector = binder?.addListener(watchFaceController)
                 downloadJob = CoroutineScope(Dispatchers.Main).launch {
                     try {
                         watchFaceController.downloadWatchface(mtu, dialPlateId, blockNumber, version, body)

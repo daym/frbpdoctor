@@ -48,10 +48,12 @@ class WatchFaceFragment : Fragment() {
 
         val chooseWatchDialButton = view.findViewById<Button>(R.id.chooseWatchDialButton)
         chooseWatchDialButton.setOnClickListener {
-            WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeWatchDial) { binder ->
+            if (recyclerView != null && recyclerView.adapter != null) { // FIXME
                 val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
-                id?.let {
-                    binder.selectWatchFace(it)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeWatchDial) { binder ->
+                    id?.let {
+                        binder.selectWatchFace(it)
+                    }
                 }
             }
         }
