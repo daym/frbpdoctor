@@ -95,7 +95,9 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.ZonedDateTime
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.pow
 
 /**
  * We only ever see the Data Channel Payload. The Preamble, Access Address, Data Channel PDU header and BLE CRC are done by RxAndroidBle internally and do not count to the MTU.
@@ -298,6 +300,15 @@ class WatchCommunicator : IWatchCommunicator {
         bleDisposables.clear()
         bleDisposables.add(
             bleDevice.establishConnection(false) // TODO timeout less than 30 s
+                .retryWhen { errors ->
+                    errors.flatMap { error ->
+                        if (error is BleDisconnectedException) {
+                            Observable.timer(1, TimeUnit.SECONDS)
+                        } else {
+                            Observable.error(error)
+                        }
+                    }
+                }
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")

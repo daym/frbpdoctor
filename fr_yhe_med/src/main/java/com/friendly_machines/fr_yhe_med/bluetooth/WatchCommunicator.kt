@@ -70,6 +70,7 @@ import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.Calendar
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
@@ -77,6 +78,7 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.math.pow
 
 /**
  * We only ever see the Data Channel Payload. The Preamble, Access Address, Data Channel PDU header and BLE CRC are done by RxAndroidBle internally and do not count to the MTU.
@@ -429,7 +431,16 @@ public class WatchCommunicator : IWatchCommunicator {
         bleDisposables.clear()
         bleDisposables.add(
             bleDevice.establishConnection(false) // TODO timeout less than 30 s
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
+                .retryWhen { errors ->
+                    errors.flatMap { error ->
+                        if (error is com.polidea.rxandroidble3.exceptions.BleDisconnectedException) {
+                            Observable.timer(1, TimeUnit.SECONDS)
+                        } else {
+                            Observable.error(error)
+                        }
+                    }
+                }
+                .subscribeOn(Scheders.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
                         this.connecting = false

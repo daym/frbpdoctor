@@ -47,8 +47,6 @@ class WatchCommunicationService : Service(), IWatchListener {
     }
 
     private var communicator: IWatchCommunicator? = null
-    private var reconnectionJob: Job? = null
-    private var reconnectionAttempt = 0
 
     private fun showSetMandatorySettingsDialog() {
         val settingsIntent = Intent(this, SettingsActivity::class.java)
@@ -69,9 +67,6 @@ class WatchCommunicationService : Service(), IWatchListener {
     }
 
     private fun start() {
-        reconnectionJob?.cancel()
-        reconnectionJob = null
-        reconnectionAttempt = 0
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val key = AppSettings.getWatchKey(this, sharedPreferences) ?: return die("Key was null")
         val keyDigest = MessageDigest.getInstance("MD5").digest(key)
@@ -281,25 +276,9 @@ class WatchCommunicationService : Service(), IWatchListener {
         communicator?.binder?.resetSequenceNumbers()
     }
 
-    override fun onConnected() {
-        reconnectionAttempt = 0
-        reconnectionJob?.cancel()
-        reconnectionJob = null
-    }
-
     override fun onException(exception: Throwable) {
         super.onException(exception)
         Log.e(TAG, "Error: $exception")
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
-        if (exception is BleDisconnectedException) {
-            reconnectionJob?.cancel() // Cancel any existing job
-            reconnectionJob = CoroutineScope(Dispatchers.Main).launch {
-                val delayMillis = (1000 * 2.0.pow(reconnectionAttempt)).toLong()
-                Log.d(TAG, "Reconnecting in ${delayMillis / 1000} seconds (attempt ${reconnectionAttempt + 1})")
-                delay(delayMillis)
-                reconnectionAttempt++
-                start()
-            }
-        }
     }
 }
