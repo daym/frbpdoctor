@@ -52,4 +52,8 @@ interface IWatchListener {
     fun onWatchSleepReminder(): Boolean {
         return false
     }
+
+    fun onConnected() {
+
+    }
 }

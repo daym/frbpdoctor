@@ -434,6 +434,7 @@ public class WatchCommunicator : IWatchCommunicator {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
+                        listeners.forEach { it.onConnected() }
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
                             bufferPacket(input)?.let {

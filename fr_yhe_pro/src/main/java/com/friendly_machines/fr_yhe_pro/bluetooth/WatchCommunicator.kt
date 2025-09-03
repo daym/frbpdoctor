@@ -303,6 +303,7 @@ class WatchCommunicator : IWatchCommunicator {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
+                        listeners.forEach { it.onConnected() }
                         setupIndications(indicationPortCharacteristic) { input ->
                             Log.d(TAG, "indication received: ${input.contentToString()}")
                             val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
