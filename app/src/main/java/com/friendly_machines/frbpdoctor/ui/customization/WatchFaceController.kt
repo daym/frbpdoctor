@@ -75,7 +75,7 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (String) -> 
     private suspend fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort): WatchResponse {
         setProgress("nextWatchFaceDownloadChunkMeta $deltaOffset $packetCount $crc")
         binder.nextWatchFaceDownloadChunkMeta(deltaOffset, packetCount, crc)
-        return receive(WatchWNextDownloadChunkCommand.Response::class)
+        return receive(WatchWNextDownloadChunkMetaCommand.Response::class)
     }
 
     /** Give the specified watchface BODY to the watch */
@@ -87,15 +87,17 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (String) -> 
         }
         body.iterator().asSequence().chunked(metaChunkSize).forEachIndexed { chunkIndex, chunk ->
             // Send MTU chunks
-            // TEST: Package should be 182 B with the 6 byte header (command code; size; checksum); package should literally say 0901 b600 *; the b6 is important
+            // MTU chunking: Protocol overhead (6 bytes) + ATT overhead (3 bytes) = 9 bytes total
             var packageCount: UShort = 0U
-            chunk.chunked(mtu - 6).forEach { packageChunk ->
+            chunk.chunked(mtu - 9).forEach { packageChunk ->
                 // (no response will come)
                 binder.sendWatchFaceDownloadChunk(packageChunk.toByteArray())
                 ++packageCount
                 delay(10) // Small delay of 10ms between chunks
             }
-            val verifyResponse = nextWatchFaceDownloadChunkMeta(metaChunkSize, packageCount, Crc16.crc16(chunk.toByteArray()).toUShort())
+            // Use actual chunk size, not fixed metaChunkSize
+            val actualChunkSize = chunk.size
+            val verifyResponse = nextWatchFaceDownloadChunkMeta(actualChunkSize, packageCount, Crc16.crc16(chunk.toByteArray()).toUShort())
             if (verifyResponse !is WatchWNextDownloadChunkMetaCommand.Response || verifyResponse.status != 0U.toByte()) {
                 setProgress("Watch did not accept chunk $chunkIndex")
                 throw Exception("Watch did not accept chunk $chunkIndex")

@@ -5,9 +5,10 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class WatchCGetFileListCommand(x: Short, y: Short) : WatchCommand(WatchOperation.CGetFileList, run {
-    val buf = ByteBuffer.allocate(2 + 2)
+    val buf = ByteBuffer.allocate(2 + 2).order(ByteOrder.LITTLE_ENDIAN)
     buf.putShort(x)
     buf.putShort(y)
     buf.array()

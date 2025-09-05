@@ -3,6 +3,7 @@ package com.friendly_machines.fr_yhe_pro.command
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 /** Example workflow:
 - We do WatchWControlDownloadCommand.start(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort)
@@ -28,15 +29,23 @@ Afterwards, regular operation:
     Response: Watch dial info
 - We do WSetCurrentWatchDial
  */
-class WatchWControlDownloadCommand(start: Boolean, length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort): WatchCommand(WatchOperation.WControlDownload, run {
-    val buf = ByteBuffer.allocate(1 + 4 + 4 + 2 + 2 + 2)
-    buf.put(if (start) { 1 } else { 0 })
-    buf.putInt(length.toInt())
-    if (dialPlateId.toInt() != 0 || crc.toInt() != 0 || version.toInt() != 0 || blockNumber.toInt() != 0) { // FIXME: terrible
-        buf.putInt(dialPlateId.toInt())
-        buf.putShort(blockNumber.toShort())
-        buf.putShort(version.toShort())
-        buf.putShort(crc.toShort())
+class WatchWControlDownloadCommand(start: Boolean, length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort, private val responseCallback: ((Response) -> Unit)? = null): WatchCommand(WatchOperation.WControlDownload, run {
+    val buf = if (start) {
+        // Start command: always 15 bytes
+        ByteBuffer.allocate(1 + 4 + 4 + 2 + 2 + 2).order(ByteOrder.LITTLE_ENDIAN).apply {
+            put(1)
+            putInt(length.toInt())
+            putInt(dialPlateId.toInt())
+            putShort(blockNumber.toShort())
+            putShort(version.toShort())
+            putShort(crc.toShort())
+        }
+    } else {
+        // Stop command: only 5 bytes (flag + length)
+        ByteBuffer.allocate(1 + 4).order(ByteOrder.LITTLE_ENDIAN).apply {
+            put(0)
+            putInt(length.toInt())
+        }
     }
     buf.array()
 }) {
