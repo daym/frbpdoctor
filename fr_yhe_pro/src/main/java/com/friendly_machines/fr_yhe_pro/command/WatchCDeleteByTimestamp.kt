@@ -1,5 +1,6 @@
 package com.friendly_machines.fr_yhe_pro.command
 
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -10,4 +11,12 @@ class WatchCDeleteByTimestamp(x: Byte, timestamp: Long): WatchCommand(WatchOpera
     buf.putInt(timestamp.toInt())
     buf.array()
 }) {
+    // FIXME: Unclear.
+    data class Response(val dummy: Unit = Unit) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): Response {
+                return Response()
+            }
+        }
+    }
 }

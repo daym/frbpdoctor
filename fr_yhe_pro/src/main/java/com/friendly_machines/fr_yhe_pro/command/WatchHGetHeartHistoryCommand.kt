@@ -7,7 +7,7 @@ import com.friendly_machines.fr_yhe_pro.indication.WatchBulkResponse
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import java.nio.ByteBuffer
 
-// FIXME: Test
+// FIXME: Verify
 class WatchHGetHeartHistoryCommand : WatchCommand(WatchOperation.HGetHeartHistory, ByteArray(0)) {
     data class Response(val items: List<HHeartDataBlock>) : WatchBulkResponse(WatchOperation.HGetHeartHistory) {
         companion object {

@@ -10,19 +10,32 @@ class WatchRGetScheduleCommand : WatchCommand(WatchOperation.RSchedule, byteArra
         val enable: Byte,
         val incidentIndex: Byte,
         val incidentEnable: Byte,
-        val incidentTime: Int,
-        val incidentId: Byte
+        val incidentTime: Long,
+        val incidentId: Byte,
+        val incidentName: String?
     ) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(
-                    index = buf.get(),
-                    enable = buf.get(),
-                    incidentIndex = buf.get(),
-                    incidentEnable = buf.get(),
-                    incidentTime = buf.int,
-                    incidentId = buf.get()
-                )
+                val index = buf.get()
+                val enable = buf.get()
+                val incidentIndex = buf.get()
+                val incidentEnable = buf.get()
+
+                // FIXME: Less terrible
+                val rawTime = buf.int.toLong()
+                val incidentTime = (rawTime + 946684800L) * 1000L - java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())
+                
+                val incidentId = buf.get()
+                
+                val incidentName = if (buf.hasRemaining()) {
+                    val nameBytes = ByteArray(buf.remaining())
+                    buf.get(nameBytes)
+                    String(nameBytes, Charsets.UTF_8)
+                } else {
+                    ""
+                }
+                
+                return Response(index, enable, incidentIndex, incidentEnable, incidentTime, incidentId, incidentName)
             }
         }
     }

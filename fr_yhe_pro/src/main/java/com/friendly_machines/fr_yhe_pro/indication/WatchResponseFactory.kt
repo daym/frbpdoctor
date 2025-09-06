@@ -4,11 +4,41 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMessageDecodingExcept
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchUnknownResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
+import com.friendly_machines.fr_yhe_pro.command.WatchABloodSugarCalibCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAControlAmbientLightCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAControlTempHumidityCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchADataConfirmationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAHealthAlertConfigCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAHealthConfigCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAHealthDataAckCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAHeartValidationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAInsuranceIntegrationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchALipidCalibCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAMobileDeviceInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetCardIdentifierCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetDeviceUUIDCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetLocationIdentifierCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetMeasureIdentifierCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetPDIdentifierCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetProductInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASleepDataAckCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAStepValidationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASyncEmergencyContactsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASyncMenstrualDataCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASyncTempHumidityCalibCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchATemperatureCalibrationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAToggleSensorsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchATriggerBloodTestCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchATriggerMeasurementCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAUpgradeNotificationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAUricAcidCalibCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCFileSyncCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchCGetByIndexCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCSyncDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCVerifyFileCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetChipSchemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceScreenInfoCommand
@@ -32,6 +62,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetHeartHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureAndHumidityHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHHistoryBlockCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetAmbientLightCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetBloodOxygenCommand
@@ -48,11 +79,12 @@ import com.friendly_machines.fr_yhe_pro.command.WatchRGetRunCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchRUploadECGHrvCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchRUploadECGRRCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchRUploadMulPhotoelectricWaveformCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchSGetChipSchemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
@@ -64,6 +96,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetNotificationCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
@@ -150,7 +183,7 @@ object WatchResponseFactory {
             WatchOperation.SNotification -> WatchSSetNotificationCommand.Response.parse(buf)
             WatchOperation.SSetScreenLitTime -> WatchSSetScreenLitTimeCommand.Response.parse(buf)
             WatchOperation.SSetSchedule -> WatchSSetScheduleCommand.Response.parse(buf)
-            WatchOperation.SGetChipScheme -> WatchSGetChipSchemeCommand.Response.parse(buf)
+            WatchOperation.GGetChipScheme -> WatchGGetChipSchemeCommand.Response.parse(buf)
 
             // "Get" section
 
@@ -231,13 +264,44 @@ object WatchResponseFactory {
             WatchOperation.REventReminder -> WatchRGetEventReminderCommand.Response.parse(buf)
             WatchOperation.ROga -> WatchRGetOgaCommand.Response.parse(buf)
             WatchOperation.RInflatedBlood -> WatchRGetInflatedBloodCommand.Response.parse(buf)
+            WatchOperation.RUploadMulPhotoelectricWaveform -> WatchRUploadMulPhotoelectricWaveformCommand.Response.parse(buf)
+            WatchOperation.RUploadECGHrv -> WatchRUploadECGHrvCommand.Response.parse(buf)
+            WatchOperation.RUploadECGRR -> WatchRUploadECGRRCommand.Response.parse(buf)
 
             // "W" section
 
             WatchOperation.WSetCurrentWatchDial -> WatchWSetCurrentWatchDialCommand.Response.parse(buf)
             WatchOperation.WGetWatchDialInfo -> WatchWGetWatchDialInfoCommand.Response.parse(buf)
 
-            // "Weather" section
+            // "A" App/Action section
+            WatchOperation.AHealthConfig -> WatchAHealthConfigCommand.Response.parse(buf)
+            WatchOperation.AHealthDataAck -> WatchAHealthDataAckCommand.Response.parse(buf)
+            WatchOperation.ASleepDataAck -> WatchASleepDataAckCommand.Response.parse(buf)
+            WatchOperation.AUpgradeNotification -> WatchAUpgradeNotificationCommand.Response.parse(buf)
+            WatchOperation.AControlAmbientLight -> WatchAControlAmbientLightCommand.Response.parse(buf)
+            WatchOperation.ATemperatureCalibration -> WatchATemperatureCalibrationCommand.Response.parse(buf)
+            WatchOperation.AControlTempHumidity -> WatchAControlTempHumidityCommand.Response.parse(buf)
+            WatchOperation.AInsuranceIntegration -> WatchAInsuranceIntegrationCommand.Response.parse(buf)
+            WatchOperation.AToggleSensors -> WatchAToggleSensorsCommand.Response.parse(buf)
+            WatchOperation.AMobileDeviceInfo -> WatchAMobileDeviceInfoCommand.Response.parse(buf)
+            WatchOperation.AStepValidation -> WatchAStepValidationCommand.Response.parse(buf)
+            WatchOperation.AHeartValidation -> WatchAHeartValidationCommand.Response.parse(buf)
+            WatchOperation.AHealthAlertConfig -> WatchAHealthAlertConfigCommand.Response.parse(buf)
+            WatchOperation.ASyncEmergencyContacts -> WatchASyncEmergencyContactsCommand.Response.parse(buf)
+            WatchOperation.ASyncTempHumidityCalib -> WatchASyncTempHumidityCalibCommand.Response.parse(buf)
+            WatchOperation.ASyncMenstrualData -> WatchASyncMenstrualDataCommand.Response.parse(buf)
+            WatchOperation.ADataConfirmation -> WatchADataConfirmationCommand.Response.parse(buf)
+            WatchOperation.ATriggerBloodTest -> WatchATriggerBloodTestCommand.Response.parse(buf)
+            WatchOperation.ATriggerMeasurement -> WatchATriggerMeasurementCommand.Response.parse(buf)
+            WatchOperation.ABloodSugarCalib -> WatchABloodSugarCalibCommand.Response.parse(buf)
+            WatchOperation.ASetPDIdentifier -> WatchASetPDIdentifierCommand.Response.parse(buf)
+            WatchOperation.ASetLocationIdentifier -> WatchASetLocationIdentifierCommand.Response.parse(buf)
+            WatchOperation.ASetCardIdentifier -> WatchASetCardIdentifierCommand.Response.parse(buf)
+            WatchOperation.ASetMeasureIdentifier -> WatchASetMeasureIdentifierCommand.Response.parse(buf)
+            WatchOperation.ASetProductInfo -> WatchASetProductInfoCommand.Response.parse(buf)
+            WatchOperation.AUricAcidCalib -> WatchAUricAcidCalibCommand.Response.parse(buf)
+            WatchOperation.ALipidCalib -> WatchALipidCalibCommand.Response.parse(buf)
+            WatchOperation.ASetDeviceUUID -> WatchASetDeviceUUIDCommand.Response.parse(buf)
             WatchOperation.ASetTodayWeather -> WatchASetTodayWeatherCommand.Response.parse(buf)
             //WatchOperation.ASetTomorrowWeather -> WatchASetTomorrowWeatherCommand.Response.parse(buf) // TODO
 
@@ -246,6 +310,8 @@ object WatchResponseFactory {
             //WatchOperation.CGetByIndex -> WatchCGetByIndexCommand.Response.parse(buf)
             WatchOperation.CGetFileCount -> WatchCGetFileCountCommand.Response.parse(buf)
             WatchOperation.CGetFileList -> WatchCGetFileListCommand.Response.parse(buf)
+            WatchOperation.CSyncData -> WatchCSyncDataCommand.Response.parse(buf)
+            WatchOperation.CFileSync -> WatchCFileSyncCommand.Response.parse(buf)
             WatchOperation.CVerifyFile -> WatchCVerifyFileCommand.Response.parse(buf)
             // 16: data block. 23: block. 39: send 0x727 (content: 0) to verify.
 
