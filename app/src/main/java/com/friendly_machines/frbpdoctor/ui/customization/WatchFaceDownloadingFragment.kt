@@ -220,12 +220,11 @@ class WatchFaceDownloadingFragment : Fragment() {
 
         setProgress("Connecting to watch...")
 
-        serviceConnection = object : Servic eConnection {
+        serviceConnection = object : ServiceConnection {
             private var disconnector: IWatchBinder? = null
-            private var watchFaceController: WatchFaceController? = null // FIXME: make it less variable again
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 binder = service as IWatchBinder
-                watchFaceController = WatchFaceController(service as IWatchBinder) { percentage, status ->
+                val watchFaceController = WatchFaceController(service as IWatchBinder) { percentage, status ->
                     setProgress(percentage, status)
                 }
                 watchFaceController?.let { controller ->
@@ -245,8 +244,7 @@ class WatchFaceDownloadingFragment : Fragment() {
                             disc.removeListener(disc)
                         }
                         disconnector = null
-                        watchFaceController = null
-                        
+
                         // Navigate back after a brief delay
                         kotlinx.coroutines.delay(2000)
                         requireActivity().runOnUiThread {
@@ -262,7 +260,6 @@ class WatchFaceDownloadingFragment : Fragment() {
                             disconnector?.removeListener(disc)
                         }
                         disconnector = null
-                        watchFaceController = null
                     }
                 }
             }
@@ -273,7 +270,6 @@ class WatchFaceDownloadingFragment : Fragment() {
                     d?.removeListener(d)
                 }
                 disconnector = null
-                watchFaceController = null
                 downloadJob?.cancel()
             }
         }
