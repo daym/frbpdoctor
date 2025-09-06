@@ -31,11 +31,9 @@ class WatchFaceFragment : Fragment() {
         addWatchDialButton.setOnClickListener {
             val editWatchFaceDialog = EditWatchFaceDialog(WatchChangeWatchDialAction.Add)
             editWatchFaceDialog.addListener(object : EditWatchFaceDialog.OnWatchDialSetListener {
-                override fun onWatchDialSet() {
-                    WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeWatchDial) { binder ->
-                        binder.getWatchDial()
-                    }
-                    // TODO refresh watch_dial list maybe
+                override fun onWatchDialSet(watchface: WatchfaceCatalogItem) {
+                    // Launch watchface download
+                    launchWatchfaceUpload(watchface)
                 }
             })
             editWatchFaceDialog.show(childFragmentManager, "edit_watch_dial_dialog")
@@ -67,5 +65,29 @@ class WatchFaceFragment : Fragment() {
         val adapter = WatchFaceAdapter(data.sortedBy { it.id })
         recyclerView!!.adapter = adapter
         adapter.notifyDataSetChanged()
+    }
+    
+    private fun launchWatchfaceUpload(watchface: WatchfaceCatalogItem) {
+        // Load the .bin file for the selected watchface
+        val binData = WatchfaceCatalogLoader.loadWatchfaceBinary(requireContext(), watchface)
+        if (binData == null) {
+            // TODO: Show error toast
+            return
+        }
+        
+        // Launch the WatchFaceDownloadingFragment with the watchface data
+        val fragment = WatchFaceDownloadingFragment.newInstance(
+            mtu = 235.toByte(), // Standard BLE MTU - 9 bytes overhead = 235
+            dialPlateId = watchface.getDialPlateIdInt(),
+            blockNumber = 0, // Default for new uploads
+            version = 1, // Default version
+            body = binData
+        )
+        
+        // Replace current fragment with downloading fragment
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container_view, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

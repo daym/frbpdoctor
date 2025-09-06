@@ -212,6 +212,7 @@ object WatchResponseFactory {
             WatchOperation.HHistorySportMode -> WatchHHistorySportModeCommand.Response.parse(buf)
             WatchOperation.HGetComprehensiveMeasurementData -> WatchHGetComprehensiveMeasurementDataCommand.Response.parse(buf)
             WatchOperation.HGetBackgroundReminderRecordHistory -> WatchHGetBackgroundReminderRecordHistoryCommand.Response.parse(buf)
+            WatchOperation.HHistoryBlock -> WatchHHistoryBlockCommand.Response.parse(buf)
 
             // "Real" section
 

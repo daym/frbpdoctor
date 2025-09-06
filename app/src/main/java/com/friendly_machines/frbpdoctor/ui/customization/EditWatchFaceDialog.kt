@@ -3,35 +3,48 @@ package com.friendly_machines.frbpdoctor.ui.customization
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
-import android.widget.CheckBox
-import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.fr_yhe_api.commondata.WatchChangeWatchDialAction
 import com.friendly_machines.frbpdoctor.R
 
 class EditWatchFaceDialog(private val action: WatchChangeWatchDialAction) : DialogFragment() {
-    private lateinit var timeEditText: EditText
-    private lateinit var dayCheckBoxes: List<CheckBox>
 
-    // Interface to communicate the selected alarm data to the calling activity/fragment
+    // Interface to communicate the selected watchface data to the calling activity/fragment
     interface OnWatchDialSetListener {
-        fun onWatchDialSet()
+        fun onWatchDialSet(watchface: WatchfaceCatalogItem)
     }
 
     private var listener: OnWatchDialSetListener? = null
+    private var adapter: WatchfaceCatalogAdapter? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         val builder = AlertDialog.Builder(activity)
         val inflater = requireActivity().layoutInflater
         val view: View = inflater.inflate(R.layout.dialog_edit_watch_dial, null)
 
+        // Load watchface catalog
+        val catalog = WatchfaceCatalogLoader.loadCatalog(requireContext())
+        
+        // Set up RecyclerView
+        val recyclerView = view.findViewById<RecyclerView>(R.id.watchfaceCatalogRecyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        
+        adapter = WatchfaceCatalogAdapter(catalog) { selectedItem ->
+            // Item selected - adapter handles visual selection
+        }
+        recyclerView.adapter = adapter
+
         builder.setPositiveButton(
             when (action) {
-                WatchChangeWatchDialAction.Add -> "Add Watch Dial"
-                WatchChangeWatchDialAction.Edit -> "Change Watch Dial"
+                WatchChangeWatchDialAction.Add -> "Upload Watchface"
+                WatchChangeWatchDialAction.Edit -> "Change Watchface"
             }
         ) { _, _ ->
-            // FIXME
+            adapter?.getSelectedItem()?.let { selectedWatchface ->
+                listener?.onWatchDialSet(selectedWatchface)
+            }
         }
 
         // Set up negative button to cancel
