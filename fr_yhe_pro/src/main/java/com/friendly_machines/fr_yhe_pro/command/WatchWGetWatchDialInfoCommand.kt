@@ -11,6 +11,7 @@ class WatchWGetWatchDialInfoCommand : WatchCommand(WatchOperation.WGetWatchDialI
     data class Response(val items: List<WatchDialDataBlock>, val dummy: Byte, val dialCount: UByte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
+                // FIXME: Check
                 val dummy = buf.get()
                 val dialCount = buf.get().toUByte()
 

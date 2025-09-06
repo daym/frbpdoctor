@@ -8,7 +8,7 @@ class WatchGGetManualModeStatusCommand : WatchCommand(WatchOperation.GGetManualM
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
+                val status = buf.get() // mode status, not regular status?
                 return Response(status = status)
             }
         }

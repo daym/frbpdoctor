@@ -16,10 +16,12 @@ class WatchSSetTimeCommand(year: Short, month: Byte, day: Byte, hour: Byte, minu
     buf.put(weekDay)
     buf.array()
 }) {
-    data class Response(val status: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(buf.get())
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

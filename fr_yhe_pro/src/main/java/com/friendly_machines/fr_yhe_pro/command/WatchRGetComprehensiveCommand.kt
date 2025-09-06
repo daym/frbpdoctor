@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchRGetComprehensiveCommand : WatchCommand(WatchOperation.RComprehensive, byteArrayOf()) {
+    // FIXME: Real time response
     data class Response(
         val steps: Int,
         val distance: Short,
@@ -21,21 +22,32 @@ class WatchRGetComprehensiveCommand : WatchCommand(WatchOperation.RComprehensive
         val ppi: Int
     ) : WatchResponse() {
         companion object {
+            private fun read24BitLeInt(buf: ByteBuffer): Int {
+                val byte1 = buf.get().toInt() and 0xFF
+                val byte2 = buf.get().toInt() and 0xFF
+                val byte3 = buf.get().toInt() and 0xFF
+                return (byte3 shl 16) or (byte2 shl 8) or byte1
+            }
+
             fun parse(buf: ByteBuffer): Response {
+                val steps = read24BitLeInt(buf)
+                val distance = buf.short
+                val kcal = buf.short
+                val heartRate = buf.get()
+                val systolicPressure = buf.get()
+                val diastolicPressure = buf.get()
+                val bloodOxygen = buf.get()
+                val respirationRate = buf.get()
+                val temperatureInt = buf.get()
+                val temperatureFloat = buf.get()
+                val wearingState = buf.get()
+                val electricity = buf.get()
+                val ppi = buf.int
+                
                 return Response(
-                    steps = buf.int,
-                    distance = buf.short,
-                    kcal = buf.short,
-                    heartRate = buf.get(),
-                    systolicPressure = buf.get(),
-                    diastolicPressure = buf.get(),
-                    bloodOxygen = buf.get(),
-                    respirationRate = buf.get(),
-                    temperatureInt = buf.get(),
-                    temperatureFloat = buf.get(),
-                    wearingState = buf.get(),
-                    electricity = buf.get(),
-                    ppi = buf.int
+                    steps, distance, kcal, heartRate, systolicPressure, diastolicPressure,
+                    bloodOxygen, respirationRate, temperatureInt, temperatureFloat,
+                    wearingState, electricity, ppi
                 )
             }
         }

@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchRGetRunCommand : WatchCommand(WatchOperation.RRun, byteArrayOf()) {
+    // FIXME: Real-time response
     data class Response(val data: ByteArray) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {

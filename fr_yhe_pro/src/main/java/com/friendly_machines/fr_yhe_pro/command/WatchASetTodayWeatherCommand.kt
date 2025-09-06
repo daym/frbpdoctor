@@ -38,7 +38,9 @@ class WatchASetTodayWeatherCommand(str1: String, str2: String, str3: String, wea
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
+                val bytes = ByteArray(buf.remaining())
+                buf.get(bytes)
+                val status = if (bytes.isNotEmpty()) bytes.last() else 0
                 return Response(status = status)
             }
         }

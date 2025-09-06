@@ -13,33 +13,46 @@ class WatchRGetOgaCommand : WatchCommand(WatchOperation.ROga, byteArrayOf()) {
         val respirationRate: Byte,
         val temperatureInt: Byte,
         val temperatureFloat: Byte,
-        val steps: Int,
-        val calories: Short,
-        val distance: Short,
+        val realSteps: Int,
+        val realCalories: Short,
+        val realDistance: Short,
         val sportsRealSteps: Int,
         val sportsRealCalories: Short,
         val sportsRealDistance: Short,
-        val recordTime: Int,
-        val ppi: Int
+        val recordTime: Int?,
+        val ppi: Int?
     ) : WatchResponse() {
         companion object {
+            private fun read24BitLeInt(buf: ByteBuffer): Int {
+                val byte1 = buf.get().toInt() and 0xFF
+                val byte2 = buf.get().toInt() and 0xFF
+                val byte3 = buf.get().toInt() and 0xFF
+                return (byte3 shl 16) or (byte2 shl 8) or byte1
+            }
+
             fun parse(buf: ByteBuffer): Response {
+                val heartRate = buf.get()
+                val systolicPressure = buf.get()
+                val diastolicPressure = buf.get()
+                val bloodOxygen = buf.get()
+                val respirationRate = buf.get()
+                val temperatureInt = buf.get()
+                val temperatureFloat = buf.get()
+                val realSteps = read24BitLeInt(buf)
+                val realCalories = buf.short
+                val realDistance = buf.short
+                val sportsRealSteps = read24BitLeInt(buf)
+                val sportsRealCalories = buf.short
+                val sportsRealDistance = buf.short
+                
+                // Optional fields based on remaining length
+                val recordTime = if (buf.remaining() >= 4) buf.int else null
+                val ppi = if (buf.remaining() >= 4) buf.int else null
+                
                 return Response(
-                    heartRate = buf.get(),
-                    systolicPressure = buf.get(),
-                    diastolicPressure = buf.get(),
-                    bloodOxygen = buf.get(),
-                    respirationRate = buf.get(),
-                    temperatureInt = buf.get(),
-                    temperatureFloat = buf.get(),
-                    steps = buf.int,
-                    calories = buf.short,
-                    distance = buf.short,
-                    sportsRealSteps = buf.int,
-                    sportsRealCalories = buf.short,
-                    sportsRealDistance = buf.short,
-                    recordTime = buf.int,
-                    ppi = buf.int
+                    heartRate, systolicPressure, diastolicPressure, bloodOxygen, respirationRate,
+                    temperatureInt, temperatureFloat, realSteps, realCalories, realDistance,
+                    sportsRealSteps, sportsRealCalories, sportsRealDistance, recordTime, ppi
                 )
             }
         }

@@ -21,11 +21,12 @@ class WatchSSetScheduleCommand(a0: Byte, a1: Byte, a2: Byte, a3: Byte, a4: Byte,
     }
     buf.array()
 }) {
-    data class Response(val status: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
                 val status = buf.get() // can be -4
-                return Response(status = status)
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

@@ -10,10 +10,12 @@ class WatchSSetTemperatureMonitorCommand(type: Byte, interval: Byte) : WatchComm
         type, interval
     )
 ) {
-    data class Response(val status: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(status = buf.get())
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

@@ -16,7 +16,7 @@ class WatchCGetFileListCommand(x: Short, y: Short) : WatchCommand(WatchOperation
     data class Response(val items: List<DirectoryEntry>) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                // in chunks of 24; 16 of that into name. Then 4 of that into file size. Then 4 of that into file checksum
+                buf.order(ByteOrder.LITTLE_ENDIAN)
                 val count = buf.remaining() / DirectoryEntry.SIZE
                 return Response(items = WatchResponseFactory.parseDataBlockArray(count, buf) {
                     DirectoryEntry.parsePro(buf)
