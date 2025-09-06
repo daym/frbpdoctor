@@ -22,10 +22,13 @@ class WatchSSetRegularReminderCommand(startHour: Byte, startMinute: Byte, endHou
 
     buf.array()
 }) {
-    data class Response(val FIXME: Byte) : WatchResponse() { // FIXME -4 ?!
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(FIXME = buf.get()) // TODO
+                // VERIFIED: Original SDK case 61 (0x3D) -> L_0x004a -> packetSettingHandle reads first byte as status
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

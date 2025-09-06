@@ -22,11 +22,11 @@ import kotlin.reflect.KClass
 //_progress.value = DownloadProgress("Sending chunk $chunkIndex")
 
 // YHE Pro; it's important that there's only one instance live of this because otherwise we could misinterpret responses meant for others as responses meant for us.
-class WatchFaceController(val binder: IWatchBinder, val progresser: (String) -> Unit) : IWatchListener {
+class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, String) -> Unit) : IWatchListener {
     private val responseChannel = Channel<WatchResponse>()
     override fun onWatchResponse(response: WatchResponse) {
         // ONLY handle responses of class 9 (W); those are very few
-        if (response is WatchWControlDownloadCommand.Response || response is WatchWDeleteWatchDialCommand.Response || response is WatchWGetWatchDialInfoCommand.Response || response is WatchWNextDownloadChunkCommand.Response || response is WatchWNextDownloadChunkMetaCommand.Response || response is WatchWSetCurrentWatchDialCommand.Response) {
+        if (response is WatchWControlDownloadCommand.Response || response is WatchWDeleteWatchDialCommand.Response || response is WatchWGetWatchDialInfoCommand.Response || response is WatchWNextDownloadChunkMetaCommand.Response || response is WatchWSetCurrentWatchDialCommand.Response) {
             responseChannel.trySend(response) // FIXME: TRY? How about when it doesn't work, block someone?
         }
     }
@@ -40,40 +40,36 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (String) -> 
         }
     }
 
-    private fun setProgress(text: String) {
-        progresser(text)
+    private fun setProgress(percentage: Float, text: String) {
+        progresser(percentage, text)
     }
 
     suspend fun listWatchFaces(): WatchResponse {
-        setProgress("listWatchFaces")
+        setProgress(0f, "Getting watch face list...")
         binder.getWatchDial()
         return receive(WatchWGetWatchDialInfoCommand.Response::class)
     }
 
     suspend fun selectWatchFace(dialPlateId: Int): WatchResponse {
-        setProgress("selectWatchFace $dialPlateId")
+        setProgress(0f, "Activating watch face...")
         binder.selectWatchFace(dialPlateId)
-//       FIXME! withTimeout(5000) {
-//            val response = receive()
-//            // ... handle response
-//        }
         return receive(WatchWSetCurrentWatchDialCommand.Response::class)
     }
 
     private suspend fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort): WatchResponse {
-        setProgress("startWatchFaceDownload $length #dialPlateId $blockNumber $version $crc")
+        setProgress(0f, "Initializing download...")
         binder.startWatchFaceDownload(length, dialPlateId, blockNumber, version, crc)
         return receive(WatchWControlDownloadCommand.Response::class)
     }
 
     private suspend fun stopWatchFaceDownload(length: UInt): WatchResponse {
-        setProgress("stopWatchFaceDownload $length")
+        setProgress(0f, "Finalizing...")
         binder.stopWatchFaceDownload(length)
         return receive(WatchWControlDownloadCommand.Response::class)
     }
 
     private suspend fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort): WatchResponse {
-        setProgress("nextWatchFaceDownloadChunkMeta $deltaOffset $packetCount $crc")
+        // setProgress("nextWatchFaceDownloadChunkMeta $deltaOffset $packetCount $crc")
         binder.nextWatchFaceDownloadChunkMeta(deltaOffset, packetCount, crc)
         return receive(WatchWNextDownloadChunkMetaCommand.Response::class)
     }
@@ -81,32 +77,55 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (String) -> 
     /** Give the specified watchface BODY to the watch */
     suspend fun downloadWatchface(mtu: Byte, dialPlateId: Int, blockNumber: Short, version: Short, body: ByteArray) = coroutineScope {
         val metaChunkSize = 4096 // Byte
+        val totalSize = body.size
+        
+        setProgress(0f, "Starting download...")
         val startResponse = startWatchFaceDownload(body.size.toUInt(), dialPlateId, blockNumber, version, Crc16.crc16(body).toUShort())
-        if (startResponse !is WatchWControlDownloadCommand.Response || startResponse.ok != 1U.toByte() || startResponse.errorCode != 0U.toByte()) {
-            throw Exception("Starting download failed")
+        if (startResponse !is WatchWControlDownloadCommand.Response) {
+            throw Exception("Starting download failed: wrong response type")
+        } else if (startResponse.control != 1.toByte() || startResponse.errorCode != 0.toByte()) {
+            throw Exception("Starting download failed: control=${startResponse.control}, error=${startResponse.errorCode}")
         }
-        body.iterator().asSequence().chunked(metaChunkSize).forEachIndexed { chunkIndex, chunk ->
+        
+        val chunks = body.iterator().asSequence().chunked(metaChunkSize)
+        val totalChunks = chunks.count()
+        var bytesTransferred = 0
+        
+        chunks.forEachIndexed { chunkIndex, chunk ->
+            val overallProgress = (bytesTransferred.toFloat() / totalSize * 100f).toInt()            
+            setProgress(overallProgress.toFloat(), "Sending chunk ${chunkIndex + 1} of $totalChunks...")
+            
             // Send MTU chunks
             // MTU chunking: Protocol overhead (6 bytes) + ATT overhead (3 bytes) = 9 bytes total
             var packageCount: UShort = 0U
-            chunk.chunked(mtu - 9).forEach { packageChunk ->
-                // (no response will come)
+            chunk.chunked(mtu.toInt() - 9).forEach { packageChunk ->
                 binder.sendWatchFaceDownloadChunk(packageChunk.toByteArray())
                 ++packageCount
                 delay(10) // Small delay of 10ms between chunks
             }
+            
             // Use actual chunk size, not fixed metaChunkSize
             val actualChunkSize = chunk.size
+            
+            setProgress(overallProgress.toFloat(), "Verifying chunk ${chunkIndex + 1}...")
             val verifyResponse = nextWatchFaceDownloadChunkMeta(actualChunkSize, packageCount, Crc16.crc16(chunk.toByteArray()).toUShort())
-            if (verifyResponse !is WatchWNextDownloadChunkMetaCommand.Response || verifyResponse.status != 0U.toByte()) {
-                setProgress("Watch did not accept chunk $chunkIndex")
-                throw Exception("Watch did not accept chunk $chunkIndex")
+            if (verifyResponse !is WatchWNextDownloadChunkMetaCommand.Response || verifyResponse.status != 0.toByte()) {
+                throw Exception("Watch did not accept chunk ${chunkIndex + 1}")
             }
+            
+            bytesTransferred += actualChunkSize
+            val updatedProgress = (bytesTransferred.toFloat() / totalSize * 100f).toInt()
+            setProgress(updatedProgress.toFloat(), "Chunk ${chunkIndex + 1} verified")
         }
+        
+        setProgress(100f, "Finalizing download...")
         val stopResponse = stopWatchFaceDownload(body.size.toUInt())
-        if (stopResponse !is WatchWControlDownloadCommand.Response || stopResponse.ok != 0U.toByte() || stopResponse.errorCode != 0U.toByte()) {
-            setProgress("Stopping download failed")
-            throw Exception("Stopping download failed")
+        if (stopResponse !is WatchWControlDownloadCommand.Response) {
+            throw Exception("Stopping download failed: wrong response type")
+        } else if (stopResponse.control != 0.toByte() || stopResponse.errorCode != 0.toByte()) {
+            throw Exception("Stopping download failed: control=${stopResponse.control}, error=${stopResponse.errorCode}")
         }
+        
+        setProgress(100f, "Download completed!")
     }
 }

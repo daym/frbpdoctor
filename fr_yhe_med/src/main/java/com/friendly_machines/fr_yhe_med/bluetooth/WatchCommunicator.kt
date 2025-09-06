@@ -439,12 +439,12 @@ public class WatchCommunicator : IWatchCommunicator {
                         }
                     }
                 }
-                .subscribeOn(Scheders.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
-                        listeners.forEach { it.onConnected() }
+                        //listeners.forEach { it.onConnected() }
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
                             bufferPacket(input)?.let {

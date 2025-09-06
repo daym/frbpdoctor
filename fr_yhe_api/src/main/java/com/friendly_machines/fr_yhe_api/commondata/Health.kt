@@ -32,15 +32,89 @@ data class HSportDataBlock(
     }
 }
 
+data class HSleepSegment(
+    val sleepType: Byte,
+    val sleepStartTime: Int,
+    val sleepLen: Int  // 3 bytes in original
+)
+
 data class HSleepDataBlock(
-    val dummy: Byte
+    val startTime: Int,
+    val endTime: Int,
+    val deepSleepCount: Short,
+    val lightSleepCount: Short,
+    val deepSleepTotal: Short,  // in seconds if deepSleepCount != 0xFFFF, else rapidEyeMovementTotal
+    val lightSleepTotal: Short,  // in seconds if deepSleepCount != 0xFFFF
+    val sleepSegments: List<HSleepSegment>,
+    val wakeCount: Int,
+    val wakeDuration: Int
 ) {
     companion object {
-        const val SIZE: Int = 20*B // FIXME
+        const val SIZE: Int = 20*B // Base header size, but has variable length segment array
 
         fun parsePro(buf: ByteBuffer): HSleepDataBlock {
-            // FIXME
-            return HSleepDataBlock(0.toByte())
+            // Skip first 2 bytes (thrown away in decompiled source)
+            buf.position(buf.position() + 2)
+            
+            // Read 2 bytes - some value (r4 in decompiled)
+            val r4 = buf.short
+            
+            // Read times
+            val startTime = buf.int
+            val endTime = buf.int
+            
+            // Read deep sleep count (if 0xFFFF, special handling)
+            val deepSleepCount = buf.short
+            
+            val lightSleepCount: Short
+            val deepSleepTotal: Short
+            val lightSleepTotal: Short
+            
+            if (deepSleepCount == 0xFFFF.toShort()) {
+                // Special case - lines 3686-3713
+                val rapidEyeMovement = buf.short  // stored as r6/r29
+                lightSleepCount = 0  // not read in this case
+                deepSleepTotal = buf.short  // stored as r14/r4 (not multiplied)
+                lightSleepTotal = buf.short  // stored as r15/r26 (not multiplied)
+            } else {
+                // Normal case - lines 3716-3746
+                lightSleepCount = buf.short  // stored as r5
+                deepSleepTotal = (buf.short * 60).toShort()  // multiplied by 60
+                lightSleepTotal = (buf.short * 60).toShort()  // multiplied by 60
+            }
+            
+            // Read sleep segments (8 bytes each) - lines 3762-3832
+            val segments = mutableListOf<HSleepSegment>()
+            var wakeCount = 0
+            var wakeDuration = 0
+            
+            // Segments continue until we've read (r4 - 20) bytes from start of segments
+            val segmentStartPos = buf.position()
+            while (buf.remaining() >= 8) {
+                val segType = buf.get()
+                buf.get() // skip 1 byte
+                val segStartTime = buf.int
+                // Read 3-byte length (little-endian)
+                val segLen = (buf.get().toInt() and 0xFF) or 
+                             ((buf.get().toInt() and 0xFF) shl 8) or
+                             ((buf.get().toInt() and 0xFF) shl 16)
+                
+                // Type 0xF4 (244) is wake segment
+                if (segType == 0xF4.toByte()) {
+                    wakeCount++
+                    wakeDuration += segLen
+                }
+                
+                segments.add(HSleepSegment(segType, segStartTime, segLen))
+                
+                // Check if we've read enough based on r4 value
+                if (buf.position() - segmentStartPos >= r4 - 20) break
+            }
+            
+            return HSleepDataBlock(
+                startTime, endTime, deepSleepCount, lightSleepCount,
+                deepSleepTotal, lightSleepTotal, segments, wakeCount, wakeDuration
+            )
         }
     }
 }
@@ -53,11 +127,10 @@ data class HHeartDataBlock(
         const val SIZE: Int = (4 + 1 + 1)*B
 
         fun parsePro(buf: ByteBuffer): HHeartDataBlock {
-            // FIXME parse one more byte and throw it away
-            return HHeartDataBlock(
-                heartStartTime = buf.int,
-                r11 = buf.get()
-            )
+            val heartStartTime = buf.int
+            val r11 = buf.get()
+            buf.get() // Skip 1 byte as shown in decompiled source line 3551
+            return HHeartDataBlock(heartStartTime, r11)
         }
     }
 }
@@ -248,10 +321,10 @@ data class HHealthMonitoringDataBlock(
     val r39: Byte
 ) {
     companion object {
-        const val SIZE: Int = 25*B // FIXME maybe wrong
+        const val SIZE: Int = 30*B // Fixed: 26 bytes of data + 4 bytes skipped
 
         fun parsePro(buf: ByteBuffer): HHealthMonitoringDataBlock {
-            return HHealthMonitoringDataBlock(
+            val result = HHealthMonitoringDataBlock(
                 startTime = buf.int,
                 stepValuer6 = buf.int,
                 r11 = buf.get(),
@@ -270,6 +343,9 @@ data class HHealthMonitoringDataBlock(
                 r19 = buf.short,
                 r39 = buf.get()
             )
+            // Skip 4 bytes as shown in decompiled source line 2887
+            buf.position(buf.position() + 4)
+            return result
         }
     }
 }
@@ -288,10 +364,10 @@ data class HHistorySportModeDataBlock(
     val maxHeartRate: Byte
 ) {
     companion object {
-        const val SIZE: Int = (4 + 4 + 4 + 2 + 2 + 1 + 1 + 1 + 4 + 1 + 1)*B // TODO pad
+        const val SIZE: Int = 26*B // 25 bytes of data + 1 byte padding
 
         fun parsePro(buf: ByteBuffer): HHistorySportModeDataBlock {
-            return HHistorySportModeDataBlock(
+            val result = HHistorySportModeDataBlock(
                 startTime = buf.int,
                 endTime = buf.int,
                 steps = buf.int,
@@ -304,6 +380,8 @@ data class HHistorySportModeDataBlock(
                 minHeartRate = buf.get(),
                 maxHeartRate = buf.get()
             )
+            buf.get() // Skip 1 byte as shown in decompiled source line 2672
+            return result
         }
     }
 }
@@ -329,10 +407,10 @@ data class HComprehensiveMeasurementDataBlock(
     val triglycerideCholesterolFloat: Byte
 ) {
     companion object {
-        const val SIZE: Int = 22*B // FIXME need to skip 22 ?!
+        const val SIZE: Int = 44*B // 22 bytes of data + 22 bytes skipped
 
         fun parsePro(buf: ByteBuffer): HComprehensiveMeasurementDataBlock {
-            return HComprehensiveMeasurementDataBlock(
+            val result = HComprehensiveMeasurementDataBlock(
                 timestamp = buf.int,
                 bloodSugarModel = buf.get(),
                 bloodSugarInteger = buf.get(),
@@ -352,6 +430,9 @@ data class HComprehensiveMeasurementDataBlock(
                 triglycerideCholesterolInteger = buf.get(),
                 triglycerideCholesterolFloat = buf.get()
             )
+            // Skip 22 bytes as shown in decompiled source line 2460
+            buf.position(buf.position() + 22)
+            return result
         }
     }
 }
@@ -364,10 +445,11 @@ data class HBackgroundReminderRecordDataBlock(
         const val SIZE: Int = (4 + 1 + 3)*B // FIXME way too little
 
         fun parsePro(buf: ByteBuffer): HBackgroundReminderRecordDataBlock {
-            return HBackgroundReminderRecordDataBlock(
-                time = buf.int,
-                r9 = buf.get()
-            )
+            val time = buf.int
+            val r9 = buf.get()
+            // Skip 3 bytes as shown in decompiled source line 2324
+            buf.position(buf.position() + 3)
+            return HBackgroundReminderRecordDataBlock(time, r9)
         }
     }
 }

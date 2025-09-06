@@ -48,7 +48,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchSGetChipSchemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetChipSchemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
@@ -84,6 +84,7 @@ import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.exceptions.BleCharacteristicNotFoundException
 import com.polidea.rxandroidble3.exceptions.BleConflictingNotificationAlreadySetException
+import com.polidea.rxandroidble3.exceptions.BleDisconnectedException
 import com.polidea.rxandroidble3.exceptions.BleGattException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -313,7 +314,7 @@ class WatchCommunicator : IWatchCommunicator {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
-                        listeners.forEach { it.onConnected() }
+                        //listeners.forEach { it.onConnected() }
                         setupIndications(indicationPortCharacteristic) { input ->
                             Log.d(TAG, "indication received: ${input.contentToString()}")
                             val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
@@ -532,7 +533,7 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, repeats, interval))
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchSSetScreenLitTimeCommand(screenTimeLit))
-        override fun getChipScheme() = enqueueCommand(WatchSGetChipSchemeCommand())
+        override fun getChipScheme() = enqueueCommand(WatchGGetChipSchemeCommand())
 
         override fun setStepGoal(steps: Int) {
             // FIXME
@@ -555,7 +556,7 @@ class WatchCommunicator : IWatchCommunicator {
             when (expectedResponseType) {
                 WatchResponseType.SetMessage -> {
                     return if (response is WatchANotificationPushCommand.Response) {
-                        if (response.dummy == 0.toByte()) {
+                        if (response.status == 0.toByte()) {
                             WatchResponseAnalysisResult.Ok
                         } else {
                             WatchResponseAnalysisResult.Err

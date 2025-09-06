@@ -186,45 +186,115 @@ class WatchFaceDownloadingFragment : Fragment() {
     }
 
     private fun setProgress(text: String) {
-        // FIXME
+        requireActivity().runOnUiThread {
+            view?.findViewById<android.widget.TextView>(com.friendly_machines.frbpdoctor.R.id.downloadStatus)?.text = text
+        }
+    }
+    
+    private fun setProgress(progress: Float, text: String) {
+        requireActivity().runOnUiThread {
+            view?.findViewById<android.widget.ProgressBar>(com.friendly_machines.frbpdoctor.R.id.downloadProgressBar)?.progress = progress.toInt()
+            view?.findViewById<android.widget.TextView>(com.friendly_machines.frbpdoctor.R.id.downloadProgressText)?.text = "${progress.toInt()}%"
+            view?.findViewById<android.widget.TextView>(com.friendly_machines.frbpdoctor.R.id.downloadStatus)?.text = text
+        }
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get parameters from arguments or hosting activity
-        // FIXME: WTF kind of defaults are those? TODO: Ask the user.
-        val mtu = arguments?.getByte("MTU") ?: 0
+        // Set up cancel button
+        view.findViewById<android.widget.Button>(com.friendly_machines.frbpdoctor.R.id.cancelButton)?.setOnClickListener {
+            cancelDownload()
+        }
+
+        // Get parameters from arguments
+        val mtu = arguments?.getByte("MTU") ?: 235.toByte()
         val dialPlateId = arguments?.getInt("DIAL_PLATE_ID") ?: 0
         val blockNumber = arguments?.getShort("BLOCK_NUMBER") ?: 0
-        val version = arguments?.getShort("VERSION") ?: 0
+        val version = arguments?.getShort("VERSION") ?: 1
         val body = arguments?.getByteArray("BODY") ?: byteArrayOf()
 
-        serviceConnection = object : ServiceConnection {
+        if (body.isEmpty()) {
+            showError("No watch face data provided")
+            return
+        }
+
+        setProgress("Connecting to watch...")
+
+        serviceConnection = object : Servic eConnection {
             private var disconnector: IWatchBinder? = null
+            private var watchFaceController: WatchFaceController? = null // FIXME: make it less variable again
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 binder = service as IWatchBinder
-                val watchFaceController = WatchFaceController(service as IWatchBinder, this@WatchFaceDownloadingFragment::setProgress)
-                disconnector = binder?.addListener(watchFaceController)
-                downloadJob = CoroutineScope(Dispatchers.Main).launch {
+                watchFaceController = WatchFaceController(service as IWatchBinder) { percentage, status ->
+                    setProgress(percentage, status)
+                }
+                watchFaceController?.let { controller ->
+                    disconnector = binder?.addListener(controller)
+                }
+                
+                downloadJob = CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        watchFaceController.downloadWatchface(mtu, dialPlateId, blockNumber, version, body)
-                        watchFaceController.listWatchFaces()
-                        watchFaceController.selectWatchFace(dialPlateId)
-                        // TODO: Notify the user of successful download and selection
+                        watchFaceController?.downloadWatchface(mtu, dialPlateId, blockNumber, version, body)
+                        watchFaceController?.listWatchFaces()
+                        watchFaceController?.selectWatchFace(dialPlateId)
+                        
+                        setProgress(100f, "Download completed successfully!")
+                        
+                        // Task completed - clean up the listener
+                        disconnector?.let { disc ->
+                            disc.removeListener(disc)
+                        }
+                        disconnector = null
+                        watchFaceController = null
+                        
+                        // Navigate back after a brief delay
+                        kotlinx.coroutines.delay(2000)
+                        requireActivity().runOnUiThread {
+                            parentFragmentManager.popBackStack()
+                        }
+                        
                     } catch (e: Exception) {
-                        // TODO: Handle download failure
                         Log.e("WatchFaceDownloadingFragment", "Watchface download failed", e)
+                        showError("Download failed: ${e.message}")
+                        
+                        // Task failed - clean up the listener
+                        disconnector?.let { disc ->
+                            disconnector?.removeListener(disc)
+                        }
+                        disconnector = null
+                        watchFaceController = null
                     }
                 }
             }
+            
             override fun onServiceDisconnected(name: ComponentName?) {
-                // Cancel the download coroutine
+                disconnector?.let { controller ->
+                    var d = disconnector
+                    d?.removeListener(d)
+                }
+                disconnector = null
+                watchFaceController = null
                 downloadJob?.cancel()
-                // Handle disconnection
             }
         }
+        
         val serviceIntent = Intent(context, WatchCommunicationService::class.java)
         context?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+    
+    private fun cancelDownload() {
+        downloadJob?.cancel()
+        requireActivity().runOnUiThread {
+            parentFragmentManager.popBackStack()
+        }
+    }
+    
+    private fun showError(message: String) {
+        requireActivity().runOnUiThread {
+            view?.findViewById<android.widget.TextView>(com.friendly_machines.frbpdoctor.R.id.downloadStatus)?.text = message
+            view?.findViewById<android.widget.TextView>(com.friendly_machines.frbpdoctor.R.id.downloadTitle)?.text = "Error"
+            view?.findViewById<android.widget.Button>(com.friendly_machines.frbpdoctor.R.id.cancelButton)?.text = "Back"
+        }
     }
 
     override fun onDestroyView() {
