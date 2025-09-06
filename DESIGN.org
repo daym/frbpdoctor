@@ -1,0 +1,129 @@
+#+TITLE: FrBpDoctor Architecture Design
+#+AUTHOR: Danny Milosavljevic
+#+DATE: 2025-09-07
+
+* WatchFaceController Architecture and Response Handling
+
+** Overview
+The ~WatchFaceController~ is responsible for downloading watch face binary data to the watch device via Bluetooth. It handles the complex multi-step protocol for transferring large binary files (watch faces) in chunks using a sophisticated coroutine-based response handling system.
+
+** Lifecycle and Integration
+
+*** WatchFaceController Lifecycle
+- *Short-lived, Task-scoped Object*: The ~WatchFaceController~ is a short-lived utility class that exists only for the duration of a watch face download operation
+- *Created*: When a UI component (like ~WatchFaceDownloadingFragment~ or ~CustomizationActivity~) needs to download a watch face
+- *Lives*: Only during the ~downloadWatchface()~ coroutine execution (typically a few seconds to minutes)
+- *Destroyed*: Immediately after the download completes or fails
+
+*** WatchCommunicationService Lifecycle  
+- *Long-lived Background Service*: The ~WatchCommunicationService~ has a much longer lifecycle
+- *Created*: When the app needs Bluetooth watch communication (typically at app startup or when user navigates to watch-related features)
+- *Lives*: As long as the app needs to maintain Bluetooth connection with the watch
+- *Destroyed*: When the app shuts down or user explicitly disconnects
+
+*** Service Integration Pattern
+#+BEGIN_SRC 
+Android App UI Layer
+       ↓
+WatchFaceController (handles download logic)
+       ↓  
+WatchCommunicationService (manages BLE connection)
+       ↓
+fr_yhe_api (protocol abstraction)
+       ↓
+fr_yhe_pro (device-specific implementation)
+       ↓
+Android Bluetooth Stack
+       ↓
+Watch Device
+#+END_SRC
+
+** Response Handling Architecture
+
+*** The Response Mechanism
+The WatchFaceController uses a sophisticated coroutine-based response handling system:
+
+1. *WatchFaceController implements ~IWatchListener~* - It registers as a listener for watch responses
+2. *It gets registered* immediately after construction via ~binder.addListener(watchFaceController)~ (line 230 in WatchFaceDownloadingFragment.kt)
+3. *It has a private ~Channel<WatchResponse>~* - This is a Kotlin coroutine channel for async communication
+
+*** Response Flow Implementation
+
+**** 1. Send Command
+#+BEGIN_SRC kotlin
+// Example: Start download command
+binder.startWatchFaceDownload(length, dialPlateId, blockNumber, version, crc)
+#+END_SRC
+
+**** 2. Wait for Response (Suspend)
+#+BEGIN_SRC kotlin
+// Suspend the coroutine until matching response arrives
+return receive(WatchWControlDownloadCommand.Response::class)
+#+END_SRC
+
+**** 3. Response Arrives via Bluetooth
+The watch sends back a response via Bluetooth to the ~WatchCommunicationService~
+
+**** 4. Listener Callback Invoked
+#+BEGIN_SRC kotlin
+override fun onWatchResponse(response: WatchResponse) {
+    // ONLY handle responses of class 9 (W); those are very few
+    if (response is WatchWControlDownloadCommand.Response || 
+        response is WatchWDeleteWatchDialCommand.Response || 
+        response is WatchWGetWatchDialInfoCommand.Response || 
+        response is WatchWNextDownloadChunkMetaCommand.Response || 
+        response is WatchWSetCurrentWatchDialCommand.Response) {
+        responseChannel.trySend(response) // Queue the response
+    }
+}
+#+END_SRC
+
+**** 5. Coroutine Unblocks  
+The ~receive()~ method uses ~responseChannel.receive()~ which suspends the coroutine until a matching response arrives:
+
+#+BEGIN_SRC kotlin
+private suspend fun <T : WatchResponse> receive(clazz: KClass<T>): WatchResponse {
+    while (true) {
+        val result = responseChannel.receive() // Suspends here until response arrives
+        if (result.javaClass == clazz) {      // Type filtering
+            return result
+        }
+    }
+}
+#+END_SRC
+
+*** Key Architecture Benefits
+
+**** Non-blocking Async Operation
+- All methods are ~suspend~ functions: ~downloadWatchface()~, ~startWatchFaceDownload()~, ~receive()~, etc.
+- Uses **coroutine suspension** rather than thread blocking
+- The "synchronous" behavior is achieved through coroutine suspension, not thread blocking
+
+**** Type-safe Response Handling
+- Each command method specifies exactly which response type it expects
+- The ~receive()~ method filters responses by type, ignoring irrelevant ones
+- Prevents response confusion when multiple operations are happening
+
+**** Separation of Concerns
+- *WatchCommunicationService*: Long-lived (app lifetime), manages Bluetooth
+- *CustomizationActivity*: Medium-lived (activity lifetime), implements ~IWatchListener~
+- *WatchFaceController*: Short-lived (operation lifetime), handles specific download logic
+
+** Download Protocol Flow
+
+*** Protocol Steps
+1. *Initialization*: Controller receives watch face binary data and metadata
+2. *Start Command*: Sends ~WatchWControlDownloadCommand.start()~ with file size, CRC, etc.
+3. *Chunked Transfer*: 
+   - Splits binary into 4KB chunks
+   - Sends each chunk via ~WatchWNextDownloadChunkCommand~
+   - After every 4KB block, sends verification via ~WatchWNextDownloadChunkMetaCommand~
+4. *Completion*: Sends ~WatchWControlDownloadCommand.stop()~
+5. *Activation*: Optionally sets the new face as active
+
+*** Error Handling & Progress
+- Validates response codes (~control~ and ~errorCode~ fields)
+- Provides progress callbacks for UI updates via ~progresser()~ function
+- Uses CRC16 checksums for data integrity
+- Implements retry logic through coroutines
+- Exception-based error reporting for failures
