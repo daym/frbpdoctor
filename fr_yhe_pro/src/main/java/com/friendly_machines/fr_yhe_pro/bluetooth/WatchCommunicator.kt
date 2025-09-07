@@ -4,6 +4,7 @@ import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -23,13 +24,27 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDCameraControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDConnectOrDisconnectCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDDynamicCodeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDEndEcgCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDFindMobileCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDInflatedBloodMeasurementResultCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDLostReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDMeasurementResultCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDMeasurementStatusAndResultCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDMusicControlCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDPhoneCallControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDPpiDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDSosCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSportModeControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSwitchDialCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSyncContactsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDUpgradeResultCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetElectrodeLocationCommand
@@ -72,13 +87,27 @@ import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
+import com.friendly_machines.fr_yhe_pro.indication.DAlarm
 import com.friendly_machines.fr_yhe_pro.indication.DCameraControl
+import com.friendly_machines.fr_yhe_pro.indication.DConnectOrDisconnect
+import com.friendly_machines.fr_yhe_pro.indication.DDynamicCode
+import com.friendly_machines.fr_yhe_pro.indication.DEndEcg
 import com.friendly_machines.fr_yhe_pro.indication.DFindMobile
+import com.friendly_machines.fr_yhe_pro.indication.DInflatedBloodMeasurementResult
+import com.friendly_machines.fr_yhe_pro.indication.DLostReminder
+import com.friendly_machines.fr_yhe_pro.indication.DMeasurementResult
+import com.friendly_machines.fr_yhe_pro.indication.DMeasurementStatusAndResult
 import com.friendly_machines.fr_yhe_pro.indication.DMusicControl
 import com.friendly_machines.fr_yhe_pro.indication.DPhoneCallControl
+import com.friendly_machines.fr_yhe_pro.indication.DPpiData
 import com.friendly_machines.fr_yhe_pro.indication.DRegularReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSos
+import com.friendly_machines.fr_yhe_pro.indication.DSportMode
+import com.friendly_machines.fr_yhe_pro.indication.DSportModeControl
+import com.friendly_machines.fr_yhe_pro.indication.DSwitchDial
+import com.friendly_machines.fr_yhe_pro.indication.DSyncContacts
+import com.friendly_machines.fr_yhe_pro.indication.DUpgradeResult
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
@@ -209,6 +238,34 @@ class WatchCommunicator : IWatchCommunicator {
                 it.onWatchRegularReminder()
             } else if (response is DSleepReminder) {
                 it.onWatchSleepReminder()
+            } else if (response is DAlarm) {
+                it.onWatchAlarm()
+            } else if (response is DConnectOrDisconnect) {
+                it.onWatchConnectOrDisconnect()
+            } else if (response is DDynamicCode) {
+                it.onWatchDynamicCode()
+            } else if (response is DEndEcg) {
+                it.onWatchEndEcg()
+            } else if (response is DInflatedBloodMeasurementResult) {
+                it.onWatchInflatedBloodMeasurementResult()
+            } else if (response is DLostReminder) {
+                it.onWatchLostReminder()
+            } else if (response is DMeasurementResult) {
+                it.onWatchMeasurementResult()
+            } else if (response is DMeasurementStatusAndResult) {
+                it.onWatchMeasurementStatusAndResult()
+            } else if (response is DPpiData) {
+                it.onWatchPpiData()
+            } else if (response is DSportMode) {
+                it.onWatchSportMode()
+            } else if (response is DSportModeControl) {
+                it.onWatchSportModeControl()
+            } else if (response is DSwitchDial) {
+                it.onWatchSwitchDial()
+            } else if (response is DSyncContacts) {
+                it.onWatchSyncContacts()
+            } else if (response is DUpgradeResult) {
+                it.onWatchUpgradeResult()
             } else {
                 return
             }
@@ -227,6 +284,34 @@ class WatchCommunicator : IWatchCommunicator {
             WatchDRegularReminderCommand(handled)
         } else if (response is DSleepReminder) {
             WatchDSleepReminderCommand(handled)
+        } else if (response is DAlarm) {
+            WatchDAlarmCommand(handled)
+        } else if (response is DConnectOrDisconnect) {
+            WatchDConnectOrDisconnectCommand(handled)
+        } else if (response is DDynamicCode) {
+            WatchDDynamicCodeCommand(handled)
+        } else if (response is DEndEcg) {
+            WatchDEndEcgCommand(handled)
+        } else if (response is DInflatedBloodMeasurementResult) {
+            WatchDInflatedBloodMeasurementResultCommand(handled)
+        } else if (response is DLostReminder) {
+            WatchDLostReminderCommand(handled)
+        } else if (response is DMeasurementResult) {
+            WatchDMeasurementResultCommand(handled)
+        } else if (response is DMeasurementStatusAndResult) {
+            WatchDMeasurementStatusAndResultCommand(handled)
+        } else if (response is DPpiData) {
+            WatchDPpiDataCommand(handled)
+        } else if (response is DSportMode) {
+            WatchDSportModeCommand(handled)
+        } else if (response is DSportModeControl) {
+            WatchDSportModeControlCommand(handled)
+        } else if (response is DSwitchDial) {
+            WatchDSwitchDialCommand(handled)
+        } else if (response is DSyncContacts) {
+            WatchDSyncContactsCommand(handled)
+        } else if (response is DUpgradeResult) {
+            WatchDUpgradeResultCommand(handled)
         } else {
             return
         })
@@ -517,9 +602,9 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
-        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(startHour, startMinute, endHour, endMinute, weekPattern, intervalInMinutes, message))
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(1, startHour, startMinute, endHour, endMinute, dayOfWeekPattern, intervalInMinutes, message))
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) {
-            enqueueCommand((WatchSSetHeartAlarmCommand(enabled, maxValue)))
+            enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, 0, maxValue.toByte())))
             // FIXME this is not safe.
             enqueueCommand((WatchSSetHeartMonitorCommand(1, interval)))
         }

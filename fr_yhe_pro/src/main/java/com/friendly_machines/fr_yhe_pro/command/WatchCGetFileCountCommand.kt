@@ -5,7 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchCGetFileCountCommand : WatchCommand(WatchOperation.CGetFileCount, byteArrayOf(1)) {
+class WatchCGetFileCountCommand : WatchCommand(WatchOperation.CGetFileCount, byteArrayOf(0)) {
     data class Response(val count: Short) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {

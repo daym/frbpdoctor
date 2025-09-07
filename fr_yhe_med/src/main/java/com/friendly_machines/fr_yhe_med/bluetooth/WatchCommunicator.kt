@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_med.bluetooth
 
 import android.os.Binder
 import android.util.Log
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
@@ -569,7 +570,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setUserSkinColor(enum: SkinColor) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy

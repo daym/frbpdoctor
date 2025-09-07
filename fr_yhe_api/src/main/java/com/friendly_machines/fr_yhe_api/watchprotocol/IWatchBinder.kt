@@ -3,6 +3,7 @@ package com.friendly_machines.fr_yhe_api.watchprotocol
 import android.os.IBinder
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 
 interface IWatchBinder : IBinder {
     fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?)
@@ -53,7 +54,7 @@ interface IWatchBinder : IBinder {
     fun setUserSkinColor(enum: SkinColor)
     fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte)
     fun setScheduleEnabled(enabled: Boolean)
-    fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?)
+    fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?)
     fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
     fun setAccidentMonitoringEnabled(enabled: Boolean)
     fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
