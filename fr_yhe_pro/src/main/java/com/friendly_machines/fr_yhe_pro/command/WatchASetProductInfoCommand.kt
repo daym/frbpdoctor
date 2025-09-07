@@ -7,10 +7,14 @@ import java.nio.ByteOrder
 
 class WatchASetProductInfoCommand(typeCode: Byte, productInfo: String) : WatchCommand(WatchOperation.ASetProductInfo, run {
     val infoBytes = productInfo.toByteArray(Charsets.UTF_8)
-    val data = ByteArray(1 + infoBytes.size)
-    data[0] = typeCode
-    infoBytes.copyInto(data, 1) // FIXME: 0-terminated ??
-    data
+    val totalSize = 1 + infoBytes.size + 1
+    val buffer = ByteBuffer.allocate(totalSize).apply {
+        order(ByteOrder.LITTLE_ENDIAN)
+        put(typeCode)
+        put(infoBytes)
+        put(0)
+    }
+    buffer.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {
