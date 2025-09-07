@@ -22,19 +22,26 @@
             android:contentDescription="@string/clock" />
     </FrameLayout>
 
-    <!-- Flow layout for 16 measurement displays -->
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/measurementsContainer"
+    <!-- Scrollable flow layout for 16 measurement displays -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="8dp"
-        app:flexWrap="wrap"
-        app:justifyContent="flex_start"
-        app:alignItems="stretch">
+        android:fillViewport="true">
         
-        <!-- Measurements will be added programmatically -->
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/measurementsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start"
+            app:alignItems="stretch">
+            
+            <!-- Measurements will be added programmatically -->
+            
+        </com.google.android.flexbox.FlexboxLayout>
         
-    </com.google.android.flexbox.FlexboxLayout>
+    </ScrollView>
 
 </LinearLayout>
