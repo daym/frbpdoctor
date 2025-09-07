@@ -80,24 +80,6 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureAndHumidityH
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistoryBlockCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetAmbientLightCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetBloodOxygenCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetBloodPressureCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetComprehensiveCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetEcgCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetEventReminderCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetHeartCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetInflatedBloodCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetOgaCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetPpgCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetRespirationCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetRunCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetScheduleCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRUploadEcgHrvCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRUploadEcgRrCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRUploadMulPhotoelectricWaveformCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
@@ -173,6 +155,7 @@ import java.nio.ByteOrder
  */
 object WatchResponseFactory {
     const val D_RESPONSE_CODE_OFFSET: Short = 1024
+    const val R_RESPONSE_CODE_OFFSET: Short = 0x600
     inline fun <reified T : Any> parseDataBlockArray(count: Int, buf: ByteBuffer, callback: (ByteBuffer) -> T): List<T> {
         return List(count) { callback(buf) }
     }
@@ -283,24 +266,22 @@ object WatchResponseFactory {
 
             // "Real" section
 
-            WatchOperation.RSport -> WatchRGetSportCommand.Response.parse(buf)
-            WatchOperation.RHeart -> WatchRGetHeartCommand.Response.parse(buf)
-            WatchOperation.RBloodOxygen -> WatchRGetBloodOxygenCommand.Response.parse(buf)
-            WatchOperation.RBloodPressure -> WatchRGetBloodPressureCommand.Response.parse(buf)
-            WatchOperation.RPpg -> WatchRGetPpgCommand.Response.parse(buf)
-            WatchOperation.REcg -> WatchRGetEcgCommand.Response.parse(buf)
-            WatchOperation.RRun -> WatchRGetRunCommand.Response.parse(buf)
-            WatchOperation.RRespiration -> WatchRGetRespirationCommand.Response.parse(buf)
-            WatchOperation.RSensor -> WatchRGetSensorCommand.Response.parse(buf)
-            WatchOperation.RAmbientLight -> WatchRGetAmbientLightCommand.Response.parse(buf)
-            WatchOperation.RComprehensive -> WatchRGetComprehensiveCommand.Response.parse(buf)
-            WatchOperation.RSchedule -> WatchRGetScheduleCommand.Response.parse(buf)
-            WatchOperation.REventReminder -> WatchRGetEventReminderCommand.Response.parse(buf)
-            WatchOperation.ROga -> WatchRGetOgaCommand.Response.parse(buf)
-            WatchOperation.RInflatedBlood -> WatchRGetInflatedBloodCommand.Response.parse(buf)
-            WatchOperation.RUploadMulPhotoelectricWaveform -> WatchRUploadMulPhotoelectricWaveformCommand.Response.parse(buf)
-            WatchOperation.RUploadECGHrv -> WatchRUploadEcgHrvCommand.Response.parse(buf)
-            WatchOperation.RUploadECGRR -> WatchRUploadEcgRrCommand.Response.parse(buf)
+            WatchOperation.RSport -> RSport.parse(buf)
+            WatchOperation.RHeart -> RHeart.parse(buf)
+            WatchOperation.RBloodOxygen -> RBloodOxygen.parse(buf)
+            WatchOperation.RBloodPressure -> RBloodPressure.parse(buf)
+            WatchOperation.RPpg -> RPpg.parse(buf)
+            WatchOperation.REcg -> REcg.parse(buf)
+            WatchOperation.RRun -> RRun.parse(buf)
+            WatchOperation.RRespiration -> RRespiration.parse(buf)
+            WatchOperation.RSensor -> RSensor.parse(buf)
+            WatchOperation.RAmbientLight -> RAmbientLight.parse(buf)
+            WatchOperation.RComprehensive -> RComprehensive.parse(buf)
+            WatchOperation.RSchedule -> RSchedule.parse(buf)
+            WatchOperation.REventReminder -> REventReminder.parse(buf)
+            WatchOperation.ROga -> ROga.parse(buf)
+            WatchOperation.RInflatedBlood -> RInflatedBlood.parse(buf)
+            WatchOperation.RUploadMulPhotoelectricWaveform -> RUploadMulPhotoelectricWaveform.parse(buf)
 
             // "W" section
 

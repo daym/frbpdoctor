@@ -64,8 +64,8 @@ enum class WatchOperation(val code: Short) {
     ROga(0x060D),
     RInflatedBlood(0x060E),
     RUploadMulPhotoelectricWaveform(0x060F),
-    RUploadECGHrv(0x06F0),
-    RUploadECGRR(0x06F1),
+    RUploadEcgHrv(0x06F0),
+    RUploadEcgRr(0x06F1),
 
     // Collect
 
