@@ -21,6 +21,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
+import com.friendly_machines.fr_yhe_pro.indication.*
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.google.android.flexbox.FlexboxLayout
@@ -43,6 +44,7 @@ class MainFragment : Fragment(), IWatchListener {
     private lateinit var handler: Handler
     private var serviceConnection: ServiceConnection? = null
     private val activeMeasurements = mutableSetOf<RealDataSensorType>()
+    private val measurementViews = mutableMapOf<RealDataSensorType, TextView>()
 
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -116,6 +118,8 @@ class MainFragment : Fragment(), IWatchListener {
                 }
             }
 
+            // Store reference to the value TextView for updates
+            measurementViews[measurement.sensorType] = value
             measurementsContainer.addView(measurementView)
         }
     }
@@ -130,7 +134,7 @@ class MainFragment : Fragment(), IWatchListener {
         ) { binder ->
             // For each active measurement, trigger getRealData
             activeMeasurements.forEach { sensorType ->
-                binder.getRealData(sensorType, RealDataMeasureType.DEFAULT)
+                binder.getRealData(sensorType, RealDataMeasureType.SEQUENCE_1)
             }
         }
     }
@@ -184,6 +188,37 @@ class MainFragment : Fragment(), IWatchListener {
     override fun onDestroyView() {
         stopPeriodicMeasurements()
         super.onDestroyView()
+    }
+
+    override fun onWatchResponse(response: WatchResponse) {
+        super.onWatchResponse(response)
+        
+        // Handle different R* response types and update corresponding measurement displays
+        when (response) {
+            is RHeart -> updateMeasurementValue(RealDataSensorType.HEART, "${response.heart}")
+            is RBloodOxygen -> updateMeasurementValue(RealDataSensorType.BLOOD_OXYGEN, "${response.bloodOxygen}")
+            is RBloodPressure -> updateMeasurementValue(RealDataSensorType.BLOOD_PRESSURE, "${response.systolicPressure};${response.diastolicPressure}")
+            //is RSport -> updateMeasurementValue(RealDataSensorType.SPORT, "${response.steps}")
+            //is RRun -> updateMeasurementValue(RealDataSensorType.RUN, "${response.steps}")
+            //is RPpg -> updateMeasurementValue(RealDataSensorType.PPG, "${response.ppgValue}")
+            //is REcg -> updateMeasurementValue(RealDataSensorType.ECG, "${response.ecgValue}")
+            is RRespiration -> updateMeasurementValue(RealDataSensorType.RESPIRATION, "${response.respirationRate}")
+            //is RSensor -> updateMeasurementValue(RealDataSensorType.SENSOR, "${response.sensorValue}")
+            //is RAmbientLight -> updateMeasurementValue(RealDataSensorType.AMBIENT_LIGHT, "${response.lightValue}")
+            is RComprehensive -> updateMeasurementValue(RealDataSensorType.COMPREHENSIVE, "OK")
+            //is RSchedule -> updateMeasurementValue(RealDataSensorType.SCHEDULE, "${response.scheduleCount}")
+            //is REventReminder -> updateMeasurementValue(RealDataSensorType.EVENT_REMINDER, "${response.reminderCount}")
+            is ROga -> updateMeasurementValue(RealDataSensorType.OGA, "Data")
+            //is RInflatedBlood -> updateMeasurementValue(RealDataSensorType.INFLATED_BLOOD, "${response.systolicPressure}/${response.diastolicPressure}")
+            //is RUploadMulPhotoelectricWaveform -> updateMeasurementValue(RealDataSensorType.MUL_PHOTOELECTRIC, "${response.waveformData.size}")
+        }
+    }
+    
+    private fun updateMeasurementValue(sensorType: RealDataSensorType, value: String) {
+        // Update measurement display on UI thread
+        activity?.runOnUiThread {
+            measurementViews[sensorType]?.text = value
+        }
     }
 
     // IWatchListener implementation
