@@ -48,6 +48,13 @@ class MainActivity : AppCompatActivity(), IWatchListener {
 
         this.drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
 
+        // Load the main fragment at startup
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main_content, MainFragment())
+                .commit()
+        }
+
         //val navController = findNavController(R.id.nav_host_fragment_activity_main)
         //setupActionBarWithNavController(this, navController)
         val navigationView = findViewById<NavigationView>(R.id.nav_view)

@@ -8,7 +8,7 @@ class WatchGGetMacAddressCommand : WatchCommand(WatchOperation.GGetMacAddress, B
     // FIXME
     data class Response(val dummy: Unit = Unit) : WatchResponse() {
         companion object {
-            fun parse(buf: ByteBuffer): Response {
+            fun parse(buf: ByteBuffer): Response { // [-2] , great
                 return Response()
             }
         }

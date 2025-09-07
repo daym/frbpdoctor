@@ -26,7 +26,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetLocationIdentifierComma
 import com.friendly_machines.fr_yhe_pro.command.WatchASetMeasureIdentifierCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetPdIdentifierCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetProductInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchASetRunModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTomorrowWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAShutdown
@@ -323,7 +323,7 @@ object WatchResponseFactory {
             WatchOperation.ASetDeviceUUID -> WatchASetDeviceUUIDCommand.Response.parse(buf)
             WatchOperation.ASetTodayWeather -> WatchASetTodayWeatherCommand.Response.parse(buf)
             WatchOperation.ASetTomorrowWeather -> WatchASetTomorrowWeatherCommand.Response.parse(buf)
-            WatchOperation.ASetRunMode -> WatchASetRunModeCommand.Response.parse(buf)
+            WatchOperation.ASetSportMode -> WatchASetSportModeCommand.Response.parse(buf)
             WatchOperation.ANotificationPush -> WatchANotificationPushCommand.Response.parse(buf)
             WatchOperation.APushCallState -> WatchAPushCallStateCommand.Response.parse(buf)
             WatchOperation.APushMessage -> WatchAPushMessageCommand.Response.parse(buf)

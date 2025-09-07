@@ -1,13 +1,21 @@
 package com.friendly_machines.fr_yhe_pro.command
 
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchAPushMessageCommand(x: Byte, message: String): WatchCommand(WatchOperation.APushMessage, run {
+/**
+ * Push message command to watch.
+ * 
+ * @param pushMessageType Push message type that determines the notification type and handling behavior
+ * @param message Message text content to send to watch (UTF-8 encoded)
+ *                Units: UTF-8 string, no length limit specified
+ */
+class WatchAPushMessageCommand(pushMessageType: PushMessageType, message: String): WatchCommand(WatchOperation.APushMessage, run {
     val messageBytes = message.toByteArray(Charsets.UTF_8)
     var buf = ByteBuffer.allocate(1 + messageBytes.size)
-    buf.put(x)
+    buf.put(pushMessageType.value)
     buf.put(messageBytes)
     buf.array()
 }) {

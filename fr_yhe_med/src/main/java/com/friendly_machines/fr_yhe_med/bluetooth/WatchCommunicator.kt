@@ -3,6 +3,7 @@ package com.friendly_machines.fr_yhe_med.bluetooth
 import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
@@ -527,6 +528,8 @@ public class WatchCommunicator : IWatchCommunicator {
             )
         )
 
+        override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+
         override fun setTime() {
             val currentTimeInSeconds = System.currentTimeMillis() / 1000
             val instance: Calendar = Calendar.getInstance()
@@ -576,6 +579,8 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getChipScheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getRealData(sensorType: com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType, measureType: com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType, duration: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 

@@ -5,6 +5,7 @@ import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -19,7 +20,10 @@ import com.friendly_machines.fr_yhe_pro.Crc16
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.bigIndicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.indicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.writingPortCharacteristic
+import com.friendly_machines.fr_yhe_pro.command.WatchAGetRealData
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAPushMessageCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
@@ -46,16 +50,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchDSwitchDialCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDSyncContactsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDUpgradeResultCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetElectrodeLocationCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetEventReminderInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetMacAddressCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetMainThemeCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetManualModeStatusCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealBloodOxygenCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
@@ -388,7 +383,7 @@ class WatchCommunicator : IWatchCommunicator {
                 .retryWhen { errors ->
                     errors.flatMap { error ->
                         if (error is BleDisconnectedException) {
-                            Observable.timer(1, TimeUnit.SECONDS)
+                            Observable.timer(1, TimeUnit.SECONDS) // TODO: check
                         } else {
                             Observable.error(error)
                         }
@@ -507,6 +502,10 @@ class WatchCommunicator : IWatchCommunicator {
             WatchANotificationPushCommand(type /* FIXME */, title, content)
         )
 
+        override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(
+            WatchAPushMessageCommand(pushMessageType, message)
+        )
+
         override fun setTime() {
             val dateTime = ZonedDateTime.now()
             val year = dateTime.year.toShort()
@@ -575,16 +574,17 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchSSetWatchWearingArmCommand(arm))
         override fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort) = enqueueCommand(WatchSSetTimeLayoutCommand(watchTimePosition, rgb565Color))
         override fun getGDeviceInfo() {
-            enqueueCommand(WatchGGetDeviceInfoCommand())
-            enqueueCommand(WatchGGetDeviceNameCommand())
-            enqueueCommand(WatchGGetScreenInfoCommand())
-            enqueueCommand(WatchGGetElectrodeLocationCommand())
-            enqueueCommand(WatchGGetEventReminderInfoCommand())
-            enqueueCommand(WatchGGetMacAddressCommand())
-            enqueueCommand(WatchGGetManualModeStatusCommand())
-            enqueueCommand(WatchGGetRealBloodOxygenCommand())
-            enqueueCommand(WatchGGetRealTemperatureCommand())
-            enqueueCommand(WatchGGetScreenParametersCommand())
+            // FIXME: Re-enable
+//            enqueueCommand(WatchGGetDeviceInfoCommand())
+//            enqueueCommand(WatchGGetDeviceNameCommand())
+//            enqueueCommand(WatchGGetScreenInfoCommand())
+//            enqueueCommand(WatchGGetElectrodeLocationCommand())
+//            enqueueCommand(WatchGGetEventReminderInfoCommand())
+//            enqueueCommand(WatchGGetMacAddressCommand())
+//            enqueueCommand(WatchGGetManualModeStatusCommand())
+//            enqueueCommand(WatchGGetRealBloodOxygenCommand())
+//            enqueueCommand(WatchGGetRealTemperatureCommand())
+//            enqueueCommand(WatchGGetScreenParametersCommand())
             enqueueCommand(WatchGGetUserConfigCommand()) // this one encompasses a lot!
         }
 
@@ -619,6 +619,8 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, repeats, interval))
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchSSetScreenLitTimeCommand(screenTimeLit))
         override fun getChipScheme() = enqueueCommand(WatchGGetChipSchemeCommand())
+        override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchASetSportModeCommand(sportState, sportType))
+        override fun getRealData(sensorType: com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType, measureType: com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType, duration: Byte) = enqueueCommand(WatchAGetRealData(sensorType, measureType, duration))
 
         override fun setStepGoal(steps: Int) {
             // FIXME
