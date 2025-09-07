@@ -24,7 +24,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetCardIdentifierCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetDeviceUUIDCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetLocationIdentifierCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetMeasureIdentifierCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchASetPDIdentifierCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetPdIdentifierCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetProductInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetRunModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
@@ -95,8 +95,8 @@ import com.friendly_machines.fr_yhe_pro.command.WatchRGetRunCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSensorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRGetSportCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRUploadECGHrvCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchRUploadECGRRCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchRUploadEcgHrvCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchRUploadEcgRrCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchRUploadMulPhotoelectricWaveformCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
@@ -129,7 +129,6 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWDeleteWatchDialCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
 import java.nio.ByteBuffer
@@ -300,8 +299,8 @@ object WatchResponseFactory {
             WatchOperation.ROga -> WatchRGetOgaCommand.Response.parse(buf)
             WatchOperation.RInflatedBlood -> WatchRGetInflatedBloodCommand.Response.parse(buf)
             WatchOperation.RUploadMulPhotoelectricWaveform -> WatchRUploadMulPhotoelectricWaveformCommand.Response.parse(buf)
-            WatchOperation.RUploadECGHrv -> WatchRUploadECGHrvCommand.Response.parse(buf)
-            WatchOperation.RUploadECGRR -> WatchRUploadECGRRCommand.Response.parse(buf)
+            WatchOperation.RUploadECGHrv -> WatchRUploadEcgHrvCommand.Response.parse(buf)
+            WatchOperation.RUploadECGRR -> WatchRUploadEcgRrCommand.Response.parse(buf)
 
             // "W" section
 
@@ -333,7 +332,7 @@ object WatchResponseFactory {
             WatchOperation.ATriggerBloodTest -> WatchATriggerBloodTestCommand.Response.parse(buf)
             WatchOperation.ATriggerMeasurement -> WatchATriggerMeasurementCommand.Response.parse(buf)
             WatchOperation.ABloodSugarCalib -> WatchABloodSugarCalibCommand.Response.parse(buf)
-            WatchOperation.ASetPDIdentifier -> WatchASetPDIdentifierCommand.Response.parse(buf)
+            WatchOperation.ASetPDIdentifier -> WatchASetPdIdentifierCommand.Response.parse(buf)
             WatchOperation.ASetLocationIdentifier -> WatchASetLocationIdentifierCommand.Response.parse(buf)
             WatchOperation.ASetCardIdentifier -> WatchASetCardIdentifierCommand.Response.parse(buf)
             WatchOperation.ASetMeasureIdentifier -> WatchASetMeasureIdentifierCommand.Response.parse(buf)
