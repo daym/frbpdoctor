@@ -69,7 +69,7 @@ class WatchFaceFragment : Fragment() {
     
     private fun launchWatchfaceUpload(watchface: WatchfaceCatalogItem) {
         // Load the .bin file for the selected watchface
-        val binData = WatchfaceCatalogLoader.loadWatchfaceBinary(requireContext(), watchface)
+        val binData = WatchFaceCatalogLoader.loadWatchfaceBinary(requireContext(), watchface)
         if (binData == null) {
             // TODO: Show error toast
             return

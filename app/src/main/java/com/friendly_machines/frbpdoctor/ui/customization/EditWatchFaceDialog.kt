@@ -17,7 +17,7 @@ class EditWatchFaceDialog(private val action: WatchChangeWatchDialAction) : Dial
     }
 
     private var listener: OnWatchDialSetListener? = null
-    private var adapter: WatchfaceCatalogAdapter? = null
+    private var adapter: WatchFaceCatalogAdapter? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         val builder = AlertDialog.Builder(activity)
@@ -25,13 +25,13 @@ class EditWatchFaceDialog(private val action: WatchChangeWatchDialAction) : Dial
         val view: View = inflater.inflate(R.layout.dialog_edit_watch_dial, null)
 
         // Load watchface catalog
-        val catalog = WatchfaceCatalogLoader.loadCatalog(requireContext())
+        val catalog = WatchFaceCatalogLoader.loadCatalog(requireContext())
         
         // Set up RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.watchfaceCatalogRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         
-        adapter = WatchfaceCatalogAdapter(catalog) { selectedItem ->
+        adapter = WatchFaceCatalogAdapter(catalog) { selectedItem ->
             // Item selected - adapter handles visual selection
         }
         recyclerView.adapter = adapter
