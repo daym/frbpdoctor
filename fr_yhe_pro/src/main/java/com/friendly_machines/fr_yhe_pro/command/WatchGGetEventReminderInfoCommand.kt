@@ -30,7 +30,13 @@ class WatchGGetEventReminderInfoCommand : WatchCommand(WatchOperation.GGetEventR
                 val incidentName = if (type.toInt() == 1 && buf.hasRemaining()) {
                     val nameBytes = ByteArray(buf.remaining())
                     buf.get(nameBytes)
-                    String(nameBytes, Charsets.UTF_8)
+                    // Find null terminator and strip it
+                    val nullIndex = nameBytes.indexOf(0)
+                    if (nullIndex >= 0) {
+                        String(nameBytes, 0, nullIndex, Charsets.UTF_8)
+                    } else {
+                        String(nameBytes, Charsets.UTF_8)
+                    }
                 } else {
                     ""
                 }
