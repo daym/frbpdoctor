@@ -11,7 +11,6 @@ class WatchAHealthAlertConfigCommand(alertType: Byte, message: String) : WatchCo
     val buffer = ByteBuffer.allocate(totalSize).apply {
         order(ByteOrder.LITTLE_ENDIAN)
         put(alertType)
-        // FIXME: 0 terminate or not ?
         put(messageBytes)
     }
     buffer.array()

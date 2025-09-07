@@ -6,13 +6,14 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class WatchAHealthDataAckCommand(ackCode: Byte, message: String) : WatchCommand(WatchOperation.AHealthDataAck, run {
-    val messageBytes = if (message.isNotEmpty()) { message.toByteArray(Charsets.UTF_8) } else byteArrayOf() // FIXME: 0 ?
-    val buf = ByteBuffer.allocate(1 + messageBytes.size).order(ByteOrder.LITTLE_ENDIAN)
-    buf.put(ackCode)
-    if (messageBytes.isNotEmpty()) {
-        buf.put(messageBytes)
+    val messageBytes = message.toByteArray(Charsets.UTF_8)
+    val totalSize = 1 + messageBytes.size
+    val buffer = ByteBuffer.allocate(totalSize).apply {
+        order(ByteOrder.LITTLE_ENDIAN)
+        put(ackCode)
+        put(messageBytes)
     }
-    buf.array()
+    buffer.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {

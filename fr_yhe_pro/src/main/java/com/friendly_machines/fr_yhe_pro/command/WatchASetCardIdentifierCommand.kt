@@ -7,10 +7,14 @@ import java.nio.ByteOrder
 
 class WatchASetCardIdentifierCommand(typeCode: Byte, cardId: String) : WatchCommand(WatchOperation.ASetCardIdentifier, run {
     val cardBytes = cardId.toByteArray(Charsets.UTF_8)
-    val data = ByteArray(1 + cardBytes.size)
-    data[0] = typeCode
-    cardBytes.copyInto(data, 1) // FIXLME: 0 or not?
-    data
+    val totalSize = 1 + cardBytes.size + 1
+    val buffer = ByteBuffer.allocate(totalSize).apply {
+        order(ByteOrder.LITTLE_ENDIAN)
+        put(typeCode)
+        put(cardBytes)
+        put(0) // Add null terminator
+    }
+    buffer.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {

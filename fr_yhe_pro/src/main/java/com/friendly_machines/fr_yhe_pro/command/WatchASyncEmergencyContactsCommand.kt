@@ -10,7 +10,6 @@ class WatchASyncEmergencyContactsCommand(name: String, phone: String) : WatchCom
     val phoneBytes = phone.toByteArray(Charsets.UTF_8)
     val totalSize = 1 + nameBytes.size + 1 + phoneBytes.size
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-    // FIXME: 0 terminate maybe ?
     buffer.put(nameBytes.size.toByte())
     buffer.put(nameBytes)
     buffer.put(phoneBytes.size.toByte())

@@ -7,11 +7,12 @@ import java.nio.ByteOrder
 
 class WatchASetLocationIdentifierCommand(typeCode: Byte, locationId: String) : WatchCommand(WatchOperation.ASetLocationIdentifier, run {
         val locationBytes = locationId.toByteArray(Charsets.UTF_8)
-        val totalSize = 1 + locationBytes.size
+        val totalSize = 1 + locationBytes.size + 1
         val buffer = ByteBuffer.allocate(totalSize).apply {
             order(ByteOrder.LITTLE_ENDIAN)
             put(typeCode)
-            put(locationBytes) // TODO: 0 terminate or not ?
+            put(locationBytes)
+            put(0)
         }
         buffer.array()
 }) {
