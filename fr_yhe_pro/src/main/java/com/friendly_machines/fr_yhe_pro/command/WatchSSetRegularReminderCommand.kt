@@ -26,7 +26,6 @@ class WatchSSetRegularReminderCommand(enabled: Byte, startHour: Byte, startMinut
     data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                // VERIFIED: Original SDK case 61 (0x3D) -> L_0x004a -> packetSettingHandle reads first byte as status
                 val status = buf.get()
                 val data = if (buf.hasRemaining()) buf.get() else null
                 return Response(status = status, data = data)

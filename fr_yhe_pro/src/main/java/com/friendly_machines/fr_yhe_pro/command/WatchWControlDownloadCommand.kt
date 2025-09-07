@@ -52,7 +52,6 @@ class WatchWControlDownloadCommand(start: Boolean, length: UInt, dialPlateId: In
     data class Response(val control: Byte, val errorCode: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                // VERIFIED: Original SDK packetDialHandle case i2=0 - complex download control logic
                 // Response [1,0] triggers next() (sends next chunk), other responses use second byte as status  
                 val control = buf.get()
                 val errorCode = buf.get()

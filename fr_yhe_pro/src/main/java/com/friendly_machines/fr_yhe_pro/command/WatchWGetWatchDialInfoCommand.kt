@@ -11,7 +11,6 @@ class WatchWGetWatchDialInfoCommand : WatchCommand(WatchOperation.WGetWatchDialI
     data class Response(val items: List<WatchDialDataBlock>, val maxDialCount: Byte, val currentDialCount: UByte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                // VERIFIED: Original SDK unpackDialInfo structure matches WatchDialDataBlock.parsePro exactly
                 // byte 0: max dial count, byte 1: current dial count, bytes 2+: dial data
                 val maxDialCount = buf.get()
                 val currentDialCount = buf.get().toUByte()
