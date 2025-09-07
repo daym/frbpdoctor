@@ -8,12 +8,15 @@ import java.nio.ByteOrder
 class WatchASyncEmergencyContactsCommand(name: String, phone: String) : WatchCommand(WatchOperation.ASyncEmergencyContacts, run {
     val nameBytes = name.toByteArray(Charsets.UTF_8)
     val phoneBytes = phone.toByteArray(Charsets.UTF_8)
-    val totalSize = 1 + nameBytes.size + 1 + phoneBytes.size
-    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-    buffer.put(nameBytes.size.toByte())
-    buffer.put(nameBytes)
-    buffer.put(phoneBytes.size.toByte())
-    buffer.put(phoneBytes)
+    val totalSize = 1 + 1 + 1 + phoneBytes.size + nameBytes.size
+    val buffer = ByteBuffer.allocate(totalSize).apply {
+        order(ByteOrder.LITTLE_ENDIAN)
+        put(1) // Command prefix
+        put(phoneBytes.size.toByte())
+        put(nameBytes.size.toByte())
+        put(phoneBytes)
+        put(nameBytes)
+    }
     buffer.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {
