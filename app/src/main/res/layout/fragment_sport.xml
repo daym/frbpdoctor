@@ -41,7 +41,7 @@
                 android:layout_weight="1"
                 android:text="▶ START"
                 android:layout_marginEnd="8dp"
-                android:background="#4CAF50"
+                android:background="@color/button_start"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -51,7 +51,7 @@
                 android:layout_weight="1"
                 android:text="⏹ STOP"
                 android:layout_marginStart="8dp"
-                android:background="#F44336"
+                android:background="@color/button_stop"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>

@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="selected">#35C51B</color>
+    <color name="button_start">#4CAF50</color>
+    <color name="button_stop">#F44336</color>
 </resources>

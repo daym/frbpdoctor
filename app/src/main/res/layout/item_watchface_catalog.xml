@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="?android:attr/textColorSecondary"
             android:text="ID: 175" />
 
     </LinearLayout>
