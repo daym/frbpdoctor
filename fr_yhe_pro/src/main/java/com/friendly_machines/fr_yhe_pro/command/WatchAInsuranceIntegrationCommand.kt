@@ -5,14 +5,14 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchAInsuranceIntegrationCommand(policyType: Byte, planCode: Byte, coverageLevel: Byte, status: Byte, flags: Byte, message: String) : WatchCommand(WatchOperation.AInsuranceIntegration, run {
+class WatchAInsuranceIntegrationCommand(policyType: Byte, planCode: Byte, coverageLevel: Byte, status: Byte, timestamp: Int, message: String) : WatchCommand(WatchOperation.AInsuranceIntegration, run {
     val messageBytes = message.toByteArray(Charsets.UTF_8)
-    val buf = ByteBuffer.allocate(5 + messageBytes.size).order(ByteOrder.LITTLE_ENDIAN)
+    val buf = ByteBuffer.allocate(8 + messageBytes.size).order(ByteOrder.LITTLE_ENDIAN)
     buf.put(policyType)
     buf.put(planCode)
     buf.put(coverageLevel)
     buf.put(status)
-    buf.put(flags)
+    buf.putInt(timestamp)
     buf.put(messageBytes)
     buf.array()
 }) {

@@ -12,10 +12,10 @@ class WatchASyncEmergencyContactsCommand(name: String, phone: String) : WatchCom
     val buffer = ByteBuffer.allocate(totalSize).apply {
         order(ByteOrder.LITTLE_ENDIAN)
         put(1) // Command prefix
-        put(phoneBytes.size.toByte())
         put(nameBytes.size.toByte())
-        put(phoneBytes)
+        put(phoneBytes.size.toByte())
         put(nameBytes)
+        put(phoneBytes)
     }
     buffer.array()
 }) {
