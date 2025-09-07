@@ -60,18 +60,18 @@ class MainFragment : Fragment(), IWatchListener {
         MeasurementData("Heart Rate", "bpm", RealDataSensorType.HEART, R.drawable.ic_sensor_heart),
         MeasurementData("Blood Oxygen", "%", RealDataSensorType.BLOOD_OXYGEN, R.drawable.ic_sensor_blood_oxygen),
         MeasurementData("Blood Pressure", "mmHg", RealDataSensorType.BLOOD_PRESSURE, R.drawable.ic_sensor_blood_pressure),
-        MeasurementData("PPG", "raw", RealDataSensorType.PPG, R.drawable.ic_sensor_ppg),
-        MeasurementData("ECG", "raw", RealDataSensorType.ECG, R.drawable.ic_sensor_ecg),
-        MeasurementData("Run", "kcal", RealDataSensorType.RUN, R.drawable.ic_sensor_run),
-        MeasurementData("Respiration", "bpm", RealDataSensorType.RESPIRATION, R.drawable.ic_sensor_respiration),
-        MeasurementData("Sensor", "raw", RealDataSensorType.SENSOR, R.drawable.ic_sensor_sensor),
-        MeasurementData("Ambient Light", "raw", RealDataSensorType.AMBIENT_LIGHT, R.drawable.ic_sensor_ambient_light),
-        MeasurementData("Comprehensive", "mixed", RealDataSensorType.COMPREHENSIVE, R.drawable.ic_sensor_comprehensive),
-        MeasurementData("Schedule", "count", RealDataSensorType.SCHEDULE, R.drawable.ic_sensor_schedule),
-        MeasurementData("Event Reminder", "count", RealDataSensorType.EVENT_REMINDER, R.drawable.ic_sensor_event_reminder),
-        MeasurementData("All Data", "mixed", RealDataSensorType.OGA, R.drawable.ic_sensor_oga),
+        MeasurementData("PPG", "signal", RealDataSensorType.PPG, R.drawable.ic_sensor_ppg),
+        MeasurementData("ECG", "signal", RealDataSensorType.ECG, R.drawable.ic_sensor_ecg),
+        MeasurementData("Run", "steps", RealDataSensorType.RUN, R.drawable.ic_sensor_run),
+        MeasurementData("Respiration", "rpm", RealDataSensorType.RESPIRATION, R.drawable.ic_sensor_respiration),
+        MeasurementData("Sensor", "data", RealDataSensorType.SENSOR, R.drawable.ic_sensor_sensor),
+        MeasurementData("Ambient Light", "lux", RealDataSensorType.AMBIENT_LIGHT, R.drawable.ic_sensor_ambient_light),
+        MeasurementData("Comprehensive", "health", RealDataSensorType.COMPREHENSIVE, R.drawable.ic_sensor_comprehensive),
+        MeasurementData("Schedule", "event", RealDataSensorType.SCHEDULE, R.drawable.ic_sensor_schedule),
+        MeasurementData("Event Reminder", "alert", RealDataSensorType.EVENT_REMINDER, R.drawable.ic_sensor_event_reminder),
+        MeasurementData("All Data", "data", RealDataSensorType.OGA, R.drawable.ic_sensor_oga),
         MeasurementData("Inflated BP", "mmHg", RealDataSensorType.INFLATED_BLOOD, R.drawable.ic_sensor_inflated_blood),
-        MeasurementData("Multi Photo", "raw", RealDataSensorType.MUL_PHOTOELECTRIC, R.drawable.ic_sensor_mul_photoelectric)
+        MeasurementData("Multi Photo", "optical", RealDataSensorType.MUL_PHOTOELECTRIC, R.drawable.ic_sensor_mul_photoelectric)
     )
     private fun loadAndDisplaySVG(context: Context) {
         try {
