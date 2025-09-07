@@ -8,21 +8,21 @@
     tools:context=".ui.home.MainFragment"
     android:id="@+id/fragment_main">
 
-    <!-- Square watchface area at top -->
+    <!-- Smaller square watchface area at top -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="200dp">
         
         <ImageView
             android:id="@+id/clockView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:contentDescription="@string/clock" />
     </FrameLayout>
 
-    <!-- Scrollable flow layout for 16 measurement displays -->
+    <!-- Larger scrollable flow layout for 16 measurement displays -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
