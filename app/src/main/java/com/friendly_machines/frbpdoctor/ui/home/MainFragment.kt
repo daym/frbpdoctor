@@ -21,7 +21,12 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchRawResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
-import com.friendly_machines.fr_yhe_pro.indication.*
+import com.friendly_machines.fr_yhe_pro.indication.RBloodOxygen
+import com.friendly_machines.fr_yhe_pro.indication.RBloodPressure
+import com.friendly_machines.fr_yhe_pro.indication.RComprehensive
+import com.friendly_machines.fr_yhe_pro.indication.RHeart
+import com.friendly_machines.fr_yhe_pro.indication.ROga
+import com.friendly_machines.fr_yhe_pro.indication.RRespiration
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.google.android.flexbox.FlexboxLayout

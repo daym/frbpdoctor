@@ -23,7 +23,6 @@ import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.writingPor
 import com.friendly_machines.fr_yhe_pro.command.WatchAGetRealData
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAPushMessageCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
@@ -76,6 +75,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureMonitorComma
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
@@ -804,6 +804,13 @@ class WatchCommunicator : IWatchCommunicator {
 
                 WatchResponseType.SetAccidentMonitoringEnabled -> {
                     return if (response is WatchSSetAccidentMonitoringCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+                WatchResponseType.SetSportMode -> {
+                    return if (response is WatchASetSportModeCommand.Response) {
                         WatchResponseAnalysisResult.Ok
                     } else {
                         WatchResponseAnalysisResult.Mismatch
