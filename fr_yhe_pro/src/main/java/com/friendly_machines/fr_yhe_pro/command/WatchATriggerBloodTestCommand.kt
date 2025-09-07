@@ -2,17 +2,19 @@ package com.friendly_machines.fr_yhe_pro.command
 
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
-import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchASyncMenstrualDataCommand(timestamp: Long, cycleDay: Byte, flowLevel: Byte) : WatchCommand(WatchOperation.ASyncMenstrualData, run {
-    val offset = TimeUtils.unixMillisToWatchTime(timestamp)
-    val buf = ByteBuffer.allocate(11).order(ByteOrder.LITTLE_ENDIAN)
-    buf.putInt(offset.toInt())
-    buf.put(cycleDay)
-    buf.put(flowLevel)
-    // Rest remain 0
+class WatchATriggerBloodTestCommand(testType: Byte, param1: Byte, param2: Byte, param3: Byte, param4: Byte, param5: Byte, param6: Byte, param7: Byte) : WatchCommand(WatchOperation.ATriggerBloodTest, run { // FIXME: WHAT THE FUCK ARE THOSE PARAMETERS
+    val buf = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN)
+    buf.put(testType)
+    buf.put(param1)
+    buf.put(param2)
+    buf.put(param3)
+    buf.put(param4)
+    buf.put(param5)
+    buf.put(param6)
+    buf.put(param7)
     buf.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {

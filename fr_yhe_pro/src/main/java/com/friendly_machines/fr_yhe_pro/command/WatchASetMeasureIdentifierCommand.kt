@@ -6,13 +6,18 @@ import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class WatchASyncMenstrualDataCommand(timestamp: Long, cycleDay: Byte, flowLevel: Byte) : WatchCommand(WatchOperation.ASyncMenstrualData, run {
-    val offset = TimeUtils.unixMillisToWatchTime(timestamp)
+class WatchASetMeasureIdentifierCommand(measureType: Byte, timestamp: Long, param1: Byte, param2: Byte, param3: Byte, param4: Byte, param5: Byte, param6: Byte) : WatchCommand(WatchOperation.ASetMeasureIdentifier, run {
+    val timezoneOffset = java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()).toLong()
+    val offset = TimeUtils.localUnixMillisToWatchTime(timestamp, timezoneOffset)
     val buf = ByteBuffer.allocate(11).order(ByteOrder.LITTLE_ENDIAN)
+    buf.put(measureType)
     buf.putInt(offset.toInt())
-    buf.put(cycleDay)
-    buf.put(flowLevel)
-    // Rest remain 0
+    buf.put(param1)
+    buf.put(param2)
+    buf.put(param3)
+    buf.put(param4)
+    buf.put(param5)
+    buf.put(param6)
     buf.array()
 }) {
     data class Response(val status: Byte) : WatchResponse() {

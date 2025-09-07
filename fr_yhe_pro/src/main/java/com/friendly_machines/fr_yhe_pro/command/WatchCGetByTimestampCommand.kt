@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_pro.command
 
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
+import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -33,8 +34,7 @@ class WatchCGetByTimestampCommand(x: Byte, timestamp: Long): WatchCommand(WatchO
                 val collectTotalLen = buf.int.toUInt()
                 val collectBlockNum = buf.short.toUShort()
                 
-                // FIXME: constant
-                val collectStartTime = (946684800L + collectSendTime.toLong()) * 1000L
+                val collectStartTime = TimeUtils.watchTimeToUnixMillis(collectSendTime.toLong())
                 
                 return Response(collectType, collectSN, collectSendTime, collectStartTime, collectTotalLen, collectBlockNum, collectDigits)
             }

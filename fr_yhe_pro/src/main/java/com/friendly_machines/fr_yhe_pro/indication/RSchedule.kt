@@ -2,6 +2,7 @@ package com.friendly_machines.fr_yhe_pro.indication
 
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory.R_RESPONSE_CODE_OFFSET
+import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 
 // Note: Request should use WatchAGetRealData(sensorType = 11, measureType, duration)
@@ -25,9 +26,9 @@ data class RSchedule(
             val incidentIndex = buf.get()
             val incidentEnable = buf.get()
 
-            // FIXME: Less terrible
             val rawTime = buf.int.toLong()
-            val incidentTime = (rawTime + 946684800L) * 1000L - java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())
+            val timezoneOffset = java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()).toLong()
+            val incidentTime = TimeUtils.watchTimeToLocalUnixMillis(rawTime, timezoneOffset)
             
             val incidentId = buf.get()
             
