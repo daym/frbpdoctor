@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,7 +54,7 @@ class WatchFaceFragment : Fragment() {
         
         uploadProgressLayout = view.findViewById(R.id.uploadProgressLayout)
 
-        val addWatchDialButton = view.findViewById<Button>(R.id.addWatchDialButton)
+        val addWatchDialButton = view.findViewById<FloatingActionButton>(R.id.addWatchDialButton)
         addWatchDialButton.setOnClickListener {
             val editWatchFaceDialog = EditWatchFaceDialog(WatchChangeWatchDialAction.Add)
             editWatchFaceDialog.addListener(object : EditWatchFaceDialog.OnWatchDialSetListener {
@@ -184,7 +185,7 @@ class WatchFaceFragment : Fragment() {
         requireActivity().runOnUiThread {
             uploadProgressLayout?.visibility = if (uploading) View.VISIBLE else View.GONE
             recyclerView?.isEnabled = !uploading
-            view?.findViewById<Button>(R.id.addWatchDialButton)?.isEnabled = !uploading
+            view?.findViewById<FloatingActionButton>(R.id.addWatchDialButton)?.isEnabled = !uploading
             view?.findViewById<Button>(R.id.chooseWatchDialButton)?.isEnabled = !uploading
         }
     }

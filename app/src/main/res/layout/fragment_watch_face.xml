@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".ui.customization.WatchFaceFragment">
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -16,29 +16,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <LinearLayout
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addWatchDialButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical">
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@android:drawable/ic_menu_add"
+            android:contentDescription="@string/AddWatchDial" />
 
-            <Button
-                android:id="@+id/addWatchDialButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/AddWatchDial" />
+        <Button
+            android:id="@+id/chooseWatchDialButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="16dp"
+            android:text="@string/ChooseWatchDial" />
 
-            <Button
-                android:id="@+id/chooseWatchDialButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ChooseWatchDial" />
-
-        </LinearLayout>
-
-    </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Upload progress section - normally hidden -->
     <LinearLayout

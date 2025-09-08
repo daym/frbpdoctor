@@ -112,12 +112,6 @@ class CustomizationActivity : AppCompatActivity(), IWatchListener, MedBigRespons
             binding.tabs, binding.viewPager
         ) { tab: TabLayout.Tab, position: Int -> tab.text = adapter.getTabTitle(position) }.attach()
 
-        val fab: FloatingActionButton = binding.fab
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-
-        }
 
         handler = Handler(Looper.getMainLooper())
     }
