@@ -1,5 +1,6 @@
 package com.friendly_machines.frbpdoctor.ui.customization
 
+import android.util.Log
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
@@ -23,11 +24,18 @@ import kotlin.reflect.KClass
 
 // YHE Pro; it's important that there's only one instance live of this because otherwise we could misinterpret responses meant for others as responses meant for us.
 class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, String) -> Unit) : IWatchListener {
+    private val TAG: String = "WatchFaceController"
     private val responseChannel = Channel<WatchResponse>()
     override fun onWatchResponse(response: WatchResponse) {
         // ONLY handle responses of class 9 (W); those are very few
         if (response is WatchWControlDownloadCommand.Response || response is WatchWDeleteWatchDialCommand.Response || response is WatchWGetWatchDialInfoCommand.Response || response is WatchWNextDownloadChunkMetaCommand.Response || response is WatchWSetCurrentWatchDialCommand.Response) {
-            responseChannel.trySend(response) // FIXME: TRY? How about when it doesn't work, block someone?
+
+            val result = responseChannel.trySend(response)
+            if (result.isFailure) {
+                Log.e(TAG, "Failed to send ${response::class.simpleName}: ${result.exceptionOrNull()}")
+                responseChannel.close()
+            }
+
         }
     }
 
