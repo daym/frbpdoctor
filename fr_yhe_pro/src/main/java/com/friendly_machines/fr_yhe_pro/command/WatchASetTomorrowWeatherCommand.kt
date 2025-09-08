@@ -1,5 +1,6 @@
 package com.friendly_machines.fr_yhe_pro.command
 
+import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -24,4 +25,15 @@ class WatchASetTomorrowWeatherCommand(str1: String, str2: String, str3: String, 
     buf.put(0.toByte())
     buf.putShort(weatherCode)
     buf.array()
-})
+}) {
+    data class Response(val status: Byte) : WatchResponse() {
+        companion object {
+            fun parse(buf: ByteBuffer): Response {
+                val bytes = ByteArray(buf.remaining())
+                buf.get(bytes)
+                val status = if (bytes.isNotEmpty()) bytes.last() else 0
+                return Response(status = status)
+            }
+        }
+    }
+}

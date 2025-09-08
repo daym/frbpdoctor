@@ -5,11 +5,12 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchSSetEventReminderModeCommand(enabled: Boolean): WatchCommand(WatchOperation.SSetEventReminderMode, byteArrayOf(if (enabled) 1 else 0)) {
-    data class Response(val status: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
-                return Response(status = status)
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

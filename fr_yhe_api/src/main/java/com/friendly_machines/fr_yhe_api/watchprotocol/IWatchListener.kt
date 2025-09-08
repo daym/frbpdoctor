@@ -52,4 +52,60 @@ interface IWatchListener {
     fun onWatchSleepReminder(): Boolean {
         return false
     }
+
+    fun onWatchAlarm(): Boolean {
+        return false
+    }
+
+    fun onWatchConnectOrDisconnect(): Boolean {
+        return false
+    }
+
+    fun onWatchDynamicCode(): Boolean {
+        return false
+    }
+
+    fun onWatchEndEcg(): Boolean {
+        return false
+    }
+
+    fun onWatchInflatedBloodMeasurementResult(): Boolean {
+        return false
+    }
+
+    fun onWatchLostReminder(): Boolean {
+        return false
+    }
+
+    fun onWatchMeasurementResult(): Boolean {
+        return false
+    }
+
+    fun onWatchMeasurementStatusAndResult(): Boolean {
+        return false
+    }
+
+    fun onWatchPpiData(): Boolean {
+        return false
+    }
+
+    fun onWatchSportMode(): Boolean {
+        return false
+    }
+
+    fun onWatchSportModeControl(): Boolean {
+        return false
+    }
+
+    fun onWatchSwitchDial(): Boolean {
+        return false
+    }
+
+    fun onWatchSyncContacts(): Boolean {
+        return false
+    }
+
+    fun onWatchUpgradeResult(): Boolean {
+        return false
+    }
 }

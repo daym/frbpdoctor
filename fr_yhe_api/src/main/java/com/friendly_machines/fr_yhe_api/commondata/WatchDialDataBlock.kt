@@ -15,5 +15,4 @@ data class WatchDialDataBlock(val id: Int, val blockNumber: Short, val canDelete
             }, version = buf.short)
         }
     }
-
 }

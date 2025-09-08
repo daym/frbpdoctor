@@ -25,6 +25,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchCameraControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchMusicControlAnswer
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchPhoneCallControlAnswer
 import com.friendly_machines.frbpdoctor.AppSettings
+import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.MyApplication
 import com.friendly_machines.frbpdoctor.ui.camera.CameraActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
@@ -69,6 +70,8 @@ class WatchCommunicationService : Service(), IWatchListener {
     override fun onCreate() {
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
             return die("No bluetooth LE support in the phone")
+        if (!BluetoothPermissionHandler.checkPermissions(this))
+            return die("No bluetooth permissions granted");
         if (!areMandatorySettingsSet())
             return die("settings missing")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -95,11 +98,10 @@ class WatchCommunicationService : Service(), IWatchListener {
         super.onDestroy()
         Log.d(TAG, "Service destroyed")
     }
-//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        Log.d(TAG, "Service started")
-//        // onStartCommand can be called multiple times although the service is already running. Use this.connecting as a proxy for that.
-//        return START_STICKY // TODO opportunistic
-//    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "Service started")
+        return START_STICKY
+    }
 
 
     override fun onBind(intent: Intent): IBinder? {
@@ -271,9 +273,5 @@ class WatchCommunicationService : Service(), IWatchListener {
         super.onException(exception)
         Log.e(TAG, "Error: $exception")
         Toast.makeText(this, "Error: $exception", Toast.LENGTH_LONG).show()
-        if (exception is BleDisconnectedException) {
-            // try to reconnect
-            start()
-        }
     }
 }

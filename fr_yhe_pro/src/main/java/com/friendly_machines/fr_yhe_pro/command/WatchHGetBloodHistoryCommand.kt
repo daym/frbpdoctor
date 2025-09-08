@@ -12,8 +12,8 @@ class WatchHGetBloodHistoryCommand : WatchCommand(WatchOperation.HGetBloodHistor
     data class Response(val items: List<HBloodDataBlock>) : WatchBulkResponse(WatchOperation.HGetBloodHistory) {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                WatchBulkResponse.Companion.parseMainHeader(buf)
-                val count = buf.remaining() / HBloodDataBlock.SIZE // [-83, 2, 32, 0, 0, 0, 104, 21, 0, 0]
+                val h = WatchBulkResponse.Companion.parseMainHeader(buf)
+                val count = buf.remaining() / HBloodDataBlock.SIZE
                 return Response(items = WatchResponseFactory.parseDataBlockArray(count, buf) {
                     HBloodDataBlock.parsePro(it)
                 })

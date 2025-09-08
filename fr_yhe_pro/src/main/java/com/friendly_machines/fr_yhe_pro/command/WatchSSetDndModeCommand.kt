@@ -14,11 +14,12 @@ class WatchSSetDndModeCommand(mode: Byte, startTimeHour: Byte, startTimeMin: Byt
     buf.put(endTimeMin)
     buf.array()
 }) {
-    data class Response(val dummy: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val dummy = buf.get() // FIXME
-                return Response(dummy = dummy)
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

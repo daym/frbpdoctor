@@ -4,6 +4,8 @@ import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -18,29 +20,49 @@ import com.friendly_machines.fr_yhe_pro.Crc16
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.bigIndicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.indicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.writingPortCharacteristic
+import com.friendly_machines.fr_yhe_pro.command.WatchAGetRealData
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAPushMessageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSleepHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteTemperatureHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteAllHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportModeHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteComprehensiveHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteHeartHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetAllHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetHeartHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodOxygenHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodOxygenHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDCameraControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDConnectOrDisconnectCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDDynamicCodeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDEndEcgCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDFindMobileCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDInflatedBloodMeasurementResultCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDLostReminderCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDMeasurementResultCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDMeasurementStatusAndResultCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDMusicControlCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDPhoneCallControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDPpiDataCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDSosCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSportModeControlCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSwitchDialCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDSyncContactsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchDUpgradeResultCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetDeviceNameCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetElectrodeLocationCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetEventReminderInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetMacAddressCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetMainThemeCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetManualModeStatusCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealBloodOxygenCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
@@ -48,7 +70,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchSGetChipSchemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchGGetChipSchemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
@@ -66,21 +88,41 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureMonitorComma
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
+import com.friendly_machines.fr_yhe_pro.indication.DAlarm
 import com.friendly_machines.fr_yhe_pro.indication.DCameraControl
+import com.friendly_machines.fr_yhe_pro.indication.DConnectOrDisconnect
+import com.friendly_machines.fr_yhe_pro.indication.DDynamicCode
+import com.friendly_machines.fr_yhe_pro.indication.DEndEcg
 import com.friendly_machines.fr_yhe_pro.indication.DFindMobile
+import com.friendly_machines.fr_yhe_pro.indication.DInflatedBloodMeasurementResult
+import com.friendly_machines.fr_yhe_pro.indication.DLostReminder
+import com.friendly_machines.fr_yhe_pro.indication.DMeasurementResult
+import com.friendly_machines.fr_yhe_pro.indication.DMeasurementStatusAndResult
 import com.friendly_machines.fr_yhe_pro.indication.DMusicControl
 import com.friendly_machines.fr_yhe_pro.indication.DPhoneCallControl
+import com.friendly_machines.fr_yhe_pro.indication.DPpiData
 import com.friendly_machines.fr_yhe_pro.indication.DRegularReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSos
+import com.friendly_machines.fr_yhe_pro.indication.DSportMode
+import com.friendly_machines.fr_yhe_pro.indication.DSportModeControl
+import com.friendly_machines.fr_yhe_pro.indication.DSwitchDial
+import com.friendly_machines.fr_yhe_pro.indication.DSyncContacts
+import com.friendly_machines.fr_yhe_pro.indication.DUpgradeResult
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
 import com.polidea.rxandroidble3.exceptions.BleCharacteristicNotFoundException
 import com.polidea.rxandroidble3.exceptions.BleConflictingNotificationAlreadySetException
+import com.polidea.rxandroidble3.exceptions.BleDisconnectedException
 import com.polidea.rxandroidble3.exceptions.BleGattException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -92,6 +134,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.ZonedDateTime
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -204,6 +247,34 @@ class WatchCommunicator : IWatchCommunicator {
                 it.onWatchRegularReminder()
             } else if (response is DSleepReminder) {
                 it.onWatchSleepReminder()
+            } else if (response is DAlarm) {
+                it.onWatchAlarm()
+            } else if (response is DConnectOrDisconnect) {
+                it.onWatchConnectOrDisconnect()
+            } else if (response is DDynamicCode) {
+                it.onWatchDynamicCode()
+            } else if (response is DEndEcg) {
+                it.onWatchEndEcg()
+            } else if (response is DInflatedBloodMeasurementResult) {
+                it.onWatchInflatedBloodMeasurementResult()
+            } else if (response is DLostReminder) {
+                it.onWatchLostReminder()
+            } else if (response is DMeasurementResult) {
+                it.onWatchMeasurementResult()
+            } else if (response is DMeasurementStatusAndResult) {
+                it.onWatchMeasurementStatusAndResult()
+            } else if (response is DPpiData) {
+                it.onWatchPpiData()
+            } else if (response is DSportMode) {
+                it.onWatchSportMode()
+            } else if (response is DSportModeControl) {
+                it.onWatchSportModeControl()
+            } else if (response is DSwitchDial) {
+                it.onWatchSwitchDial()
+            } else if (response is DSyncContacts) {
+                it.onWatchSyncContacts()
+            } else if (response is DUpgradeResult) {
+                it.onWatchUpgradeResult()
             } else {
                 return
             }
@@ -222,6 +293,34 @@ class WatchCommunicator : IWatchCommunicator {
             WatchDRegularReminderCommand(handled)
         } else if (response is DSleepReminder) {
             WatchDSleepReminderCommand(handled)
+        } else if (response is DAlarm) {
+            WatchDAlarmCommand(handled)
+        } else if (response is DConnectOrDisconnect) {
+            WatchDConnectOrDisconnectCommand(handled)
+        } else if (response is DDynamicCode) {
+            WatchDDynamicCodeCommand(handled)
+        } else if (response is DEndEcg) {
+            WatchDEndEcgCommand(handled)
+        } else if (response is DInflatedBloodMeasurementResult) {
+            WatchDInflatedBloodMeasurementResultCommand(handled)
+        } else if (response is DLostReminder) {
+            WatchDLostReminderCommand(handled)
+        } else if (response is DMeasurementResult) {
+            WatchDMeasurementResultCommand(handled)
+        } else if (response is DMeasurementStatusAndResult) {
+            WatchDMeasurementStatusAndResultCommand(handled)
+        } else if (response is DPpiData) {
+            WatchDPpiDataCommand(handled)
+        } else if (response is DSportMode) {
+            WatchDSportModeCommand(handled)
+        } else if (response is DSportModeControl) {
+            WatchDSportModeControlCommand(handled)
+        } else if (response is DSwitchDial) {
+            WatchDSwitchDialCommand(handled)
+        } else if (response is DSyncContacts) {
+            WatchDSyncContactsCommand(handled)
+        } else if (response is DUpgradeResult) {
+            WatchDUpgradeResultCommand(handled)
         } else {
             return
         })
@@ -295,11 +394,21 @@ class WatchCommunicator : IWatchCommunicator {
         bleDisposables.clear()
         bleDisposables.add(
             bleDevice.establishConnection(false) // TODO timeout less than 30 s
+                .retryWhen { errors ->
+                    errors.flatMap { error ->
+                        if (error is BleDisconnectedException) {
+                            Observable.timer(1, TimeUnit.SECONDS) // TODO: check
+                        } else {
+                            Observable.error(error)
+                        }
+                    }
+                }
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
+                        //listeners.forEach { it.onConnected() }
                         setupIndications(indicationPortCharacteristic) { input ->
                             Log.d(TAG, "indication received: ${input.contentToString()}")
                             val buf = ByteBuffer.wrap(input).order(ByteOrder.BIG_ENDIAN)
@@ -370,6 +479,7 @@ class WatchCommunicator : IWatchCommunicator {
         }
     }
 
+    
     inner class WatchCommunicationServiceBinder : Binder(), IWatchBinder {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
@@ -405,6 +515,10 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setMessage2(type: Byte, time: Int, title: String, content: String) = enqueueCommand(
             WatchANotificationPushCommand(type /* FIXME */, title, content)
+        )
+
+        override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(
+            WatchAPushMessageCommand(pushMessageType, message)
         )
 
         override fun setTime() {
@@ -461,7 +575,12 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun getHeatData() = enqueueCommand(WatchHGetTemperatureHistoryCommand())
         override fun getWatchDial() = enqueueCommand(WatchWGetWatchDialInfoCommand())
-        override fun selectWatchDial(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
+        override fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort) = enqueueCommand(WatchWControlDownloadCommand.start(length = length, dialPlateId = dialPlateId, blockNumber = blockNumber, version = version, crc = crc))
+        override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchWNextDownloadChunkCommand(chunk))
+        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort) = enqueueCommand(WatchWNextDownloadChunkMetaCommand(deltaOffset, packetCount, crc))
+        override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchWControlDownloadCommand.stop(length))
+
+        override fun selectWatchFace(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
 
         override fun getSportData() = enqueueCommand(WatchHGetSportHistoryCommand())
         override fun getFileCount() = enqueueCommand(WatchCGetFileCountCommand())
@@ -470,16 +589,17 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchSSetWatchWearingArmCommand(arm))
         override fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort) = enqueueCommand(WatchSSetTimeLayoutCommand(watchTimePosition, rgb565Color))
         override fun getGDeviceInfo() {
-            enqueueCommand(WatchGGetDeviceInfoCommand())
-            enqueueCommand(WatchGGetDeviceNameCommand())
-            enqueueCommand(WatchGGetScreenInfoCommand())
-            enqueueCommand(WatchGGetElectrodeLocationCommand())
-            enqueueCommand(WatchGGetEventReminderInfoCommand())
-            enqueueCommand(WatchGGetMacAddressCommand())
-            enqueueCommand(WatchGGetManualModeStatusCommand())
-            enqueueCommand(WatchGGetRealBloodOxygenCommand())
-            enqueueCommand(WatchGGetRealTemperatureCommand())
-            enqueueCommand(WatchGGetScreenParametersCommand())
+            // FIXME: Re-enable
+//            enqueueCommand(WatchGGetDeviceInfoCommand())
+//            enqueueCommand(WatchGGetDeviceNameCommand())
+//            enqueueCommand(WatchGGetScreenInfoCommand())
+//            enqueueCommand(WatchGGetElectrodeLocationCommand())
+//            enqueueCommand(WatchGGetEventReminderInfoCommand())
+//            enqueueCommand(WatchGGetMacAddressCommand())
+//            enqueueCommand(WatchGGetManualModeStatusCommand())
+//            enqueueCommand(WatchGGetRealBloodOxygenCommand())
+//            enqueueCommand(WatchGGetRealTemperatureCommand())
+//            enqueueCommand(WatchGGetScreenParametersCommand())
             enqueueCommand(WatchGGetUserConfigCommand()) // this one encompasses a lot!
         }
 
@@ -497,9 +617,9 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
-        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(startHour, startMinute, endHour, endMinute, weekPattern, intervalInMinutes, message))
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(1, startHour, startMinute, endHour, endMinute, dayOfWeekPattern, intervalInMinutes, message))
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) {
-            enqueueCommand((WatchSSetHeartAlarmCommand(enabled, maxValue)))
+            enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, 0, maxValue.toByte())))
             // FIXME this is not safe.
             enqueueCommand((WatchSSetHeartMonitorCommand(1, interval)))
         }
@@ -513,7 +633,9 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, repeats, interval))
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchSSetScreenLitTimeCommand(screenTimeLit))
-        override fun getChipScheme() = enqueueCommand(WatchSGetChipSchemeCommand())
+        override fun getChipScheme() = enqueueCommand(WatchGGetChipSchemeCommand())
+        override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchASetSportModeCommand(sportState, sportType))
+        override fun getRealData(sensorType: com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType, measureType: com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType, duration: Byte) = enqueueCommand(WatchAGetRealData(sensorType, measureType, duration))
 
         override fun setStepGoal(steps: Int) {
             // FIXME
@@ -524,8 +646,8 @@ class WatchCommunicator : IWatchCommunicator {
             return this@WatchCommunicator.binder // FIXME is that right?
         }
 
-        override fun removeListener(it: IWatchBinder) {
-            TODO("Not yet implemented") // FIXME
+        override fun removeListener(listener: IWatchListener) {
+            listeners.remove(listener)
         }
 
         override fun resetSequenceNumbers() {
@@ -536,7 +658,7 @@ class WatchCommunicator : IWatchCommunicator {
             when (expectedResponseType) {
                 WatchResponseType.SetMessage -> {
                     return if (response is WatchANotificationPushCommand.Response) {
-                        if (response.dummy == 0.toByte()) {
+                        if (response.status == 0.toByte()) {
                             WatchResponseAnalysisResult.Ok
                         } else {
                             WatchResponseAnalysisResult.Err
@@ -702,6 +824,13 @@ class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                WatchResponseType.SetSportMode -> {
+                    return if (response is WatchASetSportModeCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
                 else -> {
                     TODO("Not implemented")
                     return WatchResponseAnalysisResult.Err
@@ -709,10 +838,26 @@ class WatchCommunicator : IWatchCommunicator {
             }
         }
 
-        // FIXME
-        fun removeListener(that: IWatchListener) {
-            return this@WatchCommunicator.removeListener(that)
-        }
+        
+        // Delete history methods for sync acknowledgment
+        override fun deleteBloodHistory() = enqueueCommand(WatchHDeleteBloodHistoryCommand())
+        override fun deleteSleepHistory() = enqueueCommand(WatchHDeleteSleepHistoryCommand())
+        override fun deleteTemperatureHistory() = enqueueCommand(WatchHDeleteTemperatureHistoryCommand())
+        override fun deleteSportHistory() = enqueueCommand(WatchHDeleteSportHistoryCommand())
+        override fun deleteAllHistory() = enqueueCommand(WatchHDeleteAllHistoryCommand())
+        override fun deleteSportModeHistory() = enqueueCommand(WatchHDeleteSportModeHistoryCommand())
+        override fun deleteComprehensiveHistory() = enqueueCommand(WatchHDeleteComprehensiveHistoryCommand())
+        override fun deleteHeartHistory() = enqueueCommand(WatchHDeleteHeartHistoryCommand())
+        
+        // Additional history data collection methods
+        override fun getAllHistoryData() = enqueueCommand(WatchHGetAllHistoryCommand())
+        override fun getHeartHistoryData() = enqueueCommand(WatchHGetHeartHistoryCommand())
+        override fun getSportModeHistoryData() = enqueueCommand(WatchHHistorySportModeCommand())
+        override fun getBloodOxygenHistoryData() = enqueueCommand(WatchHGetBloodOxygenHistoryCommand())
+        override fun getComprehensiveHistoryData() = enqueueCommand(WatchHGetComprehensiveHistoryCommand())
+        
+        // Additional delete methods
+        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchHDeleteBloodOxygenHistoryCommand())
     }
 
     override val binder = WatchCommunicationServiceBinder()

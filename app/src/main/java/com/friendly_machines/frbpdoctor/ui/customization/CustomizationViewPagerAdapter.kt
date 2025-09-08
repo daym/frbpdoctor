@@ -12,9 +12,9 @@ class CustomizationViewPagerAdapter(fragmentActivity: FragmentActivity) : Fragme
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> WatchDialFragment()
+            0 -> WatchFaceFragment()
             1 -> AlarmFragment()
-            else -> WatchDialFragment()
+            else -> WatchFaceFragment()
         }
     }
 

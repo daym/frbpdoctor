@@ -11,8 +11,13 @@ class WatchGGetDeviceNameCommand : WatchCommand(WatchOperation.GGetDeviceName, "
                 val size = buf.remaining()
                 val result = ByteArray(size)
                 buf.get(result)
-                val deviceName = result.toString(Charsets.UTF_8)
-                // FIXME strip zero terminator
+                // Find null terminator and strip it
+                val nullIndex = result.indexOf(0)
+                val deviceName = if (nullIndex >= 0) {
+                    result.sliceArray(0 until nullIndex).toString(Charsets.UTF_8)
+                } else {
+                    result.toString(Charsets.UTF_8)
+                }
                 return Response(deviceName = deviceName)
             }
         }

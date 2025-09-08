@@ -15,8 +15,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.flask.colorpicker.ColorPickerView
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+//import com.flask.colorpicker.ColorPickerView
+//import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchDriver
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
@@ -192,19 +193,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
             is ColorPreference -> {
                 val color = preference.text?.let { Color.parseColor(it) }
-                ColorPickerDialogBuilder
-                    .with(context)
-                    .setTitle("Choose color for time display")
-                    .initialColor(color ?: 0xFFFFFF)
-                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                    .density(12)
-                    .setOnColorSelectedListener { selectedColor ->
-                        preference.text = "#" + Integer.toHexString(selectedColor and 0x00FFFFFF)
-                    }
-                    .setPositiveButton("ok") { dialog, selectedColor, allColors -> }
-                    .setNegativeButton("cancel") { dialog, which -> }
-                    .build()
-                    .show()
+//                ColorPickerDialogBuilder
+//                    .with(context)
+//                    .setTitle("Choose color for time display")
+//                    .initialColor(color ?: 0xFFFFFF)
+//                    .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+//                    .density(12)
+//                    .setOnColorSelectedListener { selectedColor ->
+//                        preference.text = "#" + Integer.toHexString(selectedColor and 0x00FFFFFF)
+//                    }
+//                    .setPositiveButton("ok") { dialog, selectedColor, allColors -> }
+//                    .setNegativeButton("cancel") { dialog, which -> }
+//                    .build()
+//                    .show()
             }
 
             is DeviceGInfoPreference -> {
@@ -226,7 +227,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     private fun calculateYearsSinceDate(dateString: String): Int {
         try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            val selectedDate = dateFormat.parse(dateString)
+            val selectedDate = dateFormat.parse(dateString) ?: return 0
 
             // Calculate the difference in years between the selected date and the current date
             val currentCalendar = Calendar.getInstance()
@@ -290,9 +291,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val regularReminder = AppSettings.getUserRegularReminder(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetRegularReminder) {
                     if (regularReminder != null) {
-                        it.setRegularReminder(regularReminder.startHour, regularReminder.startMinute, regularReminder.endHour, regularReminder.endMinute, regularReminder.repeats, regularReminder.interval, regularReminder.message)
+                        it.setRegularReminder(regularReminder.startHour, regularReminder.startMinute, regularReminder.endHour, regularReminder.endMinute, DayOfWeekPattern.fromByte(regularReminder.repeats.toByte()), regularReminder.interval, regularReminder.message)
                     } else {
-                        it.setRegularReminder(0, 0, 0, 0, 0.toUByte(), 0, null)
+                        it.setRegularReminder(0, 0, 0, 0, DayOfWeekPattern.fromByte(0), 0, null)
                     }
                 }
             } else if (AppSettings.isUserLongSittingSetting(key)) {

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
@@ -19,23 +20,94 @@ import com.friendly_machines.frbpdoctor.ui.settings.SettingsFragment
 object WatchCommunicationClientShorthand {
     private const val TAG = "WatchCommunicationClientShorthand"
 
-    /** Note: It's mandatory that callback calls serviceConnection.addListener(), remembers the result and returns it */
-    private fun bind(context: Context, callback: (ServiceConnection, IWatchBinder) -> IWatchBinder): ServiceConnection? {
+    /**
+     * Bind to the watch communication service, send the given command, and wait until expectedResponse comes back.
+     * Then unbind from the watch communication service again.
+     *
+     * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
+     * Precondition: Needs BLUETOOTH_CONNECT permission. See BluetoothPermissionHandler for help.
+     */
+    fun bindExecOneCommandUnbind(context: Context, expectedResponseType: WatchResponseType, callback: (IWatchBinder) -> Unit) {
         val serviceConnection = object : ServiceConnection {
             private var disconnector: IWatchBinder? = null
+            private var currentListener: IWatchListener? = null
+            private val timeoutHandler = Handler(Looper.getMainLooper())
+            private var timeoutRunnable: Runnable? = null
+            
+            private fun cleanup() {
+                // Cancel timeout
+                timeoutRunnable?.let { runnable ->
+                    timeoutHandler.removeCallbacks(runnable)
+                }
+                timeoutRunnable = null
+                
+                // Remove listener
+                currentListener?.let { listener ->
+                    disconnector?.removeListener(listener)
+                }
+                currentListener = null
+                disconnector = null
+                
+                // Unbind service
+                context.unbindService(this)
+            }
+            
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 val binder = service as IWatchBinder
-                callback(this, binder).let {
-                    assert(this.disconnector == null)
-                    this.disconnector = it
+                
+                // Android calls onServiceConnected multiple times if service crashes/restarts - clean up previous listener
+                currentListener?.let { oldListener ->
+                    disconnector?.removeListener(oldListener)
                 }
+                
+                val listener = object : IWatchListener {
+                    override fun onWatchResponse(response: WatchResponse) {
+                        when (binder.analyzeResponse(response, expectedResponseType)) {
+                            WatchResponseAnalysisResult.Ok -> {
+                                cleanup()
+                                Log.d(SettingsFragment.TAG, "Command finished successfully with response $response")
+                                return
+                            }
+
+                            WatchResponseAnalysisResult.Mismatch -> {
+                                // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
+                            }
+
+                            WatchResponseAnalysisResult.Err -> {
+                                cleanup()
+                                Log.e(SettingsFragment.TAG, "Command ended in unexpected response $response")
+                                Toast.makeText(context, "Command ended in unexpected response $response", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                        }
+                    }
+                }
+                currentListener = listener
+                disconnector = binder.addListener(listener)
+                
+                // Set up timeout - 3 second timeout for watch response
+                timeoutRunnable = Runnable {
+                    cleanup()
+                    Log.e(TAG, "Command timed out after 3 seconds, unbinding service")
+                    Toast.makeText(context, "Watch command timed out", Toast.LENGTH_SHORT).show()
+                }
+                timeoutHandler.postDelayed(timeoutRunnable!!, 3000)
+                
+                callback(binder)
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
-                //cleanup()
-                disconnector?.let {
-                    it.removeListener(it)
+                // Android only calls this when service crashes unexpectedly, not on normal unbind.
+                // Multiple calls possible if service keeps crashing. Clean up safely.
+                timeoutRunnable?.let { runnable ->
+                    timeoutHandler.removeCallbacks(runnable)
                 }
+                timeoutRunnable = null
+                currentListener?.let { listener ->
+                    disconnector?.removeListener(listener)
+                }
+                currentListener = null
+                disconnector = null
             }
         }
 
@@ -45,48 +117,14 @@ object WatchCommunicationClientShorthand {
             )
         ) {
             Log.e(TAG, "Could not bind to WatchCommunicationService")
-            return null
-        }
-        return serviceConnection
-    }
-
-    /**
-     * Bind to the watch communication service, send the given command, and wait until expectedResponse comes back.
-     * Then unbind from the watch communication service again.
-     *
-     * Limitations: If you run this command after some other communication, some stray response could come and be confused for the response of the new command you sent (the latter of which is actually still pending).
-     */
-    fun bindExecOneCommandUnbind(context: Context, expectedResponseType: WatchResponseType, callback: (IWatchBinder) -> Unit) {
-        bind(context) { _, binder ->
-            val disconnector = binder.addListener(object : IWatchListener {
-                override fun onWatchResponse(response: WatchResponse) {
-                    when (binder.analyzeResponse(response, expectedResponseType)) {
-                        WatchResponseAnalysisResult.Ok -> {
-                            // FIXME context.unbindService(serviceConnection)
-                            Log.d(SettingsFragment.TAG, "Command finished successfully with response $response")
-                            return
-                        }
-
-                        WatchResponseAnalysisResult.Mismatch -> {
-                            // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
-                        }
-
-                        WatchResponseAnalysisResult.Err -> {
-                            Log.e(SettingsFragment.TAG, "Command ended in unexpected response $response")
-                            Toast.makeText(context, "Command ended in unexpected response $response", Toast.LENGTH_SHORT).show()
-                        }
-                        // FIXME context.unbindService(serviceConnection)
-                    }
-                }
-            })
-            callback(binder)
-            disconnector
+            return
         }
     }
 
     /**
      * Connect to the WatchCommunicationService, add listener, start a periodic task (on handler) that keeps calling callback every periodInMs ms. Uses up handler.
      * Return a handle that can be passed to unbindService.
+     * Precondition: Needs BLUETOOTH_CONNECT permission. See BluetoothPermissionHandler for help.
      */
     fun bindPeriodic(handler: Handler, periodInMs: Long, context: Context, listener: IWatchListener, callback: (IWatchBinder) -> Unit): ServiceConnection? {
         val serviceConnection = object : ServiceConnection {

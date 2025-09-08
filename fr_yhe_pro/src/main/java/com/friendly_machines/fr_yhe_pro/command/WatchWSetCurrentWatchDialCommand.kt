@@ -10,7 +10,6 @@ class WatchWSetCurrentWatchDialCommand(id: Int) : WatchCommand(WatchOperation.WS
     buf.putInt(id)
     buf.array()
 }) {
-
     data class Response(val status: Byte) : WatchResponse() { // status == 0 ok
         companion object {
             fun parse(buf: ByteBuffer): Response {

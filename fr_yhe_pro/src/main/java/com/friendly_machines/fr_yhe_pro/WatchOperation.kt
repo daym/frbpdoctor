@@ -10,7 +10,7 @@ enum class WatchOperation(val code: Short) {
 
     // Settings
 
-    SSetTime(0x0100), SAlarm(0x0101), SGoal(0x0102), SUserInfo(0x0103), SUnit(0x0104), SSetLongSitting(0x0105), SSetWatchWearingArm(0x0108), SNotification(0x010A), SHeartAlarm(0x010B), SHeartMonitor(0x10C), SFindPhone(0x010D), SRestoreFactory(0x010E), SSetDnd(0x010F), SSetLanguage(0x0112), SRaiseScreen(0x0113), SDisplayBrightness(0x0114), SSetSkin(0x0115), SSetDeviceName(0x0117), SSetMainTheme(0x0119), SSetSleepReminder(0x011A), SGetChipScheme(0x011B), SSetData(0x011E), SSetTemperatureAlarm(0x011F), SSetTemperatureMonitor(0x0120), SSetScreenLitTime(0x0121), SSetAccidentMonitoring(0x0124), SSetSchedule(0x0127), SSetScheduleSwitch(0x0129), SSetStepCountingTime(0x012A), SSetUploadReminder(0x012B), SSetEventReminder(0x012F), SSetEventReminderMode(0x0130), SSetDeviceMacAddress(0x0134), SSetSosMode(0x0136), SSetRegularReminder(0x013D),
+    SSetTime(0x0100), SAlarm(0x0101), SGoal(0x0102), SUserInfo(0x0103), SUnit(0x0104), SSetLongSitting(0x0105), SSetWatchWearingArm(0x0108), SNotification(0x010A), SHeartAlarm(0x010B), SHeartMonitor(0x010C), SFindPhone(0x010D), SRestoreFactory(0x010E), SSetDnd(0x010F), SSetLanguage(0x0112), SRaiseScreen(0x0113), SDisplayBrightness(0x0114), SSetSkin(0x0115), SSetDeviceName(0x0117), SSetMainTheme(0x0119), SSetSleepReminder(0x011A), SSetData(0x011B), SSetTemperatureAlarm(0x011F), SSetTemperatureMonitor(0x0120), SSetScreenLitTime(0x0121), SSetAccidentMonitoring(0x0124), SSetSchedule(0x0127), SSetScheduleSwitch(0x0129), SSetStepCountingTime(0x012A), SSetUploadReminder(0x012B), SSetEventReminder(0x012F), SSetEventReminderMode(0x0130), SSetDeviceMacAddress(0x0134), SSetSosMode(0x0136), SSetRegularReminder(0x013D),
     /* TODO: 0x0140: Automatic Measurement Time */
     SSetTimeLayout(0x0141),
 
@@ -33,12 +33,12 @@ enum class WatchOperation(val code: Short) {
 
     // Health
 
-    HGetSportHistory(0x0502), HGetSleepHistory(0x0504), HGetHeartHistory(0x0506), HGetBloodHistory(0x0508), HGetAllHistory(0x0509), HGetBloodOxygenHistory(0x051A), HGetTemperatureAndHumidityHistory(0x051C), HGetTemperatureHistory(0x051E), HGetAmbientLightHistory(0x0520), HGetFallHistory(0x0529), HGetHealthMonitoringHistory(0x052B), HHistorySportMode(0x052D), HGetComprehensiveMeasurementData(0x052F), HGetBackgroundReminderRecordHistory(0x0531), HDeleteSportHistory(0x0540), HDeleteSleepHistory(0x0541), HDeleteHeartHistory(0x0542), HDeleteBloodHistory(0x0543), HDeleteAllHistory(0x0544), HDeleteBloodOxygenHistory(0x0545), HDeleteTemperatureAndHumidityHistory(0x0546), HDeleteTemperatureHistory(0x0547), HDeleteAmbientLightHistory(0x0548), HDeleteFallHistory(0x0549), HDeleteHealthMonitoringHistory(0x054A), HDeleteSportModeHistory(0x054B), HDeleteComprehensiveMeasurementData(0x054C), HDeleteBackgroundReminderRecordHistory(0x054D),
-    // TODO acks (maybe delete!): 0x580 done with (payload: 1 Byte)
+    HGetSportHistory(0x0502), HGetSleepHistory(0x0504), HGetHeartHistory(0x0506), HGetBloodHistory(0x0508), HGetAllHistory(0x0509), HFIXME511(0x0511), HFIXME(0x0517), HGetBloodOxygenHistory(0x051A), HGetTemperatureAndHumidityHistory(0x051C), HGetTemperatureHistory(0x051E), HGetAmbientLightHistory(0x0520), HGetFallHistory(0x0529), HGetHealthMonitoringHistory(0x052B), HHistorySportMode(0x052D), HGetComprehensiveMeasurementData(0x052F), HGetBackgroundReminderRecordHistory(0x0531), HDeleteSportHistory(0x0540), HDeleteSleepHistory(0x0541), HDeleteHeartHistory(0x0542), HDeleteBloodHistory(0x0543), HDeleteAllHistory(0x0544), HDeleteBloodOxygenHistory(0x0545), HDeleteTemperatureAndHumidityHistory(0x0546), HDeleteTemperatureHistory(0x0547), HDeleteAmbientLightHistory(0x0548), HDeleteFallHistory(0x0549), HDeleteHealthMonitoringHistory(0x054A), HDeleteSportModeHistory(0x054B), HDeleteComprehensiveMeasurementData(0x054C), HDeleteBackgroundReminderRecordHistory(0x054D), HHistoryBlock(0x0580),
+    // TODO acks (maybe delete!): 0x580 done with (payload: 1 Byte; [0])
 
-    // We want to control watch
+    // We want to control watch (A = Action commands, sorted by hex code)
 
-    AFindDevice(0x0300), AHeartTest(0x0301), ABloodTest(0x0302), ABloodTest2(0x0303), AAppExit(0x0304), ABindDevice(0x0306), AUnbindDevice(0x0307), ANotificationPush(0x0308), ARealData(0x0309), AQuerySampleRate(0x030A), AWaveUpload(0x030B), ASetRunMode(0x030C), ATakePhoto(0x030e), ASetTodayWeather(0x0312), ASetTomorrowWeather(0x0313), AEcgRealStatus(0x0314), AShutdown(0x0316), ATemperatureCorrect(0x0317), ATemperatureMeasurementControl(0x0318), AEmoticonIndex(0x0319), AUserInfo(0x031C), APushCallState(0x032B), // etc
+    AFindDevice(0x0300), AHeartTest(0x0301), ABloodTest(0x0302), ABloodTest2(0x0303), AAppExit(0x0304), ABindDevice(0x0306), AUnbindDevice(0x0307), ANotificationPush(0x0308), ARealData(0x0309), AQuerySampleRate(0x030A), AWaveUpload(0x030B), ASetSportMode(0x030C), ATakePhoto(0x030e), ASetTodayWeather(0x0312), ASetTomorrowWeather(0x0313), AEcgRealStatus(0x0314), AHealthConfig(0x0315), AShutdown(0x0316), ATemperatureCorrect(0x0317), ATemperatureMeasurementControl(0x0318), AEmoticonIndex(0x0319), AHealthDataAck(0x031A), ASleepDataAck(0x031B), AUserInfo(0x031C), AUpgradeNotification(0x031D), AControlAmbientLight(0x031E), ATemperatureCalibration(0x031F), AControlTempHumidity(0x0320), AInsuranceIntegration(0x0321), AToggleSensors(0x0322), AMobileDeviceInfo(0x0323), AStepValidation(0x0324), AHeartValidation(0x0325), AHealthAlertConfig(0x0326), APushMessage(0x0327), ASyncEmergencyContacts(0x0328), ASyncTempHumidityCalib(0x0329), ASyncMenstrualData(0x032A), APushCallState(0x032B), ADataConfirmation(0x032C), ATriggerBloodTest(0x032E), ATriggerMeasurement(0x032F), ABloodSugarCalib(0x0331), ASetPDIdentifier(0x0332), ASetLocationIdentifier(0x0333), ASetCardIdentifier(0x0334), ASetMeasureIdentifier(0x0335), ASetProductInfo(0x0336), AUricAcidCalib(0x0337), ALipidCalib(0x0338), ASetDeviceUUID(0x0339), // etc
 
     // TODO 0x0330 push specific information (two strings, limit first to 32, limit second to 512)
 
@@ -63,19 +63,32 @@ enum class WatchOperation(val code: Short) {
     REventReminder(0x060C),
     ROga(0x060D),
     RInflatedBlood(0x060E),
+    RUploadMulPhotoelectricWaveform(0x060F),
+    RUploadEcgHrv(0x06F0),
+    RUploadEcgRr(0x06F1),
 
     // Collect
 
     // TODO: 0x0700: parse: type: Byte, number: Short
 
-    CGetSummary(0x0701),
+    CStart(0x0700), // payload example: [0], or [1], or [x]
+    CGetByIndex(0x0701),
+    CGetByTimestamp(0x0702),
     CGetFileCount(0x0705),
     CGetFileList(0x0706),
     CGetFileMetaData(0x0707),
+    CSyncData(0x0710),
+    CFileSync(0x0717),
+    CSyncCheckResult(0x0720), // we send
     CVerifyFile(0x0727),
+    CDeleteByIndex(0x0730),
+    CDeleteByTimestamp(0x0731),
 
     // Watch Dial
 
+    WControlDownload(0x0900),
+    WNextDownloadChunk(0x0901),
+    WNextDownloadChunkMeta(0x0902), // next()
     // 0x900 send watch face to watch somehow
     // 0x901 send watch face to watch somehow
     // 0x902 send watch face to watch somehow
@@ -84,6 +97,7 @@ enum class WatchOperation(val code: Short) {
     WSetCurrentWatchDial(0x0905);
 
     // TODO 0xd75 start customize data sync (arg: byte 4; or bytes 128, type, 0)
+    // TODO 0xe03
 
     companion object {
         fun parse(code: Short) = values().find { it.code == code } ?: throw WatchMessageDecodingException("unknown command code $code")

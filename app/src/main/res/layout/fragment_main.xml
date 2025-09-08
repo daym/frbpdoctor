@@ -1,21 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.home.MainFragment"
     android:id="@+id/fragment_main">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Smaller square watchface area at top -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-    <ImageView
-        android:id="@+id/clockView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:contentDescription="@string/clock" />
+        android:layout_height="200dp">
+        
+        <ImageView
+            android:id="@+id/clockView"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_gravity="center"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/clock" />
+    </FrameLayout>
 
-</FrameLayout>
+    <!-- Larger scrollable flow layout for 16 measurement displays -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+        
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/measurementsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_start"
+            app:alignItems="stretch">
+            
+            <!-- Measurements will be added programmatically -->
+            
+        </com.google.android.flexbox.FlexboxLayout>
+        
+    </ScrollView>
+
+</LinearLayout>

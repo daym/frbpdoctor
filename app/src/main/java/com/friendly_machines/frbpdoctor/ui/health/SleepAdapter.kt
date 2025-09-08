@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 
-class SleepAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock>) : RecyclerView.Adapter<SleepViewHolder>() {
+class SleepAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.HSleepDataBlock>) : RecyclerView.Adapter<SleepViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_steps, parent, false)
+            .inflate(R.layout.item_sleep, parent, false)
         return SleepViewHolder(itemView)
     }
 

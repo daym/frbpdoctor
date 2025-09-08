@@ -16,15 +16,14 @@ class WatchCGetFileMetaDataCommand(name: String, x: Int) : WatchCommand(WatchOpe
     buf.array()
 }) {
 
-    data class Response(val entries: List<FileVerification2>) : WatchResponse() {
+    data class Response(val totalSize: UInt, val totalPackage: UInt, val verifyCode: UInt) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val entries = mutableListOf<FileVerification2>()
-                // FIXME count is wrong?
-                while (buf.remaining() >= 4 + 4 + 2) {
-                    entries.add(FileVerification2.parsePro(buf))
-                }
-                return Response(entries = entries)
+                buf.order(ByteOrder.LITTLE_ENDIAN)
+                val totalSize = buf.int.toUInt()
+                val totalPackage = buf.int.toUInt()
+                val verifyCode = buf.int.toUInt()
+                return Response(totalSize, totalPackage, verifyCode)
             }
         }
     }

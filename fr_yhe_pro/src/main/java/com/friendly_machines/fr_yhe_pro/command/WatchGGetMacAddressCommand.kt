@@ -5,11 +5,11 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchGGetMacAddressCommand : WatchCommand(WatchOperation.GGetMacAddress, ByteArray(0)) {
-    data class Response(val dummy: Byte) : WatchResponse() {
+    // FIXME
+    data class Response(val dummy: Unit = Unit) : WatchResponse() {
         companion object {
-            fun parse(buf: ByteBuffer): Response {
-                val dummy = buf.get() // FIXME
-                return Response(dummy = dummy)
+            fun parse(buf: ByteBuffer): Response { // [-2] , great
+                return Response()
             }
         }
     }

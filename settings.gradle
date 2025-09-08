@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // com.github.QuadFlask:colorpicker
+        // com.github.QuadFlask:colorpicker; FIXME: missing anyway
         maven { url "https://jitpack.io" }
     }
 }

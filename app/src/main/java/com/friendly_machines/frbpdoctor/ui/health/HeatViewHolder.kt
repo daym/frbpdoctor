@@ -11,7 +11,7 @@ class HeatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val walkTextView: TextView = itemView.findViewById(R.id.walkTextView)
     private val sportTextView: TextView = itemView.findViewById(R.id.sportTextView)
 
-    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock) {
+    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.HeatDataBlockMed) {
         dayTimestampTextView.text = "Date: ${item.dayTimestamp}"
         baseTextView.text = item.base.toString()
         walkTextView.text = item.walk.toString()

@@ -13,11 +13,12 @@ class WatchSSetNotificationCommand(enabled: Boolean, flags: Array<Boolean>/*len:
     // FIXME convert flags to bytes
     buf.array()
 }) {
-    data class Response(val dummy: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val status = buf.get() // FIXME
-                return Response(dummy = status)
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

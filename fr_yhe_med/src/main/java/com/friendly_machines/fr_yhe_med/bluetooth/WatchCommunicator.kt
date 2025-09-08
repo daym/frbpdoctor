@@ -2,6 +2,8 @@ package com.friendly_machines.fr_yhe_med.bluetooth
 
 import android.os.Binder
 import android.util.Log
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
@@ -70,6 +72,7 @@ import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.Calendar
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
@@ -429,11 +432,21 @@ public class WatchCommunicator : IWatchCommunicator {
         bleDisposables.clear()
         bleDisposables.add(
             bleDevice.establishConnection(false) // TODO timeout less than 30 s
+                .retryWhen { errors ->
+                    errors.flatMap { error ->
+                        if (error is com.polidea.rxandroidble3.exceptions.BleDisconnectedException) {
+                            Observable.timer(1, TimeUnit.SECONDS)
+                        } else {
+                            Observable.error(error)
+                        }
+                    }
+                }
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ connection ->
                     run {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
+                        //listeners.forEach { it.onConnected() }
                         setupNotifications(notificationCharacteristic) { input ->
                             Log.d(TAG, "Notification received: ${input.contentToString()}")
                             bufferPacket(input)?.let {
@@ -515,6 +528,8 @@ public class WatchCommunicator : IWatchCommunicator {
             )
         )
 
+        override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+
         override fun setTime() {
             val currentTimeInSeconds = System.currentTimeMillis() / 1000
             val instance: Calendar = Calendar.getInstance()
@@ -549,7 +564,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getStepData() = enqueueCommand(WatchGetStepDataCommand())
         override fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
         override fun getWatchDial() = enqueueCommand(WatchGetWatchFaceCommand())
-        override fun selectWatchDial(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
+        override fun selectWatchFace(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
 
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
@@ -558,12 +573,14 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setUserSkinColor(enum: SkinColor) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScheduleEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getChipScheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getRealData(sensorType: com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType, measureType: com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType, duration: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
@@ -572,8 +589,8 @@ public class WatchCommunicator : IWatchCommunicator {
             return this@WatchCommunicator.binder
         }
 
-        override fun removeListener(it: IWatchBinder) {
-            TODO("Not yet implemented") // FIXME
+        override fun removeListener(listener: IWatchListener) {
+            listeners.remove(listener)
         }
 
         override fun resetSequenceNumbers() {
@@ -767,11 +784,22 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                WatchResponseType.SetSportMode -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
             }
         }
 
         override fun getFileCount() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun getFileList() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort)  = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
@@ -782,10 +810,25 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getMainTheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setMainTheme(index: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
-        // FIXME
-        fun removeListener(that: IWatchListener) {
-            return this@WatchCommunicator.removeListener(that)
-        }
+        // Delete history methods for sync acknowledgment - dummies for med protocol
+        override fun deleteBloodHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSleepHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteTemperatureHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSportHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteAllHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSportModeHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteComprehensiveHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteHeartHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        
+        // Additional history data collection methods - dummies for med protocol
+        override fun getAllHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getHeartHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getSportModeHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getBloodOxygenHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getComprehensiveHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        
+        // Additional delete methods - dummies for med protocol
+        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
     }
 
     override val binder = WatchCommunicationServiceBinder()

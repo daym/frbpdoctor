@@ -5,10 +5,12 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 class WatchSSetStepCountingTimeCommand(time: Byte) : WatchCommand(WatchOperation.SSetStepCountingTime, byteArrayOf(time)) {
-    data class Response(val status: Byte) : WatchResponse() {
+    data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                return Response(buf.get())
+                val status = buf.get()
+                val data = if (buf.hasRemaining()) buf.get() else null
+                return Response(status = status, data = data)
             }
         }
     }

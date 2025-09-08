@@ -17,11 +17,13 @@ class WatchANotificationPushCommand(type: Byte, title: String, str2: String) : W
     output.write(byteArrayOf(0))
     output.toByteArray()
 }) {
-    data class Response(val dummy: Byte) : WatchResponse() {
+    data class Response(val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
-                val dummy = buf.get() // FIXME
-                return Response(dummy = dummy)
+                val bytes = ByteArray(buf.remaining())
+                buf.get(bytes)
+                val status = if (bytes.isNotEmpty()) bytes.last() else 0
+                return Response(status = status)
             }
         }
     }

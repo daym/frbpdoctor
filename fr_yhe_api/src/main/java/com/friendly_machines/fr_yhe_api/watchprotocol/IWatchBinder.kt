@@ -1,9 +1,14 @@
 package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
-import com.friendly_machines.fr_yhe_api.commondata.MainThemeSelection
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
+import com.friendly_machines.fr_yhe_api.commondata.SportState
+import com.friendly_machines.fr_yhe_api.commondata.SportType
+import com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType
+import com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 
 interface IWatchBinder : IBinder {
     fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?)
@@ -13,6 +18,7 @@ interface IWatchBinder : IBinder {
 
     fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String)
     fun setMessage2(type: Byte, time: Int, title: String, content: String) // FIXME remove
+    fun pushMessage(pushMessageType: PushMessageType, message: String)
     fun setTime()
     fun getBatteryState()
     fun getAlarm()
@@ -33,11 +39,11 @@ interface IWatchBinder : IBinder {
     fun getStepData()
     fun getHeatData()
     fun getWatchDial()
-    fun selectWatchDial(id: Int)
+    fun selectWatchFace(id: Int)
     fun getSportData()
     fun setStepGoal(steps: Int)
     fun addListener(watchListener: IWatchListener): IWatchBinder
-    fun removeListener(it: IWatchBinder)
+    fun removeListener(listener: IWatchListener)
     fun resetSequenceNumbers()
     fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult
 
@@ -54,11 +60,45 @@ interface IWatchBinder : IBinder {
     fun setUserSkinColor(enum: SkinColor)
     fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte)
     fun setScheduleEnabled(enabled: Boolean)
-    fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, weekPattern: UByte, intervalInMinutes: Byte, message: String?)
+    fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?)
     fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
     fun setAccidentMonitoringEnabled(enabled: Boolean)
     fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
     fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte)
     fun setScreenTimeLit(screenTimeLit: Byte)
     fun getChipScheme()
+    fun setSportMode(sportState: SportState, sportType: SportType)
+    fun getRealData(sensorType: RealDataSensorType, measureType: RealDataMeasureType = RealDataMeasureType.DEFAULT, duration: Byte = 2)
+
+    fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort)
+    fun sendWatchFaceDownloadChunk(chunk: ByteArray)
+    fun nextWatchFaceDownloadChunkMeta(deltaOffset: kotlin.Int, packetCount: kotlin.UShort, crc: kotlin.UShort)
+    fun stopWatchFaceDownload(length: kotlin.UInt)
+
+//    // Validation and acknowledgment methods
+//    fun validateHeartData(validationMode: Byte)
+//    fun validateStepData(stepCount: Int, validationMode: Byte)
+//    fun acknowledgeHealthData(ackCode: Byte, message: String)
+//    fun acknowledgeSleepData(ackCode: Byte, sleepQuality: Byte, deepSleep: Byte, lightSleep: Byte, remSleep: Byte, awakeTime: Byte)
+//    fun confirmDataReceived(confirmationType: Byte, sequenceId: Byte, status: Byte)
+    
+    // Delete history methods for sync acknowledgment
+    fun deleteBloodHistory()
+    fun deleteSleepHistory()
+    fun deleteTemperatureHistory()
+    fun deleteSportHistory()
+    fun deleteAllHistory()
+    fun deleteSportModeHistory()
+    fun deleteComprehensiveHistory()
+    fun deleteHeartHistory()
+    
+    // Additional history data collection methods
+    fun getAllHistoryData()
+    fun getHeartHistoryData()
+    fun getSportModeHistoryData()
+    fun getBloodOxygenHistoryData()
+    fun getComprehensiveHistoryData()
+    
+    // Additional delete methods
+    fun deleteBloodOxygenHistory()
 }

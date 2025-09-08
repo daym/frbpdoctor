@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 
-class HeatAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock>) : RecyclerView.Adapter<HeatViewHolder>() {
+class HeatAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlockMed>) : RecyclerView.Adapter<HeatViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeatViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_heat, parent, false)

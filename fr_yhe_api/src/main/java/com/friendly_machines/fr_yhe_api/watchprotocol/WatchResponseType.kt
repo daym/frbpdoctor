@@ -21,4 +21,5 @@ enum class WatchResponseType {
     SetHeartMonitoring,
     SetAccidentMonitoringEnabled,
     SetTemperatureMonitoring,
+    SetSportMode,
 }

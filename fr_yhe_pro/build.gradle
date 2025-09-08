@@ -40,7 +40,7 @@ dependencies {
     // (see https://github.com/ReactiveX/RxJava/releases for latest 3.x.x version)
     implementation 'io.reactivex.rxjava3:rxjava:3.1.5'
 
-    implementation 'com.polidea.rxandroidble3:rxandroidble:1.17.2'
+    implementation 'com.polidea.rxandroidble3:rxandroidble:1.19.0'
 
     //implementation 'androidx.core:core-ktx:1.8.0'
     //implementation 'androidx.appcompat:appcompat:1.6.1'

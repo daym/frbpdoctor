@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 
-class SportAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>) : RecyclerView.Adapter<SportViewHolder>() {
+class SportAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.HSportDataBlock>) : RecyclerView.Adapter<SportViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SportViewHolder {
         val itemView = LayoutInflater.from(parent.context)
