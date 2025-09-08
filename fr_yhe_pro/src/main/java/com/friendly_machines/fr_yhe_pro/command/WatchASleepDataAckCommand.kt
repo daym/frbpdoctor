@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+// UNUSED
 class WatchASleepDataAckCommand(ackCode: Byte, sleepQuality: Byte, deepSleep: Byte, lightSleep: Byte, remSleep: Byte, awakeTime: Byte) : WatchCommand(WatchOperation.ASleepDataAck, run {
     val buf = ByteBuffer.allocate(6).order(ByteOrder.LITTLE_ENDIAN)
     buf.put(ackCode)

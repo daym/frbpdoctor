@@ -6,55 +6,21 @@
     android:orientation="vertical"
     tools:context=".ui.health.SportFragment">
 
-    <!-- Sport Mode Controls -->
+    <!-- Step Goal Controls -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Sport Type Selector -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sport Type:"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/sportTypeSpinner"
+        <!-- Step Goal Button -->
+        <Button
+            android:id="@+id/setStepGoalButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Control Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/playPauseButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="▶ START"
-                android:layout_marginEnd="8dp"
-                android:background="@color/button_start"
-                android:textColor="@android:color/white" />
-
-            <Button
-                android:id="@+id/stopButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="⏹ STOP"
-                android:layout_marginStart="8dp"
-                android:background="@color/button_stop"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
+            android:text="Set Step Goal"
+            android:background="@color/button_start"
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
@@ -64,5 +30,40 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <!-- Sync Controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="?android:attr/colorBackground">
+
+        <ProgressBar
+            android:id="@+id/syncProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/syncStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/syncButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sync Sport History"
+            android:background="@color/button_start"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 
 </LinearLayout>

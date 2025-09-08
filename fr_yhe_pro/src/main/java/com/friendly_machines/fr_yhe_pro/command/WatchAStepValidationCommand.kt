@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+// UNUSED
 class WatchAStepValidationCommand(stepCount: Int, validationMode: Byte) : WatchCommand(WatchOperation.AStepValidation, run {
     val buf = ByteBuffer.allocate(5).order(ByteOrder.LITTLE_ENDIAN)
     buf.putInt(stepCount)

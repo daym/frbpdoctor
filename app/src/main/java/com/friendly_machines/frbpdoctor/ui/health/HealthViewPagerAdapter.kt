@@ -7,27 +7,35 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 
 class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
-        return 5
+        return 9
     }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> BloodPressureFragment()
-            1 -> StepsFragment()
-            2 -> HeatFragment()
-            3 -> SleepFragment()
-            4 -> SportFragment()
-            else -> SleepFragment()
+            1 -> HeatFragment()
+            2 -> SleepFragment()
+            3 -> SportFragment()
+            4 -> HeartRateFragment()
+            5 -> AllSensorFragment()
+            6 -> SportModeFragment()
+            7 -> BloodOxygenFragment()
+            8 -> ComprehensiveFragment()
+            else -> BloodPressureFragment()
         }
     }
 
     fun getTabTitle(position: Int): CharSequence? {
         return when (position) {
             0 -> "Blood Pressure"
-            1 -> "Steps"
-            2 -> "Heat"
-            3 -> "Sleep"
-            4 -> "Sport"
+            1 -> "Heat"
+            2 -> "Sleep"
+            3 -> "Sport & Steps"
+            4 -> "Heart Rate"
+            5 -> "All Sensor"
+            6 -> "Sport Mode"
+            7 -> "Blood Oxygen"
+            8 -> "Comprehensive"
             else -> null
         }
     }
@@ -35,10 +43,17 @@ class HealthViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentState
     fun requestData(currentItem: Int, binder: IWatchBinder) {
         when (currentItem) {
             0 -> binder.getBpData()
-            1 -> binder.getStepData()
-            2 -> binder.getHeatData()
-            3 -> binder.getSleepData(1701730800, 1702162800) // FIXME
-            4 -> binder.getSportData()
+            1 -> binder.getHeatData()
+            2 -> binder.getSleepData(1701730800, 1702162800) // FIXME
+            3 -> {
+                binder.getSportData()
+                binder.getStepData() // Also get step data for the combined Sport & Steps tab
+            }
+            4 -> binder.getHeartHistoryData()
+            5 -> binder.getAllHistoryData()
+            6 -> binder.getSportModeHistoryData()
+            7 -> binder.getBloodOxygenHistoryData()
+            8 -> binder.getComprehensiveHistoryData()
         }
     }
 

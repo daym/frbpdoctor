@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+// UNUSED
 class WatchADataConfirmationCommand(confirmationType: Byte, sequenceId: Byte, status: Byte) : WatchCommand(WatchOperation.ADataConfirmation, run {
     val buf = ByteBuffer.allocate(6).order(ByteOrder.LITTLE_ENDIAN)
     buf.put(confirmationType)

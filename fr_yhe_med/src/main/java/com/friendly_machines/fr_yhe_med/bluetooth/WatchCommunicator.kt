@@ -810,6 +810,26 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getMainTheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setMainTheme(index: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
+        // Delete history methods for sync acknowledgment - dummies for med protocol
+        override fun deleteBloodHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSleepHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteTemperatureHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSportHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteAllHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteSportModeHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteComprehensiveHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun deleteHeartHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        
+        // Additional history data collection methods - dummies for med protocol
+        override fun getAllHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getHeartHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getSportModeHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getBloodOxygenHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun getComprehensiveHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        
+        // Additional delete methods - dummies for med protocol
+        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+
         // FIXME
         fun removeListener(that: IWatchListener) {
             return this@WatchCommunicator.removeListener(that)

@@ -5,6 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+// UNUSED
 class WatchAHealthDataAckCommand(ackCode: Byte, message: String) : WatchCommand(WatchOperation.AHealthDataAck, run {
     val messageBytes = message.toByteArray(Charsets.UTF_8)
     val totalSize = 1 + messageBytes.size

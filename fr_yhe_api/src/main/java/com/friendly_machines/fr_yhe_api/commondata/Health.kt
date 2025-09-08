@@ -1,6 +1,7 @@
 package com.friendly_machines.fr_yhe_api.commondata
 
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 fun decodeIntegerDouble(integerPart: Byte, floatPart: Byte): Double {
     if (floatPart >= 10) {
@@ -11,8 +12,8 @@ fun decodeIntegerDouble(integerPart: Byte, floatPart: Byte): Double {
 const val B: Int = 1 // "Byte" unit
 
 data class HSportDataBlock(
-    val startTime: UInt,
-    val endTime: UInt,
+    val startTime: Timestamp2000,
+    val endTime: Timestamp2000,
     val steps: UShort,
     val distance: Short,
     val calories: Short
@@ -22,8 +23,8 @@ data class HSportDataBlock(
 
         fun parsePro(buf: ByteBuffer): HSportDataBlock {
             return HSportDataBlock(
-                startTime = buf.int.toUInt(),
-                endTime = buf.int.toUInt(),
+                startTime = Timestamp2000(buf.int),
+                endTime = Timestamp2000(buf.int),
                 steps = buf.short.toUShort(),
                 distance = buf.short,
                 calories = buf.short
@@ -39,8 +40,8 @@ data class HSleepSegment(
 )
 
 data class HSleepDataBlock(
-    val startTime: Int,
-    val endTime: Int,
+    val startTime: Timestamp2000,
+    val endTime: Timestamp2000,
     val deepSleepCount: Short,
     val lightSleepCount: Short,
     val deepSleepTotal: Short,  // in seconds if deepSleepCount != 0xFFFF, else rapidEyeMovementTotal
@@ -112,31 +113,15 @@ data class HSleepDataBlock(
             }
             
             return HSleepDataBlock(
-                startTime, endTime, deepSleepCount, lightSleepCount,
+                Timestamp2000(startTime), Timestamp2000(endTime), deepSleepCount, lightSleepCount,
                 deepSleepTotal, lightSleepTotal, segments, wakeCount, wakeDuration
             )
         }
     }
 }
 
-data class HHeartDataBlock(
-    val heartStartTime: Int,
-    val r11: Byte
-) {
-    companion object {
-        const val SIZE: Int = (4 + 1 + 1)*B
-
-        fun parsePro(buf: ByteBuffer): HHeartDataBlock {
-            val heartStartTime = buf.int
-            val r11 = buf.get()
-            buf.get() // Skip 1 byte as shown in decompiled source line 3551
-            return HHeartDataBlock(heartStartTime, r11)
-        }
-    }
-}
-
 data class HBloodDataBlock(
-    val bloodStartTime: UInt,
+    val bloodStartTime: Timestamp2000,
     val isInflated: Byte,
     val bloodSystolicPressure: UByte,
     val bloodDiastolicPressure: UByte,
@@ -149,7 +134,7 @@ data class HBloodDataBlock(
             // Attempt 1: [96, 1, 16, 0], [0], [0, 0, 11], [0, 0]
             // Attempt 2: [97, 1, 17, 0], [0], [0, 8, 11], [0, 0]
             return HBloodDataBlock(
-                bloodStartTime = buf.int.toUInt(),
+                bloodStartTime = Timestamp2000(buf.int),
                 isInflated = buf.get(),
                 bloodSystolicPressure = buf.get().toUByte(),
                 bloodDiastolicPressure = buf.get().toUByte(),
@@ -158,61 +143,74 @@ data class HBloodDataBlock(
         }
     }
 }
+data class HHistoryHeartRateDataBlock(val timestamp: Timestamp2000, val heartRateInBpm: UByte) {
+    companion object {
+        fun parsePro(buf: ByteBuffer): HHistoryHeartRateDataBlock {
+            val timestamp = buf.int // FIXME: It's in s; from 2000;
+            val heartRateInBpm = buf.get().toUByte()
+            return HHistoryHeartRateDataBlock(
+                timestamp = Timestamp2000(timestamp),
+                heartRateInBpm = heartRateInBpm,
+            )
+        }
 
-data class HAllDataBlock(
-    val startTime: Int,
-    val r6: Short,
-    val r11: Byte,
-    val r4: Byte,
-    val r5: Byte,
-    val ooValue: Byte,
+        val SIZE = 6
+    }
+}
+data class HHistoryAllDataBlock(
+    val startTime: Timestamp2000,
+    val stepValue: Short,
+    val heartRate: Byte,
+    val systolicBloodPressure: Byte,
+    val diastolicBloodPressure: Byte,
+    val bloodOxygen: Byte,
     val respiratoryRateValue: Byte,
-    val hrvValue: Byte,
-    val cvrrValue: Byte,
-    val tempIntValue: Byte,
-    val tempFloatValue: Byte,
-    val bodyFatIntValue: Byte,
-    val bodyFatFloatValue: Byte,
-    val bloodSugarValue: Byte
+    val hrv: Byte,
+    val cvrr: Byte,
+    val tempInt: Byte,
+    val tempFloat: Byte,
+    val bodyFatInt: Byte,
+    val bodyFatFloat: Byte,
+    val bloodSugar: Byte
 ) {
     companion object {
         const val SIZE: Int = 20*B
 
-        fun parsePro(buf: ByteBuffer): HAllDataBlock {
+        fun parsePro(buf: ByteBuffer): HHistoryAllDataBlock {
             // FIXME parse 2 garbage bytes
-            return HAllDataBlock(
-                startTime = buf.int,
-                r6 = buf.short,
-                r11 = buf.get(),
-                r4 = buf.get(),
-                r5 = buf.get(),
-                ooValue = buf.get(),
+            return HHistoryAllDataBlock(
+                startTime = Timestamp2000(buf.int),
+                stepValue = buf.short,
+                heartRate = buf.get(),
+                systolicBloodPressure = buf.get(),
+                diastolicBloodPressure = buf.get(),
+                bloodOxygen = buf.get(),
                 respiratoryRateValue = buf.get(),
-                hrvValue = buf.get(),
-                cvrrValue = buf.get(),
-                tempIntValue = buf.get(),
-                tempFloatValue = buf.get(),
-                bodyFatIntValue = buf.get(),
-                bodyFatFloatValue = buf.get(),
-                bloodSugarValue = buf.get()
+                hrv = buf.get(),
+                cvrr = buf.get(),
+                tempInt = buf.get(),
+                tempFloat = buf.get(),
+                bodyFatInt = buf.get(),
+                bodyFatFloat = buf.get(),
+                bloodSugar = buf.get()
             )
         }
     }
 }
 
 data class HBloodOxygenDataBlock(
-    val startTime: Int,
+    val startTime: Timestamp2000,
     val type: Byte,
-    val value: Byte
+    val bloodOxygen: Byte
 ) {
     companion object {
         const val SIZE: Int = (4 + 1 + 1)*B
 
         fun parsePro(buf: ByteBuffer): HBloodOxygenDataBlock {
             return HBloodOxygenDataBlock(
-                startTime = buf.int,
+                startTime = Timestamp2000(buf.int),
                 type = buf.get(),
-                value = buf.get()
+                bloodOxygen = buf.get()
             )
         }
     }
@@ -223,7 +221,7 @@ data class HBloodOxygenDataBlock(
 //          humidValue_int: u8 -> StringBuilder.append((int) value_int); StringBuilder.append(".")
 //          humidValue_float: u8  -> StringBuilder.append((int) value_float)
 data class HTemperatureAndHumidityDataBlock(
-    val startTime: Int,
+    val startTime: Timestamp2000,
     val type: Byte,
     val temperatureInt: Byte,
     val temperatureFloat: Byte,
@@ -235,7 +233,7 @@ data class HTemperatureAndHumidityDataBlock(
 
         fun parsePro(buf: ByteBuffer): HTemperatureAndHumidityDataBlock {
             return HTemperatureAndHumidityDataBlock(
-                startTime = buf.int,
+                startTime = Timestamp2000(buf.int),
                 type = buf.get(),
                 temperatureInt = buf.get(),
                 temperatureFloat = buf.get(),
@@ -248,7 +246,7 @@ data class HTemperatureAndHumidityDataBlock(
 
 
 data class HTemperatureDataBlock(
-    val startTime: UInt,
+    val startTime: Timestamp2000,
     val type: Byte,
     val valueInt: Byte,
     val valueFloat: Byte
@@ -258,7 +256,7 @@ data class HTemperatureDataBlock(
 
         fun parsePro(buf: ByteBuffer): HTemperatureDataBlock {
             return HTemperatureDataBlock(
-                startTime = buf.int.toUInt(),
+                startTime = Timestamp2000(buf.int),
                 type = buf.get(),
                 valueInt = buf.get(),
                 valueFloat = buf.get()
@@ -268,7 +266,7 @@ data class HTemperatureDataBlock(
 }
 
 data class HAmbientLightDataBlock(
-    val startTime: Int,
+    val startTime: Timestamp2000,
     val type: Byte,
     val value: Short
 ) {
@@ -277,7 +275,7 @@ data class HAmbientLightDataBlock(
 
         fun parsePro(buf: ByteBuffer): HAmbientLightDataBlock {
             return HAmbientLightDataBlock(
-                startTime = buf.int,
+                startTime = Timestamp2000(buf.int),
                 type = buf.get(),
                 value = buf.short
             )
@@ -286,7 +284,7 @@ data class HAmbientLightDataBlock(
 }
 
 data class HFallDataBlock(
-    val time: Int,
+    val time: Timestamp2000,
     val state: Byte
 ) {
     companion object {
@@ -294,7 +292,7 @@ data class HFallDataBlock(
 
         fun parsePro(buf: ByteBuffer): HFallDataBlock {
             return HFallDataBlock(
-                time = buf.int,
+                time = Timestamp2000(buf.int),
                 state = buf.get()
             )
         }
@@ -302,7 +300,7 @@ data class HFallDataBlock(
 }
 
 data class HHealthMonitoringDataBlock(
-    val startTime: Int,
+    val startTime: Timestamp2000,
     val stepValuer6: Int,
     val r11: Byte,
     val r4: Byte,
@@ -325,7 +323,7 @@ data class HHealthMonitoringDataBlock(
 
         fun parsePro(buf: ByteBuffer): HHealthMonitoringDataBlock {
             val result = HHealthMonitoringDataBlock(
-                startTime = buf.int,
+                startTime = Timestamp2000(buf.int),
                 stepValuer6 = buf.int,
                 r11 = buf.get(),
                 r4 = buf.get(),
@@ -351,8 +349,8 @@ data class HHealthMonitoringDataBlock(
 }
 
 data class HHistorySportModeDataBlock(
-    val startTime: Int,
-    val endTime: Int,
+    val startTime: Timestamp2000,
+    val endTime: Timestamp2000,
     val steps: Int,
     val distance: Short,
     val calories: Short,
@@ -368,8 +366,8 @@ data class HHistorySportModeDataBlock(
 
         fun parsePro(buf: ByteBuffer): HHistorySportModeDataBlock {
             val result = HHistorySportModeDataBlock(
-                startTime = buf.int,
-                endTime = buf.int,
+                startTime = Timestamp2000(buf.int),
+                endTime = Timestamp2000(buf.int),
                 steps = buf.int,
                 distance = buf.short,
                 calories = buf.short,
@@ -386,8 +384,8 @@ data class HHistorySportModeDataBlock(
     }
 }
 
-data class HComprehensiveMeasurementDataBlock(
-    val timestamp: Int, // in seconds; starting at origin 2000-01-01 00:00:00 GMT
+data class HHistoryComprehensiveMeasurementDataBlock( // FIXME check
+    val timestamp: Timestamp2000, // in seconds; starting at origin 2000-01-01 00:00:00 GMT
     val bloodSugarModel: Byte,
     val bloodSugarInteger: Byte,
     val bloodSugarFloat: Byte,
@@ -409,9 +407,9 @@ data class HComprehensiveMeasurementDataBlock(
     companion object {
         const val SIZE: Int = 44*B // 22 bytes of data + 22 bytes skipped
 
-        fun parsePro(buf: ByteBuffer): HComprehensiveMeasurementDataBlock {
-            val result = HComprehensiveMeasurementDataBlock(
-                timestamp = buf.int,
+        fun parsePro(buf: ByteBuffer): HHistoryComprehensiveMeasurementDataBlock {
+            val result = HHistoryComprehensiveMeasurementDataBlock(
+                timestamp = Timestamp2000(buf.int),
                 bloodSugarModel = buf.get(),
                 bloodSugarInteger = buf.get(),
                 bloodSugarFloat = buf.get(),
@@ -438,7 +436,7 @@ data class HComprehensiveMeasurementDataBlock(
 }
 
 data class HBackgroundReminderRecordDataBlock(
-    val time: Int,
+    val time: Timestamp2000,
     val r9: Byte
 ) {
     companion object {
@@ -449,7 +447,8 @@ data class HBackgroundReminderRecordDataBlock(
             val r9 = buf.get()
             // Skip 3 bytes as shown in decompiled source line 2324
             buf.position(buf.position() + 3)
-            return HBackgroundReminderRecordDataBlock(time, r9)
+            return HBackgroundReminderRecordDataBlock(Timestamp2000(time), r9)
         }
     }
 }
+

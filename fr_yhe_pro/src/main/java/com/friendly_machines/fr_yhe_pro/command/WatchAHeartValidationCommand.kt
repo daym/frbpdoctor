@@ -4,6 +4,7 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
+// UNUSED
 class WatchAHeartValidationCommand(validationMode: Byte) : WatchCommand(WatchOperation.AHeartValidation, byteArrayOf(validationMode)) {
     data class Response(val status: Byte) : WatchResponse() {
         companion object {

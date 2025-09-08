@@ -33,7 +33,7 @@ sealed class WatchBigResponseMed {
         }
     }
 
-    data class GetSleepData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock>) : WatchBigResponseMed() {
+    data class GetSleepData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlockMed>) : WatchBigResponseMed() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -52,9 +52,9 @@ sealed class WatchBigResponseMed {
         companion object {
             fun parse(buf: ByteBuffer): GetSleepData {
                 // sleep data (big)
-                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock>()
+                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.SleepDataBlockMed>()
                 while (buf.hasRemaining()) {
-                    val item = com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock.parseMed(buf)
+                    val item = com.friendly_machines.fr_yhe_api.commondata.SleepDataBlockMed.parseMed(buf)
                     arr.add(item)
                 }
                 return GetSleepData(arr.toTypedArray())
@@ -62,7 +62,7 @@ sealed class WatchBigResponseMed {
         }
     }
 
-    data class GetHeatData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock>) : WatchBigResponseMed() {
+    data class GetHeatData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlockMed>) : WatchBigResponseMed() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -81,9 +81,9 @@ sealed class WatchBigResponseMed {
         companion object {
             fun parse(buf: ByteBuffer): GetHeatData {
                 // heat data (big)
-                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock>()
+                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlockMed>()
                 while (buf.hasRemaining()) {
-                    val item = com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock.parseMed(buf)
+                    val item = com.friendly_machines.fr_yhe_api.commondata.HeatDataBlockMed.parseMed(buf)
                     arr.add(item)
                 }
                 return GetHeatData(arr.toTypedArray())
@@ -91,7 +91,7 @@ sealed class WatchBigResponseMed {
         }
     }
 
-    data class GetStepData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock>) : WatchBigResponseMed() {
+    data class GetStepData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlockMed>) : WatchBigResponseMed() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -110,9 +110,9 @@ sealed class WatchBigResponseMed {
         companion object {
             fun parse(buf: ByteBuffer): GetStepData {
                 // step data (big)
-                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock>()
+                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.StepsDataBlockMed>()
                 while (buf.hasRemaining()) {
-                    val item = com.friendly_machines.fr_yhe_api.commondata.StepsDataBlock.parseMed(buf)
+                    val item = com.friendly_machines.fr_yhe_api.commondata.StepsDataBlockMed.parseMed(buf)
                     arr.add(item)
                 }
                 return GetStepData(arr.toTypedArray())
@@ -140,7 +140,7 @@ sealed class WatchBigResponseMed {
         }
     }
 
-    data class GetSportData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>) : WatchBigResponseMed() {
+    data class GetSportData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.SportDataBlockMed>) : WatchBigResponseMed() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -159,9 +159,9 @@ sealed class WatchBigResponseMed {
         companion object {
             fun parse(buf: ByteBuffer): GetSportData {
                 // sport data (big)
-                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>()
+                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.SportDataBlockMed>()
                 while (buf.hasRemaining()) {
-                    val item = com.friendly_machines.fr_yhe_api.commondata.SportDataBlock.parseMed(buf)
+                    val item = com.friendly_machines.fr_yhe_api.commondata.SportDataBlockMed.parseMed(buf)
                     arr.add(item)
                 }
                 return GetSportData(arr.toTypedArray())
@@ -170,7 +170,7 @@ sealed class WatchBigResponseMed {
         }
     }
 
-    data class GetBpData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.BpDataBlock>) : WatchBigResponseMed() {
+    data class GetBpData(val data: Array<com.friendly_machines.fr_yhe_api.commondata.BpDataBlockMed>) : WatchBigResponseMed() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -189,9 +189,9 @@ sealed class WatchBigResponseMed {
         companion object {
             fun parse(buf: ByteBuffer): GetBpData {
                 // bp data (big)
-                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.BpDataBlock>()
+                val arr = ArrayList<com.friendly_machines.fr_yhe_api.commondata.BpDataBlockMed>()
                 while (buf.hasRemaining()) {
-                    val item = com.friendly_machines.fr_yhe_api.commondata.BpDataBlock.parseMed(buf)
+                    val item = com.friendly_machines.fr_yhe_api.commondata.BpDataBlockMed.parseMed(buf)
                     arr.add(item)
                 }
                 return GetBpData(arr.toTypedArray())

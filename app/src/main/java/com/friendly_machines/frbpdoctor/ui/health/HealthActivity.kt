@@ -1,12 +1,15 @@
 package com.friendly_machines.frbpdoctor.ui.health
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -21,21 +24,11 @@ import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.RespiratoryRateRecord
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.units.Pressure
-import androidx.health.connect.client.units.Temperature
 import androidx.navigation.findNavController
-import com.friendly_machines.fr_yhe_api.commondata.BpDataBlock
-import com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock
-import com.friendly_machines.fr_yhe_api.commondata.SleepDataBlock
-import com.friendly_machines.fr_yhe_api.commondata.SportDataBlock
-import com.friendly_machines.fr_yhe_api.commondata.decodeIntegerDouble
+import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetSleepHistoryCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetSportHistoryCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.indication.DInflatedBloodMeasurementResult
 import com.friendly_machines.fr_yhe_pro.indication.DSleepReminder
 import com.friendly_machines.fr_yhe_pro.indication.DSportMode
@@ -45,6 +38,7 @@ import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
+import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
@@ -69,6 +63,9 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
 
     private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 0x100
     private var serviceConnection: ServiceConnection? = null
+    var watchBinder: IWatchBinder? = null
+        private set
+    private var disconnector: IWatchBinder? = null
     private val healthClient by lazy { HealthConnectClient.getOrCreate(this) }
     private val healthConnectChannelScope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -78,18 +75,50 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     override fun onStart() {
         super.onStart()
         BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
-            this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 10000, this, this) { binder ->
-                (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+            // Create ServiceConnection directly like WatchFaceDownloadingFragment
+            val connection = object : ServiceConnection {
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    watchBinder = service as IWatchBinder
+                    disconnector = watchBinder?.addListener(this@HealthActivity)
+                    
+                    // Start the periodic data refresh
+                    handler.post(object : Runnable {
+                        override fun run() {
+                            watchBinder?.let { binder ->
+                                (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
+                            }
+                            handler.postDelayed(this, 10000)
+                        }
+                    })
+                }
+                
+                override fun onServiceDisconnected(name: ComponentName?) {
+                    disconnector?.let { disc ->
+                        disc.removeListener(disc)
+                    }
+                    disconnector = null
+                    watchBinder = null
+                    handler.removeCallbacksAndMessages(null)
+                }
             }
+            
+            serviceConnection = connection
+            val serviceIntent = Intent(this, WatchCommunicationService::class.java)
+            bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
-        serviceConnection?.let {
-            unbindService(it)
+        disconnector?.let { disc ->
+            disc.removeListener(disc)
+        }
+        disconnector = null
+        serviceConnection?.let { connection ->
+            unbindService(connection)
             serviceConnection = null
         }
+        watchBinder = null
         super.onStop()
     }
 
@@ -98,8 +127,8 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
         healthConnectChannelScope.cancel()
         handler.removeCallbacksAndMessages(null)
         // Just to make sure
-        serviceConnection?.let {
-            unbindService(it)
+        serviceConnection?.let { connection ->
+            unbindService(connection)
             serviceConnection = null
         }
 
@@ -288,71 +317,13 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
         when (response) {
             // = Pro =; TODO: add commondata interface
 
-            is WatchHGetBloodHistoryCommand.Response -> {
-                supportFragmentManager.fragments.filterIsInstance<BloodPressureFragment>().forEach { fragment ->
-                    fragment.setData(response.items.map {
-                        BpDataBlock(systolicPressure = it.bloodSystolicPressure, diastolicPressure = it.bloodDiastolicPressure, pulse = 0U, timestamp = it.bloodStartTime) // FIXME
-                    }.toTypedArray())
-                }
-                try {
-                    queueHealthRecordsInsertion(response.items.map {
-                        BloodPressureRecord(time = instantFromUnix(it.bloodStartTime), zoneOffset = null, systolic = Pressure.millimetersOfMercury(it.bloodSystolicPressure.toDouble()), diastolic = Pressure.millimetersOfMercury(it.bloodDiastolicPressure.toDouble())) // FIXME zoneOffset, measurementLocation
-                    })
-                    // TODO delete from watch maybe
-                } catch (e: RuntimeException) {
-                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
+            // Blood pressure handling moved to BloodHistoryController
 
-            is WatchHGetTemperatureHistoryCommand.Response -> {
-                supportFragmentManager.fragments.filterIsInstance<HeatFragment>().forEach { fragment ->
-                    fragment.setData(response.items.map {
-                        HeatDataBlock(dayTimestamp = it.startTime, base = 0, sport = 0, walk = 0) // FIXME
-                    }.toTypedArray())
-                }
-                try {
-                    queueHealthRecordsInsertion(response.items.map {
-                        BodyTemperatureRecord(time = instantFromUnix(it.startTime), zoneOffset = null, temperature = Temperature.celsius(decodeIntegerDouble(it.valueInt, it.valueFloat))) // FIXME zoneOffset, measurementLocation
-                    })
-                    // TODO delete from watch maybe
-                } catch (e: RuntimeException) {
-                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
+            // Temperature history handling moved to HeatHistoryController
 
-            is WatchHGetSportHistoryCommand.Response -> {
-                supportFragmentManager.fragments.filterIsInstance<SportFragment>().forEach { fragment ->
-                    fragment.setData(response.items.map {
-                        SportDataBlock(timestamp = it.startTime, sportType = 0U, avgHeartRate = 0U, heat = 0, runningDistance = it.distance, duration = (it.endTime - it.startTime).toUShort(), speed = 0, stepCount = it.steps.toInt()) // FIXME endTime, calories
-                    }.toTypedArray())
-                }
-                try {
-                    queueHealthRecordsInsertion(response.items.map {
-                        // FIXME it.distance, it.steps, it.calories
-                        ExerciseSessionRecord(startTime = instantFromUnix(it.startTime), endTime = instantFromUnix(it.endTime), exerciseRoute = null, startZoneOffset = null, endZoneOffset = null, exerciseType = 0) // FIXME zoneOffset, exerciseType, title, notes, segments, laps, exerciseRoute.
-                    })
-                    // TODO delete from watch maybe
-                } catch (e: RuntimeException) {
-                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
+            // Sport history handling moved to SportHistoryController
 
-            is WatchHGetSleepHistoryCommand.Response -> {
-                supportFragmentManager.fragments.filterIsInstance<SleepFragment>().forEach { fragment ->
-                    fragment.setData(response.items.map {
-                        SleepDataBlock(startTimestamp = 0U, endTimestamp = 0U, quality = 0) // FIXME !!!!
-                    }.toTypedArray())
-                }
-//                    try {
-//                    insertHealthRecords(response.items.map {
-//                        // TODO: quality -> notes
-//                        SleepSessionRecord(startTime = instantFromUnix(it.), endTime = instantFromUnix(it.), endZoneOffset = null, startZoneOffset = null) // TODO zone
-//                    })
-//                     TODO delete from watch maybe
-//                } catch (e: RuntimeException) {
-//            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-//        }
-            }
+            // Sleep history handling moved to SleepHistoryController
 
             is DInflatedBloodMeasurementResult -> {
                 // TODO
@@ -372,41 +343,6 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     private val bigBuffers = MedBigResponseBuffer()
     override fun onBigWatchResponse(response: com.friendly_machines.fr_yhe_med.WatchBigResponseMed) {
         Log.d(TAG, "-> big decoded: $response")
-        when (response) {
-            is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetSleepData -> {
-                supportFragmentManager.fragments.filterIsInstance<SleepFragment>().forEach { fragment ->
-                    fragment.setData(response.data)
-                }
-            }
-
-            is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetHeatData -> {
-                supportFragmentManager.fragments.filterIsInstance<HeatFragment>().forEach { fragment ->
-                    fragment.setData(response.data)
-                }
-            }
-
-            is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetStepData -> {
-                supportFragmentManager.fragments.filterIsInstance<StepsFragment>().forEach { fragment ->
-                    fragment.setData(response.data)
-                }
-            }
-
-            is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetBpData -> {
-                supportFragmentManager.fragments.filterIsInstance<BloodPressureFragment>().forEach { fragment ->
-                    fragment.setData(response.data)
-                }
-            }
-
-            is com.friendly_machines.fr_yhe_med.WatchBigResponseMed.GetSportData -> {
-                supportFragmentManager.fragments.filterIsInstance<SportFragment>().forEach { fragment ->
-                    fragment.setData(response.data)
-                }
-            }
-
-            else -> {
-
-            }
-        }
     }
 
     override fun onException(exception: Throwable) {

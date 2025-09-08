@@ -1,8 +1,8 @@
 package com.friendly_machines.fr_yhe_pro.command
 
+import com.friendly_machines.fr_yhe_api.commondata.TimeUtils
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
-import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

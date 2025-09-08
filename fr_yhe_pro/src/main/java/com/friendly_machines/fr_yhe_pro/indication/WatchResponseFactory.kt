@@ -70,7 +70,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetAmbientLightHistoryComm
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBackgroundReminderRecordHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodOxygenHistoryCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveMeasurementDataCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetFallHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetHealthMonitoringHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetHeartHistoryCommand
@@ -260,7 +260,7 @@ object WatchResponseFactory {
             WatchOperation.HGetFallHistory -> WatchHGetFallHistoryCommand.Response.parse(buf)
             WatchOperation.HGetHealthMonitoringHistory -> WatchHGetHealthMonitoringHistoryCommand.Response.parse(buf)
             WatchOperation.HHistorySportMode -> WatchHHistorySportModeCommand.Response.parse(buf)
-            WatchOperation.HGetComprehensiveMeasurementData -> WatchHGetComprehensiveMeasurementDataCommand.Response.parse(buf)
+            WatchOperation.HGetComprehensiveMeasurementData -> WatchHGetComprehensiveHistoryCommand.Response.parse(buf)
             WatchOperation.HGetBackgroundReminderRecordHistory -> WatchHGetBackgroundReminderRecordHistoryCommand.Response.parse(buf)
             WatchOperation.HHistoryBlock -> WatchHHistoryBlockCommand.Response.parse(buf)
 

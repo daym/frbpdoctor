@@ -1,31 +1,36 @@
 package com.friendly_machines.frbpdoctor.ui.health
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Spinner
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.friendly_machines.fr_yhe_api.commondata.SportState
-import com.friendly_machines.fr_yhe_api.commondata.SportType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
+import kotlinx.coroutines.launch
 
 class SportFragment : Fragment() {
 
     private var recyclerView: RecyclerView? = null
-    private lateinit var sportTypeSpinner: Spinner
-    private lateinit var playPauseButton: Button
-    private lateinit var stopButton: Button
+    private lateinit var setStepGoalButton: Button
     
-    private var currentSportState: SportState = SportState.STOP
-    private var currentSportType: SportType = SportType.WALKING
+    // Sync controls
+    private lateinit var syncButton: Button
+    private var activeController: SportHistoryController? = null
+    
+    companion object {
+        private const val TAG = "SportFragment"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,119 +43,95 @@ class SportFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize UI components
-        sportTypeSpinner = view.findViewById(R.id.sportTypeSpinner)
-        playPauseButton = view.findViewById(R.id.playPauseButton)
-        stopButton = view.findViewById(R.id.stopButton)
+        setStepGoalButton = view.findViewById(R.id.setStepGoalButton)
         
         val recyclerView = view.findViewById<RecyclerView>(R.id.list)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         this.recyclerView = recyclerView
 
-        // Set up sport type spinner
-        setupSportTypeSpinner()
-        
+        // Initialize sync controls
+        syncButton = view.findViewById<Button>(R.id.syncButton).apply {
+            setOnClickListener { toggleSync() }
+        }
+
         // Set up button listeners
-        setupButtonListeners()
+        setupStepGoalButton()
         
         // Update button states
-        updateButtonStates()
+        updateSyncButtonState()
     }
 
-    private fun setupSportTypeSpinner() {
-        val sportTypes = SportType.values().map { it.name.replace('_', ' ') }
-        val adapter = ArrayAdapter(requireContext(), R.layout.spinner_item, sportTypes)
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
-        sportTypeSpinner.adapter = adapter
-        
-        // Set default selection
-        sportTypeSpinner.setSelection(SportType.WALKING.ordinal)
-    }
 
-    private fun setupButtonListeners() {
-        playPauseButton.setOnClickListener {
-            val selectedSportType = SportType.values()[sportTypeSpinner.selectedItemPosition]
-            
-            when (currentSportState) {
-                SportState.STOP -> {
-                    // Start sport mode
-                    setSportMode(SportState.START, selectedSportType)
-                }
-                SportState.START -> {
-                    // Pause sport mode
-                    setSportMode(SportState.PAUSE, selectedSportType)
-                }
-                SportState.PAUSE -> {
-                    // Continue sport mode
-                    setSportMode(SportState.CONTINUE, selectedSportType)
-                }
-                SportState.CONTINUE -> {
-                    // Pause sport mode
-                    setSportMode(SportState.PAUSE, selectedSportType)
-                }
-            }
-        }
+    private fun setupStepGoalButton() {
+        setStepGoalButton.setOnClickListener {
+            val stepGoalEditText = EditText(requireContext())
+            stepGoalEditText.inputType = InputType.TYPE_CLASS_NUMBER
+            stepGoalEditText.hint = "Number of steps"
 
-        stopButton.setOnClickListener {
-            val selectedSportType = SportType.values()[sportTypeSpinner.selectedItemPosition]
-            setSportMode(SportState.STOP, selectedSportType)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Your target number of steps")
+                .setMessage("What number of steps do you target?") // TODO translate
+                .setView(stepGoalEditText)
+                .setPositiveButton("Set Step Goal") { _, _ ->
+                    val stepGoalText = stepGoalEditText.text.toString()
+                    try {
+                        val stepGoal = Integer.parseInt(stepGoalText)
+                        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(
+                            requireContext(), 
+                            WatchResponseType.SetStepGoal
+                        ) { binder ->
+                            binder.setStepGoal(stepGoal)
+                        }
+                        Toast.makeText(requireContext(), "Step goal set to $stepGoal", Toast.LENGTH_SHORT).show()
+                    } catch (e: NumberFormatException) {
+                        Toast.makeText(requireContext(), "Number of steps wasn't a positive number", Toast.LENGTH_LONG).show()
+                    }
+                }
+                .setNegativeButton("Cancel") { _, _ -> }
+                .show()
         }
     }
 
-    private fun setSportMode(sportState: SportState, sportType: SportType) {
-        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetSportMode) { binder ->
-            binder.setSportMode(sportState, sportType)
-        }
-        
-        // Update local state and UI
-        currentSportState = sportState
-        currentSportType = sportType
-        updateButtonStates()
-        
-        Toast.makeText(requireContext(), "Sport mode: ${sportState.name} ${sportType.name}", Toast.LENGTH_SHORT).show()
-    }
 
-    private fun updateButtonStates() {
-        when (currentSportState) {
-            SportState.STOP -> {
-                playPauseButton.text = "▶ START"
-                playPauseButton.isEnabled = true
-                stopButton.isEnabled = false
-                sportTypeSpinner.isEnabled = true // Can change sport type when stopped
-            }
-            SportState.START -> {
-                playPauseButton.text = "⏸ PAUSE"
-                playPauseButton.isEnabled = true
-                stopButton.isEnabled = true
-                sportTypeSpinner.isEnabled = false // Cannot change sport type while running
-            }
-            SportState.PAUSE -> {
-                playPauseButton.text = "▶ CONTINUE"
-                playPauseButton.isEnabled = true
-                stopButton.isEnabled = true
-                sportTypeSpinner.isEnabled = false // Cannot change sport type while paused
-            }
-            SportState.CONTINUE -> {
-                playPauseButton.text = "⏸ PAUSE"
-                playPauseButton.isEnabled = true
-                stopButton.isEnabled = true
-                sportTypeSpinner.isEnabled = false // Cannot change sport type while running
+    // Data is now managed directly by SportHistoryController - no manual setData needed
+
+    
+    private fun toggleSync() {
+        activeController?.let { controller ->
+            controller.close()
+            activeController = null
+        } ?: lifecycleScope.launch {
+            val activity = requireActivity() as HealthActivity
+            val controller = SportHistoryController.collect(
+                binder = activity.watchBinder!!,
+                context = requireContext(),
+                recyclerView = recyclerView,
+                onProgress = { _, _, _ -> updateSyncButtonState() },
+                onComplete = { 
+                    activeController = null
+                    updateSyncButtonState() 
+                },
+                onError = { 
+                    activeController = null
+                    updateSyncButtonState() 
+                }
+            )
+            if (controller != null) {
+                activeController = controller
+                updateSyncButtonState()
             }
         }
     }
 
-    // Method to handle watch-initiated state changes
-    fun onSportStateChanged(sportState: SportState, sportType: SportType) {
-        currentSportState = sportState
-        currentSportType = sportType
-        
-        // Update spinner selection if sport type changed
-        sportTypeSpinner.setSelection(sportType.ordinal)
-        
-        updateButtonStates()
+    private fun updateSyncButtonState() {
+        val isActive = HistoryControllerRegistry.isOperationActive(
+            SportHistoryController.RESPONSE_TYPES, 
+            SportHistoryController.MED_BIG_RESPONSE_TYPES
+        )
+        syncButton.text = if (isActive) "Cancel" else "Sync"
     }
 
-    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.SportDataBlock>) {
-        val adapter = SportAdapter(data.sortedBy { it.timestamp })
-        recyclerView!!.adapter = adapter
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 }

@@ -74,4 +74,31 @@ interface IWatchBinder : IBinder {
     fun sendWatchFaceDownloadChunk(chunk: ByteArray)
     fun nextWatchFaceDownloadChunkMeta(deltaOffset: kotlin.Int, packetCount: kotlin.UShort, crc: kotlin.UShort)
     fun stopWatchFaceDownload(length: kotlin.UInt)
+
+//    // Validation and acknowledgment methods
+//    fun validateHeartData(validationMode: Byte)
+//    fun validateStepData(stepCount: Int, validationMode: Byte)
+//    fun acknowledgeHealthData(ackCode: Byte, message: String)
+//    fun acknowledgeSleepData(ackCode: Byte, sleepQuality: Byte, deepSleep: Byte, lightSleep: Byte, remSleep: Byte, awakeTime: Byte)
+//    fun confirmDataReceived(confirmationType: Byte, sequenceId: Byte, status: Byte)
+    
+    // Delete history methods for sync acknowledgment
+    fun deleteBloodHistory()
+    fun deleteSleepHistory()
+    fun deleteTemperatureHistory()
+    fun deleteSportHistory()
+    fun deleteAllHistory()
+    fun deleteSportModeHistory()
+    fun deleteComprehensiveHistory()
+    fun deleteHeartHistory()
+    
+    // Additional history data collection methods
+    fun getAllHistoryData()
+    fun getHeartHistoryData()
+    fun getSportModeHistoryData()
+    fun getBloodOxygenHistoryData()
+    fun getComprehensiveHistoryData()
+    
+    // Additional delete methods
+    fun deleteBloodOxygenHistory()
 }

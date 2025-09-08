@@ -4,38 +4,66 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
+import kotlinx.coroutines.launch
 
 class HeatFragment : Fragment() {
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var syncButton: Button
+    private var activeController: HeatHistoryController? = null
 
-    private var recyclerView: RecyclerView? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_heat, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val recyclerView = view.findViewById<RecyclerView>(R.id.list)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-//        val data = mutableListOf<SleepDataBlock>()
-//        val adapter = HeatAdapter(data)
-//        recyclerView.adapter = adapter
-        //adapter.notifyDataSetChanged()
-        this.recyclerView = recyclerView
+        recyclerView = view.findViewById<RecyclerView>(R.id.list).apply {
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+        syncButton = view.findViewById<Button>(R.id.syncButton).apply {
+            setOnClickListener { toggleSync() }
+        }
+        updateButtonState()
     }
 
-    fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.HeatDataBlock>) {
-        val adapter = HeatAdapter(data.sortedBy { it.dayTimestamp })
-        recyclerView!!.adapter = adapter
-        //adapter.notifyDataSetChanged()
+    private fun toggleSync() {
+        activeController?.let { controller ->
+            controller.close()
+            activeController = null
+        } ?: lifecycleScope.launch {
+            val activity = requireActivity() as HealthActivity
+            val controller = HeatHistoryController.collect(
+                binder = activity.watchBinder!!,
+                context = requireContext(),
+                recyclerView = recyclerView,
+                onProgress = { _, _, _ -> updateButtonState() },
+                onComplete = { 
+                    activeController = null
+                    updateButtonState() 
+                },
+                onError = { 
+                    activeController = null
+                    updateButtonState() 
+                }
+            )
+            if (controller != null) {
+                activeController = controller
+                updateButtonState()
+            }
+        }
     }
 
+    private fun updateButtonState() {
+        val isActive = HistoryControllerRegistry.isOperationActive(
+            HeatHistoryController.RESPONSE_TYPES, 
+            HeatHistoryController.MED_BIG_RESPONSE_TYPES
+        )
+        syncButton.text = if (isActive) "Cancel" else "Sync"
+    }
 }

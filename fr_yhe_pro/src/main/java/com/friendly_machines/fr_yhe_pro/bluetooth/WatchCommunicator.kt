@@ -27,6 +27,19 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSleepHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteTemperatureHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteAllHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportModeHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteComprehensiveHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteHeartHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetAllHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetHeartHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetBloodOxygenHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodOxygenHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDCameraControlCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchDConnectOrDisconnectCommand
@@ -76,6 +89,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
@@ -827,6 +841,26 @@ class WatchCommunicator : IWatchCommunicator {
         fun removeListener(that: IWatchListener) {
             return this@WatchCommunicator.removeListener(that)
         }
+        
+        // Delete history methods for sync acknowledgment
+        override fun deleteBloodHistory() = enqueueCommand(WatchHDeleteBloodHistoryCommand())
+        override fun deleteSleepHistory() = enqueueCommand(WatchHDeleteSleepHistoryCommand())
+        override fun deleteTemperatureHistory() = enqueueCommand(WatchHDeleteTemperatureHistoryCommand())
+        override fun deleteSportHistory() = enqueueCommand(WatchHDeleteSportHistoryCommand())
+        override fun deleteAllHistory() = enqueueCommand(WatchHDeleteAllHistoryCommand())
+        override fun deleteSportModeHistory() = enqueueCommand(WatchHDeleteSportModeHistoryCommand())
+        override fun deleteComprehensiveHistory() = enqueueCommand(WatchHDeleteComprehensiveHistoryCommand())
+        override fun deleteHeartHistory() = enqueueCommand(WatchHDeleteHeartHistoryCommand())
+        
+        // Additional history data collection methods
+        override fun getAllHistoryData() = enqueueCommand(WatchHGetAllHistoryCommand())
+        override fun getHeartHistoryData() = enqueueCommand(WatchHGetHeartHistoryCommand())
+        override fun getSportModeHistoryData() = enqueueCommand(WatchHHistorySportModeCommand())
+        override fun getBloodOxygenHistoryData() = enqueueCommand(WatchHGetBloodOxygenHistoryCommand())
+        override fun getComprehensiveHistoryData() = enqueueCommand(WatchHGetComprehensiveHistoryCommand())
+        
+        // Additional delete methods
+        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchHDeleteBloodOxygenHistoryCommand())
     }
 
     override val binder = WatchCommunicationServiceBinder()

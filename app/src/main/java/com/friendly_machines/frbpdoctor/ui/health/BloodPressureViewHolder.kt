@@ -15,13 +15,13 @@ class BloodPressureViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
     private val diastolicPressureTextView: TextView = itemView.findViewById(R.id.diastolicPressureTextView)
     private val pulseTextView: TextView = itemView.findViewById(R.id.pulseTextView)
 
-    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.BpDataBlock) {
-        val instant = Instant.ofEpochSecond(item.timestamp.toLong())
+    fun bind(item: com.friendly_machines.fr_yhe_api.commondata.HBloodDataBlock) {
+        val instant = item.bloodStartTime.toInstant()
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         timestampTextView.text = localDateTime.format(formatter)
-        systolicPressureTextView.text = item.systolicPressure.toInt().toString()
-        diastolicPressureTextView.text = item.diastolicPressure.toInt().toString()
-        pulseTextView.text = item.pulse.toInt().toString()
+        systolicPressureTextView.text = item.bloodSystolicPressure.toInt().toString()
+        diastolicPressureTextView.text = item.bloodDiastolicPressure.toInt().toString()
+        pulseTextView.text = "N/A" // HBloodDataBlock doesn't have pulse data
     }
 }

@@ -1,8 +1,8 @@
 package com.friendly_machines.fr_yhe_pro.indication
 
+import com.friendly_machines.fr_yhe_api.commondata.TimeUtils
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.indication.WatchResponseFactory.R_RESPONSE_CODE_OFFSET
-import com.friendly_machines.fr_yhe_pro.TimeUtils
 import java.nio.ByteBuffer
 
 // Note: Request should use WatchAGetRealData(sensorType = 11, measureType, duration)

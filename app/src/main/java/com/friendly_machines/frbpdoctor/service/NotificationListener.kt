@@ -29,6 +29,9 @@ class NotificationListener : NotificationListenerService() {
             if (notification.category == Notification.CATEGORY_SERVICE || notification.category == Notification.CATEGORY_ERROR || notification.category == Notification.CATEGORY_PROGRESS || notification.category == Notification.CATEGORY_PROMO || notification.category == Notification.CATEGORY_RECOMMENDATION || notification.category == Notification.CATEGORY_STATUS) {
                 return
             }
+            if (notification.flags and Notification.FLAG_LOCAL_ONLY != 0) {
+                return
+            }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
                 Log.i(TAG, "Notification Posted: " + sbn.packageName)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this, WatchResponseType.SetMessage) { binder ->
