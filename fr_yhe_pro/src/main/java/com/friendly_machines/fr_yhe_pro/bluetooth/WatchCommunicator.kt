@@ -646,7 +646,8 @@ class WatchCommunicator : IWatchCommunicator {
         }
 
         override fun removeListener(it: IWatchBinder) {
-            TODO("Not yet implemented") // FIXME
+            // Remove the listener from the listeners collection
+            listeners.remove(it as? IWatchListener)
         }
 
         override fun resetSequenceNumbers() {

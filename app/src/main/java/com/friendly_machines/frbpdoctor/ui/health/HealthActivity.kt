@@ -41,8 +41,7 @@ import com.friendly_machines.frbpdoctor.databinding.ActivityHealthBinding
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -81,15 +80,8 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                     watchBinder = service as IWatchBinder
                     disconnector = watchBinder?.addListener(this@HealthActivity)
                     
-                    // Start the periodic data refresh
-                    handler.post(object : Runnable {
-                        override fun run() {
-                            watchBinder?.let { binder ->
-                                (binding.viewPager.adapter as HealthViewPagerAdapter).requestData(binding.viewPager.currentItem, binder)
-                            }
-                            handler.postDelayed(this, 10000)
-                        }
-                    })
+                    // Data refresh is now handled by individual controllers
+                    // No need for periodic refresh as controllers manage their own data
                 }
                 
                 override fun onServiceDisconnected(name: ComponentName?) {
@@ -253,11 +245,11 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
 //        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
 //        NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
-        val adapter = HealthViewPagerAdapter(this)
-        binding.viewPager.adapter = adapter
-        TabLayoutMediator(
-            binding.tabs, binding.viewPager
-        ) { tab: TabLayout.Tab, position: Int -> tab.text = adapter.getTabTitle(position) }.attach()
+        // Set up bottom navigation
+        setupBottomNavigation()
+        
+        // Show vitals fragment by default
+        showVitalsFragment()
 
         val fab: FloatingActionButton = binding.fab
 
@@ -346,5 +338,43 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     }
 
     override fun onException(exception: Throwable) {
+    }
+    
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_vitals -> {
+                    showVitalsFragment()
+                    true
+                }
+                R.id.nav_lifestyle -> {
+                    showLifestyleFragment()
+                    true
+                }
+                R.id.nav_reports -> {
+                    showReportsFragment()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+    
+    private fun showVitalsFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_content, VitalsFragment())
+            .commit()
+    }
+    
+    private fun showLifestyleFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_content, LifestyleFragment())
+            .commit()
+    }
+    
+    private fun showReportsFragment() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_content, ReportsFragment())
+            .commit()
     }
 }
