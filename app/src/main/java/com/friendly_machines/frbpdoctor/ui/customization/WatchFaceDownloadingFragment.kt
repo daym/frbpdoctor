@@ -222,9 +222,17 @@ class WatchFaceDownloadingFragment : Fragment() {
 
         serviceConnection = object : ServiceConnection {
             private var disconnector: IWatchBinder? = null
+            private var watchFaceController: WatchFaceController? = null
+            
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 binder = service as IWatchBinder
-                val watchFaceController = WatchFaceController(service as IWatchBinder) { percentage, status ->
+                
+                // Android calls onServiceConnected multiple times if service crashes/restarts - clean up previous listener
+                watchFaceController?.let { oldController ->
+                    disconnector?.removeListener(oldController)
+                }
+                
+                watchFaceController = WatchFaceController(service as IWatchBinder) { percentage, status ->
                     setProgress(percentage, status)
                 }
                 watchFaceController?.let { controller ->
@@ -240,8 +248,9 @@ class WatchFaceDownloadingFragment : Fragment() {
                         setProgress(100f, "Download completed successfully!")
                         
                         // Task completed - clean up the listener
-                        disconnector?.let { disc ->
-                            disc.removeListener(disc)
+                        val controller = watchFaceController
+                        if (controller != null) {
+                            disconnector?.removeListener(controller)
                         }
                         disconnector = null
 
@@ -256,8 +265,9 @@ class WatchFaceDownloadingFragment : Fragment() {
                         showError("Download failed: ${e.message}")
                         
                         // Task failed - clean up the listener
-                        disconnector?.let { disc ->
-                            disconnector?.removeListener(disc)
+                        val controller = watchFaceController
+                        if (controller != null) {
+                            disconnector?.removeListener(controller)
                         }
                         disconnector = null
                     }
@@ -265,10 +275,12 @@ class WatchFaceDownloadingFragment : Fragment() {
             }
             
             override fun onServiceDisconnected(name: ComponentName?) {
-                disconnector?.let { controller ->
-                    var d = disconnector
-                    d?.removeListener(d)
+                // Android calls this when service crashes unexpectedly, not on normal unbind
+                // Multiple calls possible if service keeps crashing. Clean up safely.
+                watchFaceController?.let { controller ->
+                    disconnector?.removeListener(controller)
                 }
+                watchFaceController = null
                 disconnector = null
                 downloadJob?.cancel()
             }

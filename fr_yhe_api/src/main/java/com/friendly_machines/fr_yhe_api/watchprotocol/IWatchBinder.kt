@@ -43,7 +43,7 @@ interface IWatchBinder : IBinder {
     fun getSportData()
     fun setStepGoal(steps: Int)
     fun addListener(watchListener: IWatchListener): IWatchBinder
-    fun removeListener(it: IWatchBinder)
+    fun removeListener(listener: IWatchListener)
     fun resetSequenceNumbers()
     fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult
 

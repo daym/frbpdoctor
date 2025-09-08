@@ -589,8 +589,8 @@ public class WatchCommunicator : IWatchCommunicator {
             return this@WatchCommunicator.binder
         }
 
-        override fun removeListener(it: IWatchBinder) {
-            TODO("Not yet implemented") // FIXME
+        override fun removeListener(listener: IWatchListener) {
+            listeners.remove(listener)
         }
 
         override fun resetSequenceNumbers() {
@@ -829,11 +829,6 @@ public class WatchCommunicator : IWatchCommunicator {
         
         // Additional delete methods - dummies for med protocol
         override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-
-        // FIXME
-        fun removeListener(that: IWatchListener) {
-            return this@WatchCommunicator.removeListener(that)
-        }
     }
 
     override val binder = WatchCommunicationServiceBinder()

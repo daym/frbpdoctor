@@ -479,6 +479,7 @@ class WatchCommunicator : IWatchCommunicator {
         }
     }
 
+    
     inner class WatchCommunicationServiceBinder : Binder(), IWatchBinder {
         //        fun getService(): WatchCommunicationService {
 //            return this@WatchCommunicationService
@@ -645,9 +646,8 @@ class WatchCommunicator : IWatchCommunicator {
             return this@WatchCommunicator.binder // FIXME is that right?
         }
 
-        override fun removeListener(it: IWatchBinder) {
-            // Remove the listener from the listeners collection
-            listeners.remove(it as? IWatchListener)
+        override fun removeListener(listener: IWatchListener) {
+            listeners.remove(listener)
         }
 
         override fun resetSequenceNumbers() {
@@ -838,10 +838,6 @@ class WatchCommunicator : IWatchCommunicator {
             }
         }
 
-        // FIXME
-        fun removeListener(that: IWatchListener) {
-            return this@WatchCommunicator.removeListener(that)
-        }
         
         // Delete history methods for sync acknowledgment
         override fun deleteBloodHistory() = enqueueCommand(WatchHDeleteBloodHistoryCommand())

@@ -122,7 +122,7 @@ class HistoryDataCollectionExample {
         //     try {
         //         controller.collectHistory() // runs the collection
         //     } finally {
-        //         disconnector?.removeListener(disconnector)
+        //         disconnector?.removeListener(controller)
         //     }
         // } finally {
         //     HistoryControllerRegistry.completeOperation(WatchHGetBloodHistoryCommand::class)

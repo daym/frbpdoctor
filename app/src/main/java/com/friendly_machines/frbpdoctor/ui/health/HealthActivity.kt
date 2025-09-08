@@ -86,7 +86,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
                 
                 override fun onServiceDisconnected(name: ComponentName?) {
                     disconnector?.let { disc ->
-                        disc.removeListener(disc)
+                        disc.removeListener(this@HealthActivity)
                     }
                     disconnector = null
                     watchBinder = null
@@ -103,7 +103,7 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
         disconnector?.let { disc ->
-            disc.removeListener(disc)
+            disc.removeListener(this@HealthActivity)
         }
         disconnector = null
         serviceConnection?.let { connection ->
@@ -251,18 +251,6 @@ class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer
         // Show vitals fragment by default
         showVitalsFragment()
 
-        val fab: FloatingActionButton = binding.fab
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-
-            BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
-                // UNSAFE since we don't know the response. It will keep the listener alive forever.
-                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(this@HealthActivity, WatchResponseType.SetProfile) { binder ->
-                    binder.setMainTheme(1)
-                }
-            }
-        }
 
         handler = Handler(Looper.getMainLooper())
 
