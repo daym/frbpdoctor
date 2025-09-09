@@ -3,7 +3,6 @@ package com.friendly_machines.frbpdoctor.ui.customization
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -20,7 +19,6 @@ class WatchFaceAdapter(
     inner class WatchFaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
         private val blockNumberTextView: TextView = itemView.findViewById(R.id.blockNumberTextView)
-        private val canDeleteCheckbox: CheckBox = itemView.findViewById(R.id.canDeleteCheckBox)
         private val versionTextView: TextView = itemView.findViewById(R.id.versionTextView)
         private val selectButton: MaterialButton = itemView.findViewById(R.id.selectButton)
         private val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
@@ -51,7 +49,6 @@ class WatchFaceAdapter(
         fun bind(item: com.friendly_machines.fr_yhe_api.commondata.WatchDialDataBlock) {
             idTextView.text = "Watch Face ${item.id}"
             blockNumberTextView.text = item.blockNumber.toString()
-            canDeleteCheckbox.isChecked = item.canDelete
             versionTextView.text = item.version.toString()
             
             selectButton.setOnClickListener {
@@ -62,8 +59,9 @@ class WatchFaceAdapter(
                 onDeleteClick(item.id)
             }
             
-            // Enable/disable delete button based on canDelete flag
+            // Configure delete button based on canDelete flag
             deleteButton.isEnabled = item.canDelete
+            deleteButton.alpha = if (item.canDelete) 1.0f else 0.5f
             
             if (item.id == selectedItemId) {
                 itemView.setBackgroundResource(R.drawable.selected_item_background)
