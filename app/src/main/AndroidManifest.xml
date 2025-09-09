@@ -64,7 +64,6 @@
             android:name=".service.WatchCommunicationService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="camera"
             android:label="@string/watch_communication_service" />
         <service
             android:name=".service.NotificationListener"
