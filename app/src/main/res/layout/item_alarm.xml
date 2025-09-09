@@ -1,84 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="16dp">
+    android:layout_margin="8dp"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="4dp">
 
-    <TextView
-        android:id="@+id/idTextView"
-        android:layout_width="10dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <CheckBox
-        android:id="@+id/enabledCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp" />
+        <!-- Top row: ID, Time, Title, Enabled checkbox, Delete button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/timeTextView"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/idTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:layout_marginEnd="8dp" />
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/timeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="16dp" />
 
-    <CheckBox
-        android:id="@+id/repeatMondayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Mondays" />
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp" />
 
-    <CheckBox
-        android:id="@+id/repeatTuesdayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Tuesdays" />
+            <CheckBox
+                android:id="@+id/enabledCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-    <CheckBox
-        android:id="@+id/repeatWednesdayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Wednesdays" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                app:iconTint="?attr/colorError"
+                android:textColor="?attr/colorError" />
 
-    <CheckBox
-        android:id="@+id/repeatThursdayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Thursdays" />
+        </LinearLayout>
 
-    <CheckBox
-        android:id="@+id/repeatFridayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Fridays" />
+        <!-- Days of week row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
-    <CheckBox
-        android:id="@+id/repeatSaturdayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Saturdays" />
+            <CheckBox
+                android:id="@+id/repeatMondayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="M" />
 
-    <CheckBox
-        android:id="@+id/repeatSundayCheckBox"
-        android:layout_width="10dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Sundays" />
-</LinearLayout>
+            <CheckBox
+                android:id="@+id/repeatTuesdayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="T" />
+
+            <CheckBox
+                android:id="@+id/repeatWednesdayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="W" />
+
+            <CheckBox
+                android:id="@+id/repeatThursdayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="T" />
+
+            <CheckBox
+                android:id="@+id/repeatFridayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="F" />
+
+            <CheckBox
+                android:id="@+id/repeatSaturdayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="S" />
+
+            <CheckBox
+                android:id="@+id/repeatSundayCheckBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="S" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

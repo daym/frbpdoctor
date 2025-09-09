@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,7 +41,7 @@ class AlarmFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val addAlarmTimeButton = view.findViewById<Button>(R.id.addAlarmButton)
+        val addAlarmTimeButton = view.findViewById<FloatingActionButton>(R.id.addAlarmButton)
         addAlarmTimeButton.setOnClickListener {
             val editAlarmDialog = EditAlarmDialog(WatchChangeAlarmAction.Add)
             editAlarmDialog.addListener(object : EditAlarmDialog.OnAlarmSetListener {
@@ -110,7 +110,18 @@ class AlarmFragment : Fragment() {
     }
 
     fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>) {
-        val adapter = AlarmAdapter(data.sortedBy { it.id })
+        val adapter = AlarmAdapter(data.sortedBy { it.id }) { alarmId ->
+            // Handle delete click
+            lifecycleScope.launch {
+                try {
+                    alarmController?.deleteAlarm(alarmId, 0) // Pass x=alarmId, y=0; FIXME
+                    // Refresh alarm list after deletion
+                    alarmController?.listAlarms()
+                } catch (e: Exception) {
+                    Log.e("AlarmFragment", "Failed to delete alarm", e)
+                }
+            }
+        }
         recyclerView!!.adapter = adapter
         //adapter.notifyDataSetChanged()
     }

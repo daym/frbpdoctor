@@ -10,8 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.material.button.MaterialButton
 import android.widget.LinearLayout
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -66,40 +66,6 @@ class WatchFaceFragment : Fragment() {
             editWatchFaceDialog.show(childFragmentManager, "edit_watch_dial_dialog")
         }
 
-        val chooseWatchDialButton = view.findViewById<MaterialButton>(R.id.chooseWatchDialButton)
-        chooseWatchDialButton.setOnClickListener {
-            if (recyclerView != null && recyclerView.adapter != null && watchFaceController != null) {
-                val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
-                id?.let { dialId ->
-                    lifecycleScope.launch {
-                        try {
-                            watchFaceController?.selectWatchFace(dialId)
-                        } catch (e: Exception) {
-                            Log.e("WatchFaceFragment", "Failed to select watch face", e)
-                        }
-                    }
-                }
-            }
-        }
-
-        val deleteWatchDialButton = view.findViewById<MaterialButton>(R.id.deleteWatchDialButton)
-        deleteWatchDialButton.setOnClickListener {
-            if (recyclerView != null && recyclerView.adapter != null && watchFaceController != null) {
-                val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
-                id?.let { dialId ->
-                    lifecycleScope.launch {
-                        try {
-                            watchFaceController?.deleteWatchFace(dialId)
-                            // Refresh the watch face list after deletion
-                            loadWatchFaces()
-                        } catch (e: Exception) {
-                            Log.e("WatchFaceFragment", "Failed to delete watch face", e)
-                        }
-                    }
-                }
-            }
-        }
-
         val cancelButton = view.findViewById<MaterialButton>(R.id.cancelButton)
         cancelButton.setOnClickListener {
             cancelUpload()
@@ -110,7 +76,29 @@ class WatchFaceFragment : Fragment() {
     }
 
     fun setData(data: List<WatchDialDataBlock>) {
-        val adapter = WatchFaceAdapter(data.sortedBy { it.id })
+        val adapter = WatchFaceAdapter(
+            data.sortedBy { it.id },
+            onSelectClick = { dialId ->
+                lifecycleScope.launch {
+                    try {
+                        watchFaceController?.selectWatchFace(dialId)
+                    } catch (e: Exception) {
+                        Log.e("WatchFaceFragment", "Failed to select watch face", e)
+                    }
+                }
+            },
+            onDeleteClick = { dialId ->
+                lifecycleScope.launch {
+                    try {
+                        watchFaceController?.deleteWatchFace(dialId)
+                        // Refresh the watch face list after deletion
+                        loadWatchFaces()
+                    } catch (e: Exception) {
+                        Log.e("WatchFaceFragment", "Failed to delete watch face", e)
+                    }
+                }
+            }
+        )
         recyclerView!!.adapter = adapter
         adapter.notifyDataSetChanged()
     }
@@ -204,7 +192,6 @@ class WatchFaceFragment : Fragment() {
             uploadProgressLayout?.visibility = if (uploading) View.VISIBLE else View.GONE
             recyclerView?.isEnabled = !uploading
             view?.findViewById<FloatingActionButton>(R.id.addWatchDialButton)?.isEnabled = !uploading
-            view?.findViewById<MaterialButton>(R.id.chooseWatchDialButton)?.isEnabled = !uploading
         }
     }
     

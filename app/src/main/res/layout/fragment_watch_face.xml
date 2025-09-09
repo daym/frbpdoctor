@@ -26,37 +26,6 @@
             android:src="@android:drawable/ic_menu_add"
             android:contentDescription="@string/AddWatchDial" />
 
-        <!-- Material Design button bar at bottom -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:layout_marginBottom="56dp">
-            
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chooseWatchDialButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Choose"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:strokeColor="?attr/colorPrimary" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/deleteWatchDialButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="Delete"
-                style="@style/Widget.MaterialComponents.Button"
-                app:backgroundTint="?attr/colorError" />
-            
-        </LinearLayout>
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Upload progress section - normally hidden -->

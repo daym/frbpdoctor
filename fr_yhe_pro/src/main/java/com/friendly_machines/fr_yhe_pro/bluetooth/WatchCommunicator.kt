@@ -90,6 +90,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSDeleteAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWDeleteWatchDialCommand
@@ -553,6 +554,8 @@ class WatchCommunicator : IWatchCommunicator {
         ) {
             // FIXME
         }
+        
+        override fun deleteAlarm(x: Byte, y: Byte) = enqueueCommand(WatchSDeleteAlarmCommand(x, y))
 
         override fun bindWatch(userId: Long, key: ByteArray) {
             // FIXME

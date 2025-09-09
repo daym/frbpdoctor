@@ -44,4 +44,13 @@ class AlarmController(val binder: IWatchBinder) : IWatchListener, MedBigResponse
             result
         }
     }
+    
+    suspend fun listAlarms(): Array<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>? {
+        return getAlarms()
+    }
+    
+    suspend fun deleteAlarm(x: Byte, y: Byte) {
+        binder.deleteAlarm(x, y)
+        // Note: Delete response handling would go here if needed
+    }
 }

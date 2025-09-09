@@ -29,6 +29,8 @@ interface IWatchBinder : IBinder {
     fun editAlarm(
         id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
     )
+    
+    fun deleteAlarm(x: Byte, y: Byte)
 
     fun bindWatch(userId: Long, key: ByteArray)
     fun unbindWatch()

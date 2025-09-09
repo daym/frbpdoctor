@@ -551,6 +551,8 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun editAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray) = enqueueCommand(
             WatchChangeAlarmCommand(WatchChangeAlarmAction.Edit, id, enabled, hour, min, title, repeats),
         )
+        
+        override fun deleteAlarm(x: Byte, y: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun bindWatch(userId: Long, key: ByteArray) = enqueueCommand(
             WatchBindCommand(userId, key)

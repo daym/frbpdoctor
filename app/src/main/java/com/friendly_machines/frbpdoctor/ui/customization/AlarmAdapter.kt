@@ -5,11 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.friendly_machines.frbpdoctor.R
 
-class AlarmAdapter(private val data: List<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>) : RecyclerView.Adapter<AlarmViewHolder>() {
+class AlarmAdapter(
+    private val data: List<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>,
+    private val onDeleteClick: (id: Byte) -> Unit
+) : RecyclerView.Adapter<AlarmViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_alarm, parent, false)
-        return AlarmViewHolder(itemView)
+        return AlarmViewHolder(itemView, onDeleteClick)
     }
 
     override fun onBindViewHolder(holder: AlarmViewHolder, position: Int) {

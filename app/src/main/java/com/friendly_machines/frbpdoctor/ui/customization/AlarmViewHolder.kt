@@ -4,9 +4,10 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.friendly_machines.frbpdoctor.R
 
-class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class AlarmViewHolder(itemView: View, private val onDeleteClick: (id: Byte) -> Unit) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
     private val enabledCheckBox: CheckBox = itemView.findViewById(R.id.enabledCheckBox)
     private val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
@@ -18,6 +19,7 @@ class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val repeatFridayCheckBox: CheckBox = itemView.findViewById(R.id.repeatFridayCheckBox)
     private val repeatSaturdayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSaturdayCheckBox)
     private val repeatSundayCheckBox: CheckBox = itemView.findViewById(R.id.repeatSundayCheckBox)
+    private val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
 
     fun bind(item: com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock) {
         idTextView.text = item.id.toString()
@@ -31,5 +33,9 @@ class AlarmViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         repeatFridayCheckBox.isChecked = item.repeats[4] != 0.toByte()
         repeatSaturdayCheckBox.isChecked = item.repeats[5] != 0.toByte()
         repeatSundayCheckBox.isChecked = item.repeats[6] != 0.toByte()
+        
+        deleteButton.setOnClickListener {
+            onDeleteClick(item.id.toByte()) // FIXME!!!
+        }
     }
 }
