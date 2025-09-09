@@ -86,7 +86,7 @@
             android:label="@string/title_activity_health" />
         <activity
             android:name=".ui.customization.CustomizationActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_customization">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
