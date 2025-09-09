@@ -186,7 +186,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
-            android:key="userLongSitting1StartTime"
+            android:key="userLongSitting1EndTime"
             android:title="Long sitting 1: end time"
             app:useSimpleSummaryProvider="true" />
 
