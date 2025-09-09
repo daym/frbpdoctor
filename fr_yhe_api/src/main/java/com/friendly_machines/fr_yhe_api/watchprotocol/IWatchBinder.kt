@@ -65,6 +65,7 @@ interface IWatchBinder : IBinder {
     fun setScheduleEnabled(enabled: Boolean)
     fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?)
     fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
+    fun setHeartAlarm(enabled: Boolean, minValue: Byte, maxValue: UByte)
     fun setAccidentMonitoringEnabled(enabled: Boolean)
     fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
     fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte)

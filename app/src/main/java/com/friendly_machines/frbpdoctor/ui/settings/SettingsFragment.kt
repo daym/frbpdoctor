@@ -314,6 +314,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                         it.setHeartMonitoring(false, 0, 0.toUByte())
                     }
                 }
+            } else if (AppSettings.isUserHeartAlarmSetting(key)) {
+                val heartAlarm = AppSettings.getUserHeartAlarm(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetHeartAlarm) {
+                    if (heartAlarm != null) {
+                        it.setHeartAlarm(heartAlarm.enabled, heartAlarm.minValue, heartAlarm.maxValue)
+                    } else {
+                        it.setHeartAlarm(false, 0, 0.toUByte())
+                    }
+                }
             } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
                 val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetTemperatureMonitoring) {

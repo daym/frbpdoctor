@@ -630,9 +630,11 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(1, startHour, startMinute, endHour, endMinute, dayOfWeekPattern, intervalInMinutes, message))
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) {
-            enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, 0, maxValue.toByte())))
-            // FIXME this is not safe.
-            enqueueCommand((WatchSSetHeartMonitorCommand(1, interval)))
+            enqueueCommand((WatchSSetHeartMonitorCommand(1, if (enabled) interval else 0)))
+        }
+
+        override fun setHeartAlarm(enabled: Boolean, minValue: Byte, maxValue: UByte) {
+            enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, minValue, maxValue.toByte())))
         }
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchSSetAccidentMonitoringCommand(enabled))

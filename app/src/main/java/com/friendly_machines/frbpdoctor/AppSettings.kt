@@ -53,6 +53,10 @@ object AppSettings {
     private const val KEY_USER_HEART_MONITORING_INTERVAL = "userHeartMonitoringInterval"
     private const val KEY_USER_HEART_MONITORING_MAX_VALUE = "userHeartMonitoringMaxValue2"
 
+    private const val KEY_USER_HEART_ALARM_ENABLED = "userHeartAlarmEnabled"
+    private const val KEY_USER_HEART_ALARM_MIN_VALUE = "userHeartAlarmMinValue"
+    private const val KEY_USER_HEART_ALARM_MAX_VALUE = "userHeartAlarmMaxValue"
+
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
     private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
@@ -357,6 +361,7 @@ object AppSettings {
     }
 
     data class HeartMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
+    data class HeartAlarm(val enabled: Boolean, val minValue: Byte, val maxValue: UByte)
 
     fun isUserHeartMonitoringSetting(key: String): Boolean {
         return setOf(KEY_USER_HEART_MONITORING_ENABLED, KEY_USER_HEART_MONITORING_INTERVAL, KEY_USER_HEART_MONITORING_MAX_VALUE).contains(key)
@@ -376,6 +381,23 @@ object AppSettings {
             return null
         }
         return HeartMonitoring(enabled = enabled, interval = interval, maxValue = maxValue)
+    }
+
+    fun getUserHeartAlarm(sharedPreferences: SharedPreferences): HeartAlarm? {
+        val enabled = sharedPreferences.getBoolean(KEY_USER_HEART_ALARM_ENABLED, false)
+        if (!enabled) {
+            return null
+        }
+        val minValue = sharedPreferences.getInt(KEY_USER_HEART_ALARM_MIN_VALUE, 0).toByte()
+        val maxValue = sharedPreferences.getInt(KEY_USER_HEART_ALARM_MAX_VALUE, 0).toUByte()
+        if (maxValue == 0.toUByte()) {
+            return null
+        }
+        return HeartAlarm(enabled = enabled, minValue = minValue, maxValue = maxValue)
+    }
+
+    fun isUserHeartAlarmSetting(key: String): Boolean {
+        return setOf(KEY_USER_HEART_ALARM_ENABLED, KEY_USER_HEART_ALARM_MIN_VALUE, KEY_USER_HEART_ALARM_MAX_VALUE).contains(key)
     }
 
     data class TemperatureMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
