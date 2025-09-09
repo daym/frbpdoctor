@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import com.friendly_machines.frbpdoctor.ui.BaseActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.Instant
 
-class HealthActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer.IBigResponseListener {
+class HealthActivity : BaseActivity(), IWatchListener, MedBigResponseBuffer.IBigResponseListener {
     companion object {
         const val TAG: String = "HealthActivity"
     }

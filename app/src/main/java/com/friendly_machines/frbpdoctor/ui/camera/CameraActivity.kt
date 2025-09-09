@@ -7,14 +7,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Surface
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.friendly_machines.frbpdoctor.ui.BaseActivity
 import androidx.core.app.ActivityCompat
 import com.friendly_machines.frbpdoctor.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CameraActivity : AppCompatActivity() {
+class CameraActivity : BaseActivity() {
     companion object {
         val PREPARE_CAMERA = "com.friendly_machines.frbpdoctor.PREPARE_CAMERA_ACTION"
         val SHOOT_CAMERA = "com.friendly_machines.frbpdoctor.SHOOT_CAMERA_ACTION"

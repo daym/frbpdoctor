@@ -8,7 +8,7 @@ import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.friendly_machines.frbpdoctor.ui.BaseActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.TimeZone
 
-class WeatherActivity : AppCompatActivity() {
+class WeatherActivity : BaseActivity() {
     private fun hasPermissions(context: Context, permissions: Set<String>): Boolean = permissions.all {
         ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }

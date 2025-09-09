@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import com.friendly_machines.frbpdoctor.ui.BaseActivity
 import androidx.fragment.app.commit
 import androidx.navigation.findNavController
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -23,7 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class CustomizationActivity : AppCompatActivity(), IWatchListener, MedBigResponseBuffer.IBigResponseListener {
+class CustomizationActivity : BaseActivity(), IWatchListener, MedBigResponseBuffer.IBigResponseListener {
     companion object {
         const val TAG: String = "CustomizationActivity"
     }

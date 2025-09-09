@@ -37,9 +37,22 @@ import java.security.MessageDigest
 class WatchCommunicationService : Service(), IWatchListener {
     companion object {
         const val TAG: String = "WatchCommunicationService"
+        const val ACTION_SERVICE_STATUS = "com.friendly_machines.frbpdoctor.SERVICE_STATUS"
+        const val EXTRA_RUNNING = "running"
+
+        @Volatile
+        var isRunning: Boolean = false
+            private set
     }
 
     private var communicator: IWatchCommunicator? = null
+
+    private fun sendStatusBroadcast(running: Boolean) {
+        val intent = Intent(ACTION_SERVICE_STATUS).apply {
+            putExtra(EXTRA_RUNNING, running)
+        }
+        sendBroadcast(intent)
+    }
 
     private fun showSetMandatorySettingsDialog() {
         val settingsIntent = Intent(this, SettingsActivity::class.java)
@@ -88,9 +101,16 @@ class WatchCommunicationService : Service(), IWatchListener {
         communicator.addListener(this)
         this.communicator = communicator
         start()
+        
+        // Set status AFTER successful initialization
+        isRunning = true
+        sendStatusBroadcast(true)
     }
 
     override fun onDestroy() {
+        isRunning = false
+        sendStatusBroadcast(false)
+        
         val communicator = this.communicator
         if (communicator != null) {
             communicator.removeListener(this)

@@ -11,7 +11,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -22,6 +21,7 @@ import com.friendly_machines.frbpdoctor.BluetoothPermissionHandler
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.databinding.ActivityMainBinding
+import com.friendly_machines.frbpdoctor.ui.BaseActivity
 import com.friendly_machines.frbpdoctor.ui.customization.CustomizationActivity
 import com.friendly_machines.frbpdoctor.ui.health.HealthActivity
 import com.friendly_machines.frbpdoctor.ui.settings.SettingsActivity
@@ -29,7 +29,7 @@ import com.friendly_machines.frbpdoctor.ui.weather.WeatherActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
-class MainActivity : AppCompatActivity(), IWatchListener {
+class MainActivity : BaseActivity(), IWatchListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var handler: Handler
     private lateinit var binding: ActivityMainBinding
