@@ -5,6 +5,8 @@ import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
+import com.friendly_machines.fr_yhe_api.commondata.WatchChangeAlarmAction
+import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchCommunicator
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
@@ -16,7 +18,6 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseAnalysisResult
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponseType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchTimePosition
-import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigNotificationCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.bigWritingPortCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.decodeBigMessage
@@ -29,7 +30,6 @@ import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.encodeMidd
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.notificationCharacteristic
 import com.friendly_machines.fr_yhe_med.bluetooth.WatchCharacteristic.writingPortCharacteristic
 import com.friendly_machines.fr_yhe_med.command.WatchBindCommand
-import com.friendly_machines.fr_yhe_api.commondata.WatchChangeAlarmAction
 import com.friendly_machines.fr_yhe_med.command.WatchChangeAlarmCommand
 import com.friendly_machines.fr_yhe_med.command.WatchCommand
 import com.friendly_machines.fr_yhe_med.command.WatchDeviceInfoCommand
@@ -348,18 +348,19 @@ public class WatchCommunicator : IWatchCommunicator {
             val chunk = ByteArray(chunkSize)
             buf.get(chunk)
             val rawPacket = encodeFirstPacket(packetIndex, chunk, totalMessageSize)
-            bleDisposables.add(connection!!.writeCharacteristic(
-                writingPortCharacteristic, rawPacket
-            ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
-                Log.d(
-                    TAG, "Write characteristic successful"
-                )
-            }) { throwable: Throwable ->
-                Log.e(
-                    TAG, "Write characteristic error: $throwable"
-                )
-                notifyListenersOfException(throwable)
-            })
+            bleDisposables.add(
+                connection!!.writeCharacteristic(
+                    writingPortCharacteristic, rawPacket
+                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
+                    Log.d(
+                        TAG, "Write characteristic successful"
+                    )
+                }) { throwable: Throwable ->
+                    Log.e(
+                        TAG, "Write characteristic error: $throwable"
+                    )
+                    notifyListenersOfException(throwable)
+                })
         }
         while (buf.hasRemaining()) {
             packetIndex += 1
@@ -368,18 +369,19 @@ public class WatchCommunicator : IWatchCommunicator {
             buf.get(chunk)
             assert(packetIndex == 0) // FIXME
             val rawPacket = encodeMiddlePacket(packetIndex, chunk)
-            bleDisposables.add(connection!!.writeCharacteristic(
-                writingPortCharacteristic, rawPacket
-            ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
-                Log.d(
-                    TAG, "Write characteristic successful"
-                )
-            }) { throwable: Throwable ->
-                Log.e(
-                    TAG, "Write characteristic error: $throwable"
-                )
-                notifyListenersOfException(throwable)
-            })
+            bleDisposables.add(
+                connection!!.writeCharacteristic(
+                    writingPortCharacteristic, rawPacket
+                ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ _: ByteArray? ->
+                    Log.d(
+                        TAG, "Write characteristic successful"
+                    )
+                }) { throwable: Throwable ->
+                    Log.e(
+                        TAG, "Write characteristic error: $throwable"
+                    )
+                    notifyListenersOfException(throwable)
+                })
         }
     }
 
@@ -544,15 +546,19 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getBatteryState() = enqueueCommand(WatchGetBatteryStateCommand())
         override fun getAlarm() = enqueueCommand(WatchGetAlarmCommand())
 
-        override fun addAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray) = enqueueCommand(
-            WatchChangeAlarmCommand(WatchChangeAlarmAction.Add, id, enabled, hour, min, title, repeats),
-        )
+        override fun addAlarm(alarmId: Byte, hour: Byte, minute: Byte, weekPattern: Byte, enabled: Boolean) {
+            return enqueueCommand(
+                WatchChangeAlarmCommand(WatchChangeAlarmAction.Add, alarmId.toInt(), enabled, hour, minute, com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed.Appointment /* FIXME */, BooleanArray(7))
+            )
+        }
 
-        override fun editAlarm(id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray) = enqueueCommand(
-            WatchChangeAlarmCommand(WatchChangeAlarmAction.Edit, id, enabled, hour, min, title, repeats),
-        )
-        
-        override fun deleteAlarm(x: Byte, y: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun editAlarm(id: Int, oldHour: Byte, oldMinute: Byte, enabled: Boolean, newHour: Byte, newMinute: Byte, weekPattern: BooleanArray) {
+            return enqueueCommand(
+                WatchChangeAlarmCommand(WatchChangeAlarmAction.Edit, id, enabled, newHour, newMinute, com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed.Appointment /* FIXME */, weekPattern),
+            )
+        }
+
+        override fun deleteAlarm(hour: Byte, minute: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun bindWatch(userId: Long, key: ByteArray) = enqueueCommand(
             WatchBindCommand(userId, key)
@@ -787,6 +793,7 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+
                 WatchResponseType.SetSportMode -> {
                     return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
@@ -801,7 +808,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getFileList() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
-        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort)  = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
+        override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
 
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
@@ -822,14 +829,14 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun deleteSportModeHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteComprehensiveHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteHeartHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-        
+
         // Additional history data collection methods - dummies for med protocol
         override fun getAllHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getHeartHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getSportModeHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getBloodOxygenHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getComprehensiveHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-        
+
         // Additional delete methods - dummies for med protocol
         override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
     }

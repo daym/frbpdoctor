@@ -1,14 +1,14 @@
 package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
+import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
+import com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType
+import com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.SportState
 import com.friendly_machines.fr_yhe_api.commondata.SportType
-import com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType
-import com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
-import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
-import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 
 interface IWatchBinder : IBinder {
     fun setProfile(height: Int, weight: Int, sex: WatchProfileSex, age: Byte, arm: WatchWearingArm?)
@@ -23,14 +23,14 @@ interface IWatchBinder : IBinder {
     fun getBatteryState()
     fun getAlarm()
     fun addAlarm(
-        id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
+        alarmId: Byte, hour: Byte, minute: Byte, weekPattern: Byte, enabled: Boolean
     )
 
     fun editAlarm(
-        id: Int, enabled: Boolean, hour: Byte, min: Byte, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, repeats: BooleanArray
+        id: Int, oldHour: Byte, oldMinute: Byte, enabled: Boolean, newHour: Byte, newMinute: Byte, weekPattern: BooleanArray
     )
-    
-    fun deleteAlarm(x: Byte, y: Byte)
+
+    fun deleteAlarm(hour: Byte, minute: Byte)
 
     fun bindWatch(userId: Long, key: ByteArray)
     fun unbindWatch()
@@ -84,7 +84,7 @@ interface IWatchBinder : IBinder {
 //    fun acknowledgeHealthData(ackCode: Byte, message: String)
 //    fun acknowledgeSleepData(ackCode: Byte, sleepQuality: Byte, deepSleep: Byte, lightSleep: Byte, remSleep: Byte, awakeTime: Byte)
 //    fun confirmDataReceived(confirmationType: Byte, sequenceId: Byte, status: Byte)
-    
+
     // Delete history methods for sync acknowledgment
     fun deleteBloodHistory()
     fun deleteSleepHistory()
@@ -94,14 +94,14 @@ interface IWatchBinder : IBinder {
     fun deleteSportModeHistory()
     fun deleteComprehensiveHistory()
     fun deleteHeartHistory()
-    
+
     // Additional history data collection methods
     fun getAllHistoryData()
     fun getHeartHistoryData()
     fun getSportModeHistoryData()
     fun getBloodOxygenHistoryData()
     fun getComprehensiveHistoryData()
-    
+
     // Additional delete methods
     fun deleteBloodOxygenHistory()
 }

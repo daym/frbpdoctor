@@ -5,7 +5,7 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 // SAlarm is used in multiple commands
-class WatchSDeleteAlarmCommand(x: Byte, y: Byte) : WatchCommand(WatchOperation.SAlarm, byteArrayOf(2.toByte(), x, y)) {
+class WatchSDeleteAlarmCommand(hour: Byte, minute: Byte) : WatchCommand(WatchOperation.SAlarm, byteArrayOf(2.toByte(), hour, minute)) {
     data class Response(val optType: Byte, val status: Byte) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {

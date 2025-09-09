@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.friendly_machines.frbpdoctor.R
 
-class AlarmViewHolder(itemView: View, private val onDeleteClick: (id: Byte) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class AlarmViewHolder(itemView: View, private val onDeleteClick: (alarmData: com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock) -> Unit) : RecyclerView.ViewHolder(itemView) {
     private val idTextView: TextView = itemView.findViewById(R.id.idTextView)
     private val enabledCheckBox: CheckBox = itemView.findViewById(R.id.enabledCheckBox)
     private val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
@@ -35,7 +35,7 @@ class AlarmViewHolder(itemView: View, private val onDeleteClick: (id: Byte) -> U
         repeatSundayCheckBox.isChecked = item.repeats[6] != 0.toByte()
         
         deleteButton.setOnClickListener {
-            onDeleteClick(item.id.toByte()) // FIXME!!!
+            onDeleteClick(item)
         }
     }
 }

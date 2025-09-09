@@ -49,8 +49,8 @@ class AlarmController(val binder: IWatchBinder) : IWatchListener, MedBigResponse
         return getAlarms()
     }
     
-    suspend fun deleteAlarm(x: Byte, y: Byte) {
-        binder.deleteAlarm(x, y)
+    suspend fun deleteAlarm(hour: Byte, minute: Byte) {
+        binder.deleteAlarm(hour, minute)
         // Note: Delete response handling would go here if needed
     }
 }

@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +21,7 @@ import com.friendly_machines.frbpdoctor.MedBigResponseBuffer
 import com.friendly_machines.frbpdoctor.R
 import com.friendly_machines.frbpdoctor.WatchCommunicationClientShorthand
 import com.friendly_machines.frbpdoctor.service.WatchCommunicationService
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class AlarmFragment : Fragment() {
@@ -47,8 +47,11 @@ class AlarmFragment : Fragment() {
             editAlarmDialog.addListener(object : EditAlarmDialog.OnAlarmSetListener {
                 override fun onAlarmSet(enabled: Boolean, title: com.friendly_machines.fr_yhe_api.commondata.AlarmTitleMed, hour: Byte, min: Byte, repeatOnDaysOfWeek: BooleanArray) {
                     WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.ChangeAlarm) { binder ->
-                        val id = 1 // FIXME!
-                        binder.addAlarm(id, enabled, hour, min, title, repeatOnDaysOfWeek)
+                        val id = 0.toByte()
+                        binder.addAlarm(
+                            id, hour, min, repeatOnDaysOfWeek.foldIndexed(0) { index, acc, bool ->
+                            if (bool) acc or (1 shl index) else acc
+                        }.toByte() /* FIXME order */, enabled)
                     }
                     // TODO refresh alarm list maybe
                 }
@@ -65,16 +68,16 @@ class AlarmFragment : Fragment() {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 val binder = service as IWatchBinder
-                
+
                 // Android calls onServiceConnected multiple times if service crashes/restarts - clean up previous controller
                 alarmController?.let { oldController ->
                     disconnector?.removeListener(oldController)
                 }
-                
+
                 alarmController = AlarmController(binder)
                 bigBuffers.listener = alarmController
                 disconnector = binder.addListener(alarmController!!)
-                
+
                 // Load alarms
                 lifecycleScope.launch {
                     try {
@@ -94,7 +97,7 @@ class AlarmFragment : Fragment() {
                 disconnector = null
             }
         }
-        
+
         val serviceIntent = Intent(context, WatchCommunicationService::class.java)
         context?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
@@ -110,11 +113,11 @@ class AlarmFragment : Fragment() {
     }
 
     fun setData(data: Array<com.friendly_machines.fr_yhe_api.commondata.AlarmDataBlock>) {
-        val adapter = AlarmAdapter(data.sortedBy { it.id }) { alarmId ->
-            // Handle delete click
+        val adapter = AlarmAdapter(data.sortedBy { it.id }) { alarmData ->
+            // Handle delete click - need the actual alarm data to get hour/minute
             lifecycleScope.launch {
                 try {
-                    alarmController?.deleteAlarm(alarmId, 0) // Pass x=alarmId, y=0; FIXME
+                    alarmController?.deleteAlarm(alarmData.hour, alarmData.min)
                     // Refresh alarm list after deletion
                     alarmController?.listAlarms()
                 } catch (e: Exception) {
