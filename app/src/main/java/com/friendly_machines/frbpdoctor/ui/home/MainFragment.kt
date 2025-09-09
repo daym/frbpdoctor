@@ -121,6 +121,8 @@ class MainFragment : Fragment(), IWatchListener {
                     activeMeasurements.remove(measurement.sensorType)
                     value.text = "--"
                 }
+                // Update service connection status based on checkbox state
+                updateMeasurementRunStatus()
             }
 
             // Store reference to the value TextView for updates
@@ -150,6 +152,20 @@ class MainFragment : Fragment(), IWatchListener {
             serviceConnection = null
         }
         handler.removeCallbacksAndMessages(null)
+    }
+    
+    private fun updateMeasurementRunStatus() {
+        val shouldRun = activeMeasurements.isNotEmpty()
+        val isRunning = serviceConnection != null
+        
+        if (shouldRun && !isRunning) {
+            // Need to start measurements
+            startPeriodicMeasurements()
+        } else if (!shouldRun && isRunning) {
+            // Need to stop measurements
+            stopPeriodicMeasurements()
+        }
+        // If shouldRun == isRunning, no change needed
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,7 +203,8 @@ class MainFragment : Fragment(), IWatchListener {
             }
         })
         
-        startPeriodicMeasurements()
+        // Don't start measurements automatically - wait for checkbox selection
+        // Service will only start when user checks a measurement box
     }
 
     override fun onDestroyView() {
