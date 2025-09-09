@@ -137,22 +137,13 @@ class MainActivity : BaseActivity(), IWatchListener {
 
     override fun onStart() {
         super.onStart()
-        BluetoothPermissionHandler.start(this, BLUETOOTH_PERMISSION_REQUEST_CODE) {
-            this.serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(handler, 1000, this, this) { binder ->
-                //binder.setTime()
-                //binder.getBatteryState()
-                //binder.getWatchFace() // ok but response is weird
-            }
-        }
-        // nope. startService(serviceIntent)
+        // Service binding is handled by MainFragment based on checkbox state
+        // No need to bind here in MainActivity
     }
 
     override fun onStop() {
         handler.removeCallbacksAndMessages(null)
-        serviceConnection?.let {
-            unbindService(it)
-            serviceConnection = null
-        }
+        // Service unbinding is handled by MainFragment
         super.onStop()
     }
 
