@@ -64,6 +64,12 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
         return receive(WatchWSetCurrentWatchDialCommand.Response::class)
     }
 
+    suspend fun deleteWatchFace(dialPlateId: Int): WatchResponse {
+        setProgress(0f, "Deleting watch face...")
+        binder.deleteWatchDial(dialPlateId)
+        return receive(WatchWDeleteWatchDialCommand.Response::class)
+    }
+
     private suspend fun startWatchFaceDownload(length: UInt, dialPlateId: Int, blockNumber: Short, version: Short, crc: UShort): WatchResponse {
         setProgress(0f, "Initializing download...")
         binder.startWatchFaceDownload(length, dialPlateId, blockNumber, version, crc)

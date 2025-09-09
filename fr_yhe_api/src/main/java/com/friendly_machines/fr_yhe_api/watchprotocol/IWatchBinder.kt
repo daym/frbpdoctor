@@ -40,6 +40,7 @@ interface IWatchBinder : IBinder {
     fun getHeatData()
     fun getWatchDial()
     fun selectWatchFace(id: Int)
+    fun deleteWatchDial(id: Int)
     fun getSportData()
     fun setStepGoal(steps: Int)
     fun addListener(watchListener: IWatchListener): IWatchBinder

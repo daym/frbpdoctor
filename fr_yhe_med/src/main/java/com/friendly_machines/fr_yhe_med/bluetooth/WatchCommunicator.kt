@@ -565,6 +565,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getHeatData() = enqueueCommand(WatchGetHeatDataCommand())
         override fun getWatchDial() = enqueueCommand(WatchGetWatchFaceCommand())
         override fun selectWatchFace(id: Int) = enqueueCommand(WatchSetWatchFaceCommand(id))
+        override fun deleteWatchDial(id: Int) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))

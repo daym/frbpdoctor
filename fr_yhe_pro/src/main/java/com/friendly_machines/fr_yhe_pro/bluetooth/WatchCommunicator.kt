@@ -92,6 +92,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetComprehensiveHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchWDeleteWatchDialCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
@@ -581,6 +582,7 @@ class WatchCommunicator : IWatchCommunicator {
         override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchWControlDownloadCommand.stop(length))
 
         override fun selectWatchFace(id: Int) = enqueueCommand(WatchWSetCurrentWatchDialCommand(id))
+        override fun deleteWatchDial(id: Int) = enqueueCommand(WatchWDeleteWatchDialCommand(id))
 
         override fun getSportData() = enqueueCommand(WatchHGetSportHistoryCommand())
         override fun getFileCount() = enqueueCommand(WatchCGetFileCountCommand())

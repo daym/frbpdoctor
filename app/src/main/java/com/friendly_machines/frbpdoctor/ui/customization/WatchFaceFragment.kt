@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import com.google.android.material.button.MaterialButton
 import android.widget.LinearLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
@@ -66,7 +66,7 @@ class WatchFaceFragment : Fragment() {
             editWatchFaceDialog.show(childFragmentManager, "edit_watch_dial_dialog")
         }
 
-        val chooseWatchDialButton = view.findViewById<Button>(R.id.chooseWatchDialButton)
+        val chooseWatchDialButton = view.findViewById<MaterialButton>(R.id.chooseWatchDialButton)
         chooseWatchDialButton.setOnClickListener {
             if (recyclerView != null && recyclerView.adapter != null && watchFaceController != null) {
                 val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
@@ -82,7 +82,25 @@ class WatchFaceFragment : Fragment() {
             }
         }
 
-        val cancelButton = view.findViewById<Button>(R.id.cancelButton)
+        val deleteWatchDialButton = view.findViewById<MaterialButton>(R.id.deleteWatchDialButton)
+        deleteWatchDialButton.setOnClickListener {
+            if (recyclerView != null && recyclerView.adapter != null && watchFaceController != null) {
+                val id = (recyclerView!!.adapter as WatchFaceAdapter).getSelectedItemId()
+                id?.let { dialId ->
+                    lifecycleScope.launch {
+                        try {
+                            watchFaceController?.deleteWatchFace(dialId)
+                            // Refresh the watch face list after deletion
+                            loadWatchFaces()
+                        } catch (e: Exception) {
+                            Log.e("WatchFaceFragment", "Failed to delete watch face", e)
+                        }
+                    }
+                }
+            }
+        }
+
+        val cancelButton = view.findViewById<MaterialButton>(R.id.cancelButton)
         cancelButton.setOnClickListener {
             cancelUpload()
         }
@@ -186,7 +204,7 @@ class WatchFaceFragment : Fragment() {
             uploadProgressLayout?.visibility = if (uploading) View.VISIBLE else View.GONE
             recyclerView?.isEnabled = !uploading
             view?.findViewById<FloatingActionButton>(R.id.addWatchDialButton)?.isEnabled = !uploading
-            view?.findViewById<Button>(R.id.chooseWatchDialButton)?.isEnabled = !uploading
+            view?.findViewById<MaterialButton>(R.id.chooseWatchDialButton)?.isEnabled = !uploading
         }
     }
     
