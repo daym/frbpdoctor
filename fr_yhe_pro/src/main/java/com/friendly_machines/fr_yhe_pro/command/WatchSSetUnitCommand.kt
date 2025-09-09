@@ -4,6 +4,8 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
+// - Blood Sugar Unit: 0=mmol/L, 1=mg/dL
+// - Uric Acid Unit: 0=μmol/L, 1=mg/dL
 class WatchSSetUnitCommand(distance: Byte, weight: Byte, temperature: Byte, time24h: Boolean, bloodSugarUnit: Byte, uricAcidUnit: Byte) : WatchCommand(
     WatchOperation.SUnit, byteArrayOf(
         distance, weight, temperature, when (time24h) {
