@@ -65,6 +65,15 @@ import com.friendly_machines.fr_yhe_pro.command.WatchGGetRealTemperatureCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetScreenParametersCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteAllHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteBloodOxygenHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteComprehensiveHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteHeartHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSleepHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteSportModeHistoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchHDeleteTemperatureHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetAllHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetAmbientLightHistoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHGetBackgroundReminderRecordHistoryCommand
@@ -262,6 +271,18 @@ object WatchResponseFactory {
             WatchOperation.HHistorySportMode -> WatchHHistorySportModeCommand.Response.parse(buf)
             WatchOperation.HGetComprehensiveMeasurementData -> WatchHGetComprehensiveHistoryCommand.Response.parse(buf)
             WatchOperation.HGetBackgroundReminderRecordHistory -> WatchHGetBackgroundReminderRecordHistoryCommand.Response.parse(buf)
+            
+            // History Delete operations
+            WatchOperation.HDeleteSportHistory -> WatchHDeleteSportHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteSleepHistory -> WatchHDeleteSleepHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteHeartHistory -> WatchHDeleteHeartHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteBloodHistory -> WatchHDeleteBloodHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteAllHistory -> WatchHDeleteAllHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteBloodOxygenHistory -> WatchHDeleteBloodOxygenHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteTemperatureHistory -> WatchHDeleteTemperatureHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteSportModeHistory -> WatchHDeleteSportModeHistoryCommand.Response.parse(buf)
+            WatchOperation.HDeleteComprehensiveMeasurementData -> WatchHDeleteComprehensiveHistoryCommand.Response.parse(buf)
+            
             WatchOperation.HHistoryBlock -> WatchHHistoryBlockCommand.Response.parse(buf)
 
             // "Real" section
