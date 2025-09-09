@@ -68,6 +68,8 @@ class WatchCommunicationService : Service(), IWatchListener {
         this.communicator?.start(bleDevice, keyDigest)
     }
     override fun onCreate() {
+        super.onCreate()
+        
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
             return die("No bluetooth LE support in the phone")
         if (!BluetoothPermissionHandler.checkPermissions(this))
