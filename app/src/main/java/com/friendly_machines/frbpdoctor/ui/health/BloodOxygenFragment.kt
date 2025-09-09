@@ -23,7 +23,7 @@ class BloodOxygenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = view.findViewById<RecyclerView>(R.id.list).apply {
+        recyclerView = view.findViewById<RecyclerView>(R.id.bloodOxygenRecyclerView).apply {
             layoutManager = LinearLayoutManager(requireContext())
         }
         syncButton = view.findViewById<Button>(R.id.syncButton).apply {
