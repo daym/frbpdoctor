@@ -57,6 +57,13 @@ object AppSettings {
     private const val KEY_USER_HEART_ALARM_MIN_VALUE = "userHeartAlarmMinValue"
     private const val KEY_USER_HEART_ALARM_MAX_VALUE = "userHeartAlarmMaxValue"
 
+    private const val KEY_UNITS_DISTANCE = "unitsDistance"
+    private const val KEY_UNITS_WEIGHT = "unitsWeight"
+    private const val KEY_UNITS_TEMPERATURE = "unitsTemperature"
+    private const val KEY_UNITS_TIME_24H = "unitsTime24h"
+    private const val KEY_UNITS_BLOOD_SUGAR = "unitsBloodSugar"
+    private const val KEY_UNITS_URIC_ACID = "unitsUricAcid"
+
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
     private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
@@ -362,6 +369,7 @@ object AppSettings {
 
     data class HeartMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
     data class HeartAlarm(val enabled: Boolean, val minValue: Byte, val maxValue: UByte)
+    data class UnitPreferences(val distance: Byte, val weight: Byte, val temperature: Byte, val time24h: Boolean, val bloodSugar: Byte, val uricAcid: Byte)
 
     fun isUserHeartMonitoringSetting(key: String): Boolean {
         return setOf(KEY_USER_HEART_MONITORING_ENABLED, KEY_USER_HEART_MONITORING_INTERVAL, KEY_USER_HEART_MONITORING_MAX_VALUE).contains(key)
@@ -398,6 +406,20 @@ object AppSettings {
 
     fun isUserHeartAlarmSetting(key: String): Boolean {
         return setOf(KEY_USER_HEART_ALARM_ENABLED, KEY_USER_HEART_ALARM_MIN_VALUE, KEY_USER_HEART_ALARM_MAX_VALUE).contains(key)
+    }
+
+    fun getUnitPreferences(sharedPreferences: SharedPreferences): UnitPreferences {
+        val distance = sharedPreferences.getString(KEY_UNITS_DISTANCE, "0")?.toByte() ?: 0
+        val weight = sharedPreferences.getString(KEY_UNITS_WEIGHT, "0")?.toByte() ?: 0
+        val temperature = sharedPreferences.getString(KEY_UNITS_TEMPERATURE, "0")?.toByte() ?: 0
+        val time24h = sharedPreferences.getBoolean(KEY_UNITS_TIME_24H, true)
+        val bloodSugar = sharedPreferences.getString(KEY_UNITS_BLOOD_SUGAR, "0")?.toByte() ?: 0
+        val uricAcid = sharedPreferences.getString(KEY_UNITS_URIC_ACID, "0")?.toByte() ?: 0
+        return UnitPreferences(distance = distance, weight = weight, temperature = temperature, time24h = time24h, bloodSugar = bloodSugar, uricAcid = uricAcid)
+    }
+
+    fun isUnitSetting(key: String): Boolean {
+        return setOf(KEY_UNITS_DISTANCE, KEY_UNITS_WEIGHT, KEY_UNITS_TEMPERATURE, KEY_UNITS_TIME_24H, KEY_UNITS_BLOOD_SUGAR, KEY_UNITS_URIC_ACID).contains(key)
     }
 
     data class TemperatureMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)

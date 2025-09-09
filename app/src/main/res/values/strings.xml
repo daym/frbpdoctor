@@ -185,4 +185,50 @@
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
 
+    <!-- Unit preference arrays -->
+    <string-array name="distance_unit_options">
+        <item>Kilometers</item>
+        <item>Miles</item>
+    </string-array>
+    <string-array name="distance_unit_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="weight_unit_options">
+        <item>Kilograms</item>
+        <item>Pounds</item>
+    </string-array>
+    <string-array name="weight_unit_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="temperature_unit_options">
+        <item>Celsius</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="temperature_unit_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="blood_sugar_unit_options">
+        <item>mmol/L</item>
+        <item>mg/dL</item>
+    </string-array>
+    <string-array name="blood_sugar_unit_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="uric_acid_unit_options">
+        <item>μmol/L</item>
+        <item>mg/dL</item>
+    </string-array>
+    <string-array name="uric_acid_unit_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

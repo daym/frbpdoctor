@@ -65,6 +65,48 @@
         android:title="Watch arm"
         app:useSimpleSummaryProvider="true" />
 
+    <PreferenceCategory android:key="units" android:title="Units">
+        <ListPreference
+            android:dialogTitle="Distance unit"
+            android:entries="@array/distance_unit_options"
+            android:entryValues="@array/distance_unit_values"
+            android:key="unitsDistance"
+            android:title="Distance"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:dialogTitle="Weight unit"
+            android:entries="@array/weight_unit_options"
+            android:entryValues="@array/weight_unit_values"
+            android:key="unitsWeight"
+            android:title="Weight"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:dialogTitle="Temperature unit"
+            android:entries="@array/temperature_unit_options"
+            android:entryValues="@array/temperature_unit_values"
+            android:key="unitsTemperature"
+            android:title="Temperature"
+            app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference
+            android:key="unitsTime24h"
+            android:title="24-hour time format"
+            android:summary="Use 24-hour time format" />
+        <ListPreference
+            android:dialogTitle="Blood sugar unit"
+            android:entries="@array/blood_sugar_unit_options"
+            android:entryValues="@array/blood_sugar_unit_values"
+            android:key="unitsBloodSugar"
+            android:title="Blood sugar"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:dialogTitle="Uric acid unit"
+            android:entries="@array/uric_acid_unit_options"
+            android:entryValues="@array/uric_acid_unit_values"
+            android:key="unitsUricAcid"
+            android:title="Uric acid"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
         android:inputType="number"
         android:key="watchScreenLitTime"

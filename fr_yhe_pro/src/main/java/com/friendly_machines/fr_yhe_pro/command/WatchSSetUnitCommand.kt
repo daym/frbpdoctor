@@ -9,8 +9,8 @@ import java.nio.ByteBuffer
 class WatchSSetUnitCommand(distance: Byte, weight: Byte, temperature: Byte, time24h: Boolean, bloodSugarUnit: Byte, uricAcidUnit: Byte) : WatchCommand(
     WatchOperation.SUnit, byteArrayOf(
         distance, weight, temperature, when (time24h) {
-            true -> 1
-            false -> 0
+            true -> 0   // 24-hour format sends 0
+            false -> 1  // 12-hour format sends 1
         }, bloodSugarUnit, uricAcidUnit
     )
 ) {

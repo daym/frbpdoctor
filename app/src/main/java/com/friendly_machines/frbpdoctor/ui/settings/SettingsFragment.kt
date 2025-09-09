@@ -323,6 +323,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                         it.setHeartAlarm(false, 0, 0.toUByte())
                     }
                 }
+            } else if (AppSettings.isUnitSetting(key)) {
+                val unitPreferences = AppSettings.getUnitPreferences(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetUnits) {
+                    it.setUnits(unitPreferences.distance, unitPreferences.weight, unitPreferences.temperature, unitPreferences.time24h, unitPreferences.bloodSugar, unitPreferences.uricAcid)
+                }
             } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
                 val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetTemperatureMonitoring) {

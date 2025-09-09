@@ -91,6 +91,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureMonitorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTimeLayoutCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetUnitCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetUserInfoCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetWatchWearingArmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
@@ -635,6 +636,10 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setHeartAlarm(enabled: Boolean, minValue: Byte, maxValue: UByte) {
             enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, minValue, maxValue.toByte())))
+        }
+
+        override fun setUnits(distance: Byte, weight: Byte, temperature: Byte, time24h: Boolean, bloodSugarUnit: Byte, uricAcidUnit: Byte) {
+            enqueueCommand(WatchSSetUnitCommand(distance, weight, temperature, time24h, bloodSugarUnit, uricAcidUnit))
         }
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchSSetAccidentMonitoringCommand(enabled))
