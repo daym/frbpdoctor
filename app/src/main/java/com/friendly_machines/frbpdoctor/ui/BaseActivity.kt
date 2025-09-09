@@ -33,21 +33,20 @@ abstract class BaseActivity : AppCompatActivity() {
                 this,
                 serviceStatusReceiver,
                 filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
+                ContextCompat.RECEIVER_EXPORTED
             )
         } else {
             registerReceiver(serviceStatusReceiver, filter)
         }
         
-        // Set initial subtitle - don't show incorrect status
-        // The broadcast will update it when service actually starts
-        supportActionBar?.subtitle = "Connecting..."
+        // Set initial subtitle based on current state
+        updateSubtitle(WatchCommunicationService.isRunning)
     }
     
     override fun onResume() {
         super.onResume()
-        // Update subtitle based on current status when activity resumes
-        // This handles returning from other activities
+        // Update subtitle when returning to activity
+        // This ensures correct state when navigating between activities
         updateSubtitle(WatchCommunicationService.isRunning)
     }
     

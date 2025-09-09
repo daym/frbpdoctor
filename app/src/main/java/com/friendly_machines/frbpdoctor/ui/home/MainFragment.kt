@@ -132,7 +132,13 @@ class MainFragment : Fragment(), IWatchListener {
     }
 
     private fun startPeriodicMeasurements() {
-        handler = Handler(Looper.getMainLooper())
+        // Only start if not already running
+        if (serviceConnection != null) return
+        
+        if (!::handler.isInitialized) {
+            handler = Handler(Looper.getMainLooper())
+        }
+        
         serviceConnection = WatchCommunicationClientShorthand.bindPeriodic(
             handler, 
             2000, // 2 second period
@@ -151,7 +157,9 @@ class MainFragment : Fragment(), IWatchListener {
             requireContext().unbindService(it)
             serviceConnection = null
         }
-        handler.removeCallbacksAndMessages(null)
+        if (::handler.isInitialized) {
+            handler.removeCallbacksAndMessages(null)
+        }
     }
     
     private fun updateMeasurementRunStatus() {
@@ -207,7 +215,23 @@ class MainFragment : Fragment(), IWatchListener {
         // Service will only start when user checks a measurement box
     }
 
+    override fun onStop() {
+        super.onStop()
+        // Stop measurements when fragment goes to background
+        // Only if view was created (handler is initialized)
+        if (::handler.isInitialized) {
+            stopPeriodicMeasurements()
+        }
+    }
+    
+    override fun onStart() {
+        super.onStart()
+        // Restart measurements if any checkboxes were checked
+        updateMeasurementRunStatus()
+    }
+    
     override fun onDestroyView() {
+        // Also stop when view is destroyed (just in case)
         stopPeriodicMeasurements()
         super.onDestroyView()
     }
