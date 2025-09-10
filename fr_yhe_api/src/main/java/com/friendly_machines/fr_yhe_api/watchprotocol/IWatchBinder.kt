@@ -92,7 +92,7 @@ interface IWatchBinder : IBinder {
 //    fun acknowledgeSleepData(ackCode: Byte, sleepQuality: Byte, deepSleep: Byte, lightSleep: Byte, remSleep: Byte, awakeTime: Byte)
 //    fun confirmDataReceived(confirmationType: Byte, sequenceId: Byte, status: Byte)
 
-    // Delete history methods for sync acknowledgment
+    // "Delete history" methods for sync acknowledgment
     fun deleteBloodHistory()
     fun deleteSleepHistory()
     fun deleteTemperatureHistory()
@@ -101,14 +101,14 @@ interface IWatchBinder : IBinder {
     fun deleteSportModeHistory()
     fun deleteComprehensiveHistory()
     fun deleteHeartHistory()
+    fun deleteBloodOxygenHistory()
 
-    // Additional history data collection methods
+    // History data collection methods
     fun getAllHistoryData()
     fun getHeartHistoryData()
     fun getSportModeHistoryData()
     fun getBloodOxygenHistoryData()
     fun getComprehensiveHistoryData()
 
-    // Additional delete methods
-    fun deleteBloodOxygenHistory()
+    fun restoreFactorySettings()
 }

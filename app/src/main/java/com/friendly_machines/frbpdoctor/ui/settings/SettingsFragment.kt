@@ -1,6 +1,7 @@
 package com.friendly_machines.frbpdoctor.ui.settings
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.companion.AssociationInfo
 import android.companion.AssociationRequest
 import android.companion.CompanionDeviceManager
@@ -11,6 +12,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -71,6 +73,25 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
     }
 
+    private fun showFactoryResetConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Factory Reset Watch")
+            .setMessage("WARNING: This will reset your watch to factory settings. All data will be lost! Continue?")
+            .setPositiveButton("Reset") { _, _ ->
+                performFactoryReset()
+            }
+            .setNegativeButton("Cancel", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show()
+    }
+
+    private fun performFactoryReset() {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.RestoreFactory) {
+            it.restoreFactorySettings()
+        }
+        Toast.makeText(requireContext(), "Factory reset command sent to watch", Toast.LENGTH_LONG).show()
+    }
+
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
         if (age <= 0 || age >= 256) throw RuntimeException("profile age is invalid")
@@ -100,6 +121,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
         findPreference<Preference>("set_time_on_watch")?.setOnPreferenceClickListener {
             setTime()
+            true
+        }
+        
+        findPreference<Preference>("factory_reset_watch")?.setOnPreferenceClickListener {
+            showFactoryResetConfirmationDialog()
             true
         }
     }

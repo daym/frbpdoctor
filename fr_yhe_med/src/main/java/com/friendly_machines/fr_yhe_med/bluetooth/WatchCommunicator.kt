@@ -872,6 +872,14 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.RestoreFactory -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
             }
         }
 
@@ -881,17 +889,12 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun sendWatchFaceDownloadChunk(chunk: ByteArray) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun nextWatchFaceDownloadChunkMeta(deltaOffset: Int, packetCount: UShort, crc: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun stopWatchFaceDownload(length: UInt) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
-
         override fun setWatchWearingArm(arm: WatchWearingArm) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setWatchTimeLayout(watchTimePosition: WatchTimePosition, rgb565Color: UShort) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
-        override fun getGDeviceInfo() {
-        }
-
+        override fun getGDeviceInfo() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun getMainTheme() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
         override fun setMainTheme(index: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy request
-
-        // Delete history methods for sync acknowledgment - dummies for med protocol
         override fun deleteBloodHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteSleepHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteTemperatureHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
@@ -900,16 +903,13 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun deleteSportModeHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteComprehensiveHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteHeartHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-
-        // Additional history data collection methods - dummies for med protocol
         override fun getAllHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getHeartHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getSportModeHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getBloodOxygenHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun getComprehensiveHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
-
-        // Additional delete methods - dummies for med protocol
         override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun restoreFactorySettings() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
     }
 
     override val binder = WatchCommunicationServiceBinder()

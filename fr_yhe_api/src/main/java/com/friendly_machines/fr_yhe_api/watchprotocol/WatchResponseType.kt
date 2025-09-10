@@ -30,4 +30,5 @@ enum class WatchResponseType {
     SetAccidentMonitoringEnabled,
     SetTemperatureMonitoring,
     SetSportMode,
+    RestoreFactory,
 }

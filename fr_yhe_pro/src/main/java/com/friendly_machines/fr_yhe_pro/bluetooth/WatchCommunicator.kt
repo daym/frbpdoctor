@@ -78,6 +78,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSModifyAlarmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSRestoreFactoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDisplayBrightnessCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
@@ -907,6 +908,14 @@ class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.RestoreFactory -> {
+                    return if (response is WatchSRestoreFactoryCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
 
                 else -> {
                     TODO("Not implemented")
@@ -925,6 +934,7 @@ class WatchCommunicator : IWatchCommunicator {
         override fun deleteSportModeHistory() = enqueueCommand(WatchHDeleteSportModeHistoryCommand())
         override fun deleteComprehensiveHistory() = enqueueCommand(WatchHDeleteComprehensiveHistoryCommand())
         override fun deleteHeartHistory() = enqueueCommand(WatchHDeleteHeartHistoryCommand())
+        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchHDeleteBloodOxygenHistoryCommand())
 
         // Additional history data collection methods
         override fun getAllHistoryData() = enqueueCommand(WatchHGetAllHistoryCommand())
@@ -933,8 +943,7 @@ class WatchCommunicator : IWatchCommunicator {
         override fun getBloodOxygenHistoryData() = enqueueCommand(WatchHGetBloodOxygenHistoryCommand())
         override fun getComprehensiveHistoryData() = enqueueCommand(WatchHGetComprehensiveHistoryCommand())
 
-        // Additional delete methods
-        override fun deleteBloodOxygenHistory() = enqueueCommand(WatchHDeleteBloodOxygenHistoryCommand())
+        override fun restoreFactorySettings() = enqueueCommand(WatchSRestoreFactoryCommand())
     }
 
     override val binder = WatchCommunicationServiceBinder()
