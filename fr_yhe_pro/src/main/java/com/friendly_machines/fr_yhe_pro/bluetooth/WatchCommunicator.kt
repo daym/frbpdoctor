@@ -75,6 +75,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSDeleteAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSModifyAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
@@ -641,6 +642,10 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setAntiLoss(enabled: Boolean) {
             enqueueCommand(WatchSSetAntiLossCommand(if (enabled) 2 else 0))
+        }
+
+        override fun setEventReminderMode(enabled: Boolean) {
+            enqueueCommand(WatchSSetEventReminderModeCommand(enabled))
         }
 
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))

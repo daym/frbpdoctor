@@ -70,6 +70,7 @@ interface IWatchBinder : IBinder {
     fun setHeartAlarm(enabled: Boolean, minValue: Byte, maxValue: UByte)
     fun setUnits(distance: Byte, weight: Byte, temperature: Byte, timeFormat: Byte, bloodSugarUnit: Byte, uricAcidUnit: Byte)
     fun setAntiLoss(enabled: Boolean)
+    fun setEventReminderMode(enabled: Boolean)
     fun setAccidentMonitoringEnabled(enabled: Boolean)
     fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte)
     fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte)

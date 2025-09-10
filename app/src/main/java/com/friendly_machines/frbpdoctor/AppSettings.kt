@@ -70,6 +70,8 @@ object AppSettings {
     private const val KEY_DISPLAY_BRIGHTNESS = "displayBrightness"
     
     private const val KEY_ANTI_LOSS_ENABLED = "antiLossEnabled"
+    
+    private const val KEY_EVENT_REMINDER_MODE_ENABLED = "eventReminderModeEnabled"
 
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
@@ -461,6 +463,14 @@ object AppSettings {
         return sharedPreferences.getBoolean(KEY_ANTI_LOSS_ENABLED, false)
     }
 
+    fun isEventReminderModeSetting(key: String): Boolean {
+        return key == KEY_EVENT_REMINDER_MODE_ENABLED
+    }
+
+    fun isEventReminderModeEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_EVENT_REMINDER_MODE_ENABLED, false)
+    }
+
     fun syncUnitsFromWatchUserConfig(sharedPreferences: SharedPreferences, userConfigResponse: com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand.Response) {
         val editor = sharedPreferences.edit()
         
@@ -481,6 +491,9 @@ object AppSettings {
         
         // Sync anti-loss setting from watch - enabled if antiLossType > 0
         editor.putBoolean(KEY_ANTI_LOSS_ENABLED, userConfigResponse.antiLossType > 0)
+        
+        // Sync event reminder mode setting from watch - enabled if eventSwitch > 0
+        editor.putBoolean(KEY_EVENT_REMINDER_MODE_ENABLED, userConfigResponse.eventSwitch > 0)
         
         editor.apply()
     }

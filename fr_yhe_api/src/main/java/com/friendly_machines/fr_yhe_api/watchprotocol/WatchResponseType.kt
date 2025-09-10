@@ -25,6 +25,7 @@ enum class WatchResponseType {
     SetRaiseToWake,
     SetDisplayBrightness,
     SetAntiLoss,
+    SetEventReminderMode,
     SetAccidentMonitoringEnabled,
     SetTemperatureMonitoring,
     SetSportMode,

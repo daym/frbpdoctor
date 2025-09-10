@@ -4,7 +4,12 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-class WatchSSetUploadReminderCommand(enabled: Boolean, x: Byte) : WatchCommand(WatchOperation.SSetUploadReminder, byteArrayOf(if (enabled) 1.toByte() else 0.toByte(), x)) {
+/**
+ * Sets the upload reminder configuration on the watch.
+ *
+ * @param enabled Whether upload reminders are enabled
+ */
+class WatchSSetUploadReminderCommand(enabled: Boolean, parameter2: Byte) : WatchCommand(WatchOperation.SSetUploadReminder, byteArrayOf(if (enabled) 1.toByte() else 0.toByte(), parameter2)) {
     data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
         companion object {
             fun parse(buf: ByteBuffer): Response {
