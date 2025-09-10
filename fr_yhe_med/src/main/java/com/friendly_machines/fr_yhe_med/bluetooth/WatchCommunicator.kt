@@ -586,6 +586,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setHeartMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setHeartAlarm(enabled: Boolean, minValue: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setUnits(distance: Byte, weight: Byte, temperature: Byte, timeFormat: Byte, bloodSugarUnit: Byte, uricAcidUnit: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setAntiLoss(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setTemperatureMonitoring(enabled: Boolean, interval: Byte, maxValue: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
@@ -797,6 +798,14 @@ public class WatchCommunicator : IWatchCommunicator {
                 }
 
                 WatchResponseType.SetLanguage -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetAntiLoss -> {
                     return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
                     } else {

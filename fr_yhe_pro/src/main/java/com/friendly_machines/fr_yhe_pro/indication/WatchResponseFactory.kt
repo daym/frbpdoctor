@@ -90,6 +90,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryComma
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistoryBlockCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDataCommand
@@ -199,6 +200,7 @@ object WatchResponseFactory {
             WatchOperation.SSetEventReminder -> WatchSSetEventReminderCommand.Response.parse(buf)
             WatchOperation.SSetEventReminderMode -> WatchSSetEventReminderModeCommand.Response.parse(buf)
             WatchOperation.SFindPhone -> WatchSFindPhoneCommand.Response.parse(buf)
+            WatchOperation.SSetAntiLoss -> WatchSSetAntiLossCommand.Response.parse(buf)
             WatchOperation.SSetLongSitting -> WatchSSetLongSittingCommand.Response.parse(buf)
             WatchOperation.SNotification -> WatchSSetNotificationCommand.Response.parse(buf)
             WatchOperation.SSetScreenLitTime -> WatchSSetScreenLitTimeCommand.Response.parse(buf)

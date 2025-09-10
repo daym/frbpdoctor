@@ -66,6 +66,8 @@ object AppSettings {
 
     private const val KEY_LANGUAGE = "language"
 
+    private const val KEY_ANTI_LOSS_ENABLED = "antiLossEnabled"
+
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
     private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
@@ -432,6 +434,14 @@ object AppSettings {
         return sharedPreferences.getString(KEY_LANGUAGE, "0")?.toByte() ?: 0
     }
 
+    fun isAntiLossSetting(key: String): Boolean {
+        return key == KEY_ANTI_LOSS_ENABLED
+    }
+
+    fun isAntiLossEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_ANTI_LOSS_ENABLED, false)
+    }
+
     fun syncUnitsFromWatchUserConfig(sharedPreferences: SharedPreferences, userConfigResponse: com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand.Response) {
         val editor = sharedPreferences.edit()
         
@@ -443,6 +453,9 @@ object AppSettings {
         
         // Sync language setting from watch
         editor.putString(KEY_LANGUAGE, userConfigResponse.language.toString())
+        
+        // Sync anti-loss setting from watch - enabled if antiLossType > 0
+        editor.putBoolean(KEY_ANTI_LOSS_ENABLED, userConfigResponse.antiLossType > 0)
         
         editor.apply()
     }

@@ -280,6 +280,11 @@
             android:entryValues="@array/language_values"
             android:defaultValue="0"
             app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference
+            android:key="findPhoneEnabled"
+            android:title="Find Phone (Anti-Loss)"
+            android:summary="Alert when watch moves too far from phone"
+            android:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:key="watch_actions" android:title="Actions">

@@ -73,6 +73,8 @@ import com.friendly_machines.fr_yhe_pro.command.WatchHGetTemperatureHistoryComma
 import com.friendly_machines.fr_yhe_pro.command.WatchHHistorySportModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSAddAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSDeleteAlarmCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSModifyAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
@@ -627,6 +629,10 @@ class WatchCommunicator : IWatchCommunicator {
             enqueueCommand(WatchSSetLanguageCommand(language))
         }
 
+        override fun setAntiLoss(enabled: Boolean) {
+            enqueueCommand(WatchSSetAntiLossCommand(if (enabled) 2 else 0))
+        }
+
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
         override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(1, startHour, startMinute, endHour, endMinute, dayOfWeekPattern, intervalInMinutes, message))
@@ -845,6 +851,14 @@ class WatchCommunicator : IWatchCommunicator {
 
                 WatchResponseType.SetLanguage -> {
                     return if (response is WatchSSetLanguageCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetAntiLoss -> {
+                    return if (response is WatchSSetAntiLossCommand.Response) {
                         WatchResponseAnalysisResult.Ok
                     } else {
                         WatchResponseAnalysisResult.Mismatch
