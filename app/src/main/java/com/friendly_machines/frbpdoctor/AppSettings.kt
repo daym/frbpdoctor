@@ -66,6 +66,8 @@ object AppSettings {
 
     private const val KEY_LANGUAGE = "language"
 
+    private const val KEY_RAISE_TO_WAKE_ENABLED = "raiseToWakeEnabled"
+    
     private const val KEY_ANTI_LOSS_ENABLED = "antiLossEnabled"
 
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
@@ -434,6 +436,14 @@ object AppSettings {
         return sharedPreferences.getString(KEY_LANGUAGE, "0")?.toByte() ?: 0
     }
 
+    fun isRaiseToWakeSetting(key: String): Boolean {
+        return key == KEY_RAISE_TO_WAKE_ENABLED
+    }
+
+    fun isRaiseToWakeEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_RAISE_TO_WAKE_ENABLED, true) // Default: enabled
+    }
+
     fun isAntiLossSetting(key: String): Boolean {
         return key == KEY_ANTI_LOSS_ENABLED
     }
@@ -453,6 +463,9 @@ object AppSettings {
         
         // Sync language setting from watch
         editor.putString(KEY_LANGUAGE, userConfigResponse.language.toString())
+        
+        // Sync raise-to-wake setting from watch - enabled if handRaiseSwitch > 0
+        editor.putBoolean(KEY_RAISE_TO_WAKE_ENABLED, userConfigResponse.handRaiseSwitch > 0)
         
         // Sync anti-loss setting from watch - enabled if antiLossType > 0
         editor.putBoolean(KEY_ANTI_LOSS_ENABLED, userConfigResponse.antiLossType > 0)

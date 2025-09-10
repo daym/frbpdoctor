@@ -84,6 +84,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartMonitorCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLongSittingCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetRaiseScreenCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
@@ -627,6 +628,10 @@ class WatchCommunicator : IWatchCommunicator {
 
         override fun setLanguage(language: Byte) {
             enqueueCommand(WatchSSetLanguageCommand(language))
+        }
+        
+        override fun setRaiseToWake(enabled: Boolean) {
+            enqueueCommand(WatchSSetRaiseScreenCommand(enabled))
         }
 
         override fun setAntiLoss(enabled: Boolean) {

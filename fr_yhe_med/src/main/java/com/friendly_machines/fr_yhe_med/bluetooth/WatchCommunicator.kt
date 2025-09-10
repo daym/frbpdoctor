@@ -578,6 +578,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getSportData() = enqueueCommand(WatchGetSportDataCommand())
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSetStepGoalCommand(steps))
         override fun setLanguage(language: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setRaiseToWake(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
         override fun setUserSkinColor(enum: SkinColor) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
@@ -798,6 +799,14 @@ public class WatchCommunicator : IWatchCommunicator {
                 }
 
                 WatchResponseType.SetLanguage -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetRaiseToWake -> {
                     return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok
                     } else {

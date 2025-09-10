@@ -103,6 +103,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetLanguageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetLongSittingCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetMainThemeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetNotificationCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetRaiseScreenCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
@@ -185,6 +186,7 @@ object WatchResponseFactory {
 
             WatchOperation.SSetMainTheme -> WatchSSetMainThemeCommand.Response.parse(buf)
             WatchOperation.SSetLanguage -> WatchSSetLanguageCommand.Response.parse(buf)
+            WatchOperation.SRaiseScreen -> WatchSSetRaiseScreenCommand.Response.parse(buf)
             WatchOperation.SSetTime -> WatchSSetTimeCommand.Response.parse(buf)
             WatchOperation.SSetWatchWearingArm -> WatchSSetWatchWearingArmCommand.Response.parse(buf)
             WatchOperation.SUserInfo -> WatchSSetUserInfoCommand.Response.parse(buf)
