@@ -326,7 +326,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             } else if (AppSettings.isUnitSetting(key)) {
                 val unitPreferences = AppSettings.getUnitPreferences(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetUnits) {
-                    it.setUnits(unitPreferences.distance, unitPreferences.weight, unitPreferences.temperature, unitPreferences.time24h, unitPreferences.bloodSugar, unitPreferences.uricAcid)
+                    it.setUnits(unitPreferences.distance, unitPreferences.weight, unitPreferences.temperature, unitPreferences.timeFormat, unitPreferences.bloodSugar, unitPreferences.uricAcid)
                 }
             } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
                 val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)

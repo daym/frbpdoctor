@@ -87,10 +87,13 @@
             android:key="unitsTemperature"
             android:title="Temperature"
             app:useSimpleSummaryProvider="true" />
-        <CheckBoxPreference
-            android:key="unitsTime24h"
-            android:title="24-hour time format"
-            android:summary="Use 24-hour time format" />
+        <ListPreference
+            android:dialogTitle="Time format"
+            android:entries="@array/time_format_options"
+            android:entryValues="@array/time_format_values"
+            android:key="unitsTimeFormat"
+            android:title="Time format"
+            app:useSimpleSummaryProvider="true" />
         <ListPreference
             android:dialogTitle="Blood sugar unit"
             android:entries="@array/blood_sugar_unit_options"

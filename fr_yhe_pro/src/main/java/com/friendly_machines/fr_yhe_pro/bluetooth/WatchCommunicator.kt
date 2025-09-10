@@ -638,8 +638,8 @@ class WatchCommunicator : IWatchCommunicator {
             enqueueCommand((WatchSSetHeartAlarmCommand(if (enabled) 1 else 0, minValue, maxValue.toByte())))
         }
 
-        override fun setUnits(distance: Byte, weight: Byte, temperature: Byte, time24h: Boolean, bloodSugarUnit: Byte, uricAcidUnit: Byte) {
-            enqueueCommand(WatchSSetUnitCommand(distance, weight, temperature, time24h, bloodSugarUnit, uricAcidUnit))
+        override fun setUnits(distance: Byte, weight: Byte, temperature: Byte, timeFormat: Byte, bloodSugarUnit: Byte, uricAcidUnit: Byte) {
+            enqueueCommand(WatchSSetUnitCommand(distance, weight, temperature, timeFormat, bloodSugarUnit, uricAcidUnit))
         }
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchSSetAccidentMonitoringCommand(enabled))

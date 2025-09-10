@@ -60,7 +60,7 @@ object AppSettings {
     private const val KEY_UNITS_DISTANCE = "unitsDistance"
     private const val KEY_UNITS_WEIGHT = "unitsWeight"
     private const val KEY_UNITS_TEMPERATURE = "unitsTemperature"
-    private const val KEY_UNITS_TIME_24H = "unitsTime24h"
+    private const val KEY_UNITS_TIME_FORMAT = "unitsTimeFormat"
     private const val KEY_UNITS_BLOOD_SUGAR = "unitsBloodSugar"
     private const val KEY_UNITS_URIC_ACID = "unitsUricAcid"
 
@@ -369,7 +369,7 @@ object AppSettings {
 
     data class HeartMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)
     data class HeartAlarm(val enabled: Boolean, val minValue: Byte, val maxValue: UByte)
-    data class UnitPreferences(val distance: Byte, val weight: Byte, val temperature: Byte, val time24h: Boolean, val bloodSugar: Byte, val uricAcid: Byte)
+    data class UnitPreferences(val distance: Byte, val weight: Byte, val temperature: Byte, val timeFormat: Byte, val bloodSugar: Byte, val uricAcid: Byte)
 
     fun isUserHeartMonitoringSetting(key: String): Boolean {
         return setOf(KEY_USER_HEART_MONITORING_ENABLED, KEY_USER_HEART_MONITORING_INTERVAL, KEY_USER_HEART_MONITORING_MAX_VALUE).contains(key)
@@ -412,14 +412,26 @@ object AppSettings {
         val distance = sharedPreferences.getString(KEY_UNITS_DISTANCE, "0")?.toByte() ?: 0
         val weight = sharedPreferences.getString(KEY_UNITS_WEIGHT, "0")?.toByte() ?: 0
         val temperature = sharedPreferences.getString(KEY_UNITS_TEMPERATURE, "0")?.toByte() ?: 0
-        val time24h = sharedPreferences.getBoolean(KEY_UNITS_TIME_24H, true)
+        val timeFormat = sharedPreferences.getString(KEY_UNITS_TIME_FORMAT, "0")?.toByte() ?: 0
         val bloodSugar = sharedPreferences.getString(KEY_UNITS_BLOOD_SUGAR, "0")?.toByte() ?: 0
         val uricAcid = sharedPreferences.getString(KEY_UNITS_URIC_ACID, "0")?.toByte() ?: 0
-        return UnitPreferences(distance = distance, weight = weight, temperature = temperature, time24h = time24h, bloodSugar = bloodSugar, uricAcid = uricAcid)
+        return UnitPreferences(distance = distance, weight = weight, temperature = temperature, timeFormat = timeFormat, bloodSugar = bloodSugar, uricAcid = uricAcid)
     }
 
     fun isUnitSetting(key: String): Boolean {
-        return setOf(KEY_UNITS_DISTANCE, KEY_UNITS_WEIGHT, KEY_UNITS_TEMPERATURE, KEY_UNITS_TIME_24H, KEY_UNITS_BLOOD_SUGAR, KEY_UNITS_URIC_ACID).contains(key)
+        return setOf(KEY_UNITS_DISTANCE, KEY_UNITS_WEIGHT, KEY_UNITS_TEMPERATURE, KEY_UNITS_TIME_FORMAT, KEY_UNITS_BLOOD_SUGAR, KEY_UNITS_URIC_ACID).contains(key)
+    }
+
+    fun syncUnitsFromWatchUserConfig(sharedPreferences: SharedPreferences, userConfigResponse: com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand.Response) {
+        val editor = sharedPreferences.edit()
+        
+        // Sync the 4 units we can read from the watch - all straight values now
+        editor.putString(KEY_UNITS_DISTANCE, userConfigResponse.distanceUnit.toString())
+        editor.putString(KEY_UNITS_WEIGHT, userConfigResponse.weightUnit.toString())
+        editor.putString(KEY_UNITS_TEMPERATURE, userConfigResponse.temperatureUnit.toString())
+        editor.putString(KEY_UNITS_TIME_FORMAT, userConfigResponse.timeUnit.toString())
+        
+        editor.apply()
     }
 
     data class TemperatureMonitoring(val enabled: Boolean, val interval: Byte, val maxValue: UByte)

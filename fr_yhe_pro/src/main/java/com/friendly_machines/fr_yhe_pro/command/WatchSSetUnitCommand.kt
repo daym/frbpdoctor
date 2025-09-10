@@ -4,14 +4,19 @@ import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
-// - Blood Sugar Unit: 0=mmol/L, 1=mg/dL
-// - Uric Acid Unit: 0=μmol/L, 1=mg/dL
-class WatchSSetUnitCommand(distance: Byte, weight: Byte, temperature: Byte, time24h: Boolean, bloodSugarUnit: Byte, uricAcidUnit: Byte) : WatchCommand(
+/**
+ * Sets all 6 unit preferences on the watch atomically.
+ * 
+ * @param distance Distance unit: 0=kilometers, 1=miles
+ * @param weight Weight unit: 0=kilograms, 1=pounds  
+ * @param temperature Temperature unit: 0=Celsius, 1=Fahrenheit
+ * @param timeFormat Time format: 0=24-hour, 1=12-hour
+ * @param bloodSugarUnit Blood sugar unit: 0=mmol/L, 1=mg/dL
+ * @param uricAcidUnit Uric acid unit: 0=μmol/L, 1=mg/dL
+ */
+class WatchSSetUnitCommand(distance: Byte, weight: Byte, temperature: Byte, timeFormat: Byte, bloodSugarUnit: Byte, uricAcidUnit: Byte) : WatchCommand(
     WatchOperation.SUnit, byteArrayOf(
-        distance, weight, temperature, when (time24h) {
-            true -> 0   // 24-hour format sends 0
-            false -> 1  // 12-hour format sends 1
-        }, bloodSugarUnit, uricAcidUnit
+        distance, weight, temperature, timeFormat, bloodSugarUnit, uricAcidUnit
     )
 ) {
     data class Response(val status: Byte, val data: Byte?) : WatchResponse() {
