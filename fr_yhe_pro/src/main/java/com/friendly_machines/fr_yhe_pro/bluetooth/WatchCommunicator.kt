@@ -79,6 +79,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSFindPhoneCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSGoalCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSModifyAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSRestoreFactoryCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
@@ -684,9 +685,8 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchASetSportModeCommand(sportState, sportType))
         override fun getRealData(sensorType: com.friendly_machines.fr_yhe_api.commondata.RealDataSensorType, measureType: com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType, duration: Byte) = enqueueCommand(WatchAGetRealData(sensorType, measureType, duration))
 
-        override fun setStepGoal(steps: Int) {
-            // FIXME
-        }
+        // Note: WatchSGoalCommand also handles sleepQuality (goalType=3) - both use the same command and response class
+        override fun setStepGoal(steps: Int) = enqueueCommand(WatchSGoalCommand(0, steps))
 
         override fun addListener(that: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(that)
@@ -727,17 +727,18 @@ class WatchCommunicator : IWatchCommunicator {
 //                    }
 //                }
 //
-//                WatchResponseType.SetStepGoal -> {
-//                    return if (response is WatchSetStepGoalCommand.Response) {
-//                        if (response.status == 0.toByte()) {
-//                            WatchResponseAnalysisResult.Ok
-//                        } else {
-//                            WatchResponseAnalysisResult.Err
-//                        }
-//                    } else {
-//                        WatchResponseAnalysisResult.Mismatch
-//                    }
-//                }
+                // Note: WatchSGoalCommand also handles sleepQuality (goalType=3) - both use the same command and response class
+                WatchResponseType.SetStepGoal -> {
+                    return if (response is WatchSGoalCommand.Response) {
+                        if (response.status == 0.toByte()) {
+                            WatchResponseAnalysisResult.Ok
+                        } else {
+                            WatchResponseAnalysisResult.Err
+                        }
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
 //
 //                WatchResponseType.Unbind -> {
 //                    return if (response is WatchUnbindCommand.Response) {
