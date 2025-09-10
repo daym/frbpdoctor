@@ -33,4 +33,5 @@ enum class WatchResponseType {
     RestoreFactory,
     SetTakePhotoMode,
     SetSosMode,
+    FindDevice,
 }

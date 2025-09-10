@@ -20,6 +20,7 @@ import com.friendly_machines.fr_yhe_pro.Crc16
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.bigIndicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.indicationPortCharacteristic
 import com.friendly_machines.fr_yhe_pro.bluetooth.WatchCharacteristic.writingPortCharacteristic
+import com.friendly_machines.fr_yhe_pro.command.WatchAFindDeviceCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAGetRealData
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAPushMessageCommand
@@ -934,6 +935,14 @@ class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.FindDevice -> {
+                    return if (response is WatchAFindDeviceCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
 
                 else -> {
                     TODO("Not implemented")
@@ -966,6 +975,8 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchASetTakePhotoModeCommand(if (enabled) 1.toByte() else 0.toByte()))
 
         override fun setSosMode(enabled: Boolean) = enqueueCommand(WatchSSetSosModeCommand(if (enabled) 1.toByte() else 0.toByte()))
+
+        override fun findDevice(duration: Byte, intensity: Byte, pattern: Byte) = enqueueCommand(WatchAFindDeviceCommand(duration, intensity, pattern))
     }
 
     override val binder = WatchCommunicationServiceBinder()

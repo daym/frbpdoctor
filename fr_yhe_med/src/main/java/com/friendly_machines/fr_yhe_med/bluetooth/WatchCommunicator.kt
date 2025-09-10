@@ -896,6 +896,14 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.FindDevice -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
             }
         }
 
@@ -928,6 +936,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun restoreFactorySettings() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setSosMode(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun findDevice(duration: Byte, intensity: Byte, pattern: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
     }
 
     override val binder = WatchCommunicationServiceBinder()

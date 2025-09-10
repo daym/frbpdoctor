@@ -308,6 +308,10 @@
         <Preference
             android:key="set_time_on_watch"
             android:title="Set time on watch (to current time)" />
+        <Preference
+            android:key="find_my_watch"
+            android:title="Find My Watch"
+            android:summary="Make the watch vibrate and beep to help locate it" />
         <com.friendly_machines.frbpdoctor.ui.settings.DeviceGInfoPreference
             android:key="get_watch_g_info"
             android:title="Get watch device info"

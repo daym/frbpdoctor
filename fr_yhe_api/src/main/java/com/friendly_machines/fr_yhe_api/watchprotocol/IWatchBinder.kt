@@ -115,4 +115,6 @@ interface IWatchBinder : IBinder {
     fun setTakePhotoMode(enabled: Boolean)
     
     fun setSosMode(enabled: Boolean)
+    
+    fun findDevice(duration: Byte = 1, intensity: Byte = 5, pattern: Byte = 2)
 }

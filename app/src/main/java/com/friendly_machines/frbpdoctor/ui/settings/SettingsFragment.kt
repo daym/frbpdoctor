@@ -91,6 +91,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
         Toast.makeText(requireContext(), "Factory reset command sent to watch", Toast.LENGTH_LONG).show()
     }
+    
+    private fun findMyWatch() {
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.FindDevice) {
+            it.findDevice()
+        }
+        Toast.makeText(requireContext(), "Finding your watch... Listen for sounds and vibration", Toast.LENGTH_LONG).show()
+    }
 
     private fun setProfile(profile: AppSettings.Profile) {
         val age = calculateYearsSinceDate(profile.birthdayString)
@@ -121,6 +128,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         }
         findPreference<Preference>("set_time_on_watch")?.setOnPreferenceClickListener {
             setTime()
+            true
+        }
+        
+        findPreference<Preference>("find_my_watch")?.setOnPreferenceClickListener {
+            findMyWatch()
             true
         }
         
