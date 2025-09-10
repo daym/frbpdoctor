@@ -50,6 +50,7 @@ class WatchCommunicationService : Service(), IWatchListener {
     private fun sendStatusBroadcast(running: Boolean) {
         val intent = Intent(ACTION_SERVICE_STATUS).apply {
             putExtra(EXTRA_RUNNING, running)
+            setPackage(packageName)
         }
         sendBroadcast(intent)
     }
