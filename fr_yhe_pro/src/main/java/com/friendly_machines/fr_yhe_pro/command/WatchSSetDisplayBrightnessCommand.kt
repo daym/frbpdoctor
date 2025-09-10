@@ -5,10 +5,15 @@ import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.nio.ByteBuffer
 
 /**
- * Display brightness command.
  * Controls the screen brightness level of the watch.
  *
- * @param level Brightness level (0=lowest, 1=middle, 2=high, 3=auto, 4=lower, 5=higher)
+ * @param level Brightness level:
+ *              0 = Lowest brightness
+ *              1 = Middle brightness (default)
+ *              2 = High brightness
+ *              3 = Auto brightness
+ *              4 = Lower brightness  
+ *              5 = Higher brightness
  */
 class WatchSSetDisplayBrightnessCommand(level: Byte) : WatchCommand(WatchOperation.SDisplayBrightness, byteArrayOf(level)) {
     data class Response(val status: Byte) : WatchResponse() {
