@@ -53,9 +53,9 @@ abstract class BaseActivity : AppCompatActivity() {
     
     private fun updateSubtitle(isRunning: Boolean) {
         supportActionBar?.subtitle = if (isRunning) {
-            "Watch Connected"
+            "Watch communication service running"
         } else {
-            "Watch Disconnected"
+            "Watch communication service stopped"
         }
     }
 }
