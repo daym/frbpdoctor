@@ -343,6 +343,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetRaiseToWake) {
                     it.setRaiseToWake(enabled)
                 }
+            } else if (AppSettings.isDisplayBrightnessSetting(key)) {
+                val brightness = AppSettings.getDisplayBrightness(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetDisplayBrightness) {
+                    it.setDisplayBrightness(brightness)
+                }
             } else if (AppSettings.isAntiLossSetting(key)) {
                 val enabled = AppSettings.isAntiLossEnabled(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetAntiLoss) {

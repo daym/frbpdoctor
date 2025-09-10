@@ -61,6 +61,7 @@ interface IWatchBinder : IBinder {
     fun setMainTheme(index: Byte) // not sure that's materially different from selectWatchDial
     fun setLanguage(language: Byte)
     fun setRaiseToWake(enabled: Boolean)
+    fun setDisplayBrightness(level: Byte)
     fun setUserSkinColor(enum: SkinColor)
     fun setUserSleep(hour: Byte, minute: Byte, repeats: UByte)
     fun setScheduleEnabled(enabled: Boolean)

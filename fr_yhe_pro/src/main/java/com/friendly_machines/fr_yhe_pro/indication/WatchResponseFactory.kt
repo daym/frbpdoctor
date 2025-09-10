@@ -94,6 +94,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDataCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetDisplayBrightnessCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetEventReminderModeCommand
@@ -187,6 +188,7 @@ object WatchResponseFactory {
             WatchOperation.SSetMainTheme -> WatchSSetMainThemeCommand.Response.parse(buf)
             WatchOperation.SSetLanguage -> WatchSSetLanguageCommand.Response.parse(buf)
             WatchOperation.SRaiseScreen -> WatchSSetRaiseScreenCommand.Response.parse(buf)
+            WatchOperation.SDisplayBrightness -> WatchSSetDisplayBrightnessCommand.Response.parse(buf)
             WatchOperation.SSetTime -> WatchSSetTimeCommand.Response.parse(buf)
             WatchOperation.SSetWatchWearingArm -> WatchSSetWatchWearingArmCommand.Response.parse(buf)
             WatchOperation.SUserInfo -> WatchSSetUserInfoCommand.Response.parse(buf)

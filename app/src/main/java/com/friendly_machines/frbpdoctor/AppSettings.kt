@@ -67,6 +67,7 @@ object AppSettings {
     private const val KEY_LANGUAGE = "language"
 
     private const val KEY_RAISE_TO_WAKE_ENABLED = "raiseToWakeEnabled"
+    private const val KEY_DISPLAY_BRIGHTNESS = "displayBrightness"
     
     private const val KEY_ANTI_LOSS_ENABLED = "antiLossEnabled"
 
@@ -444,6 +445,14 @@ object AppSettings {
         return sharedPreferences.getBoolean(KEY_RAISE_TO_WAKE_ENABLED, true) // Default: enabled
     }
 
+    fun isDisplayBrightnessSetting(key: String): Boolean {
+        return key == KEY_DISPLAY_BRIGHTNESS
+    }
+
+    fun getDisplayBrightness(sharedPreferences: SharedPreferences): Byte {
+        return sharedPreferences.getString(KEY_DISPLAY_BRIGHTNESS, "1")?.toByte() ?: 1 // Default: middle
+    }
+
     fun isAntiLossSetting(key: String): Boolean {
         return key == KEY_ANTI_LOSS_ENABLED
     }
@@ -466,6 +475,9 @@ object AppSettings {
         
         // Sync raise-to-wake setting from watch - enabled if handRaiseSwitch > 0
         editor.putBoolean(KEY_RAISE_TO_WAKE_ENABLED, userConfigResponse.handRaiseSwitch > 0)
+        
+        // Sync display brightness setting from watch
+        editor.putString(KEY_DISPLAY_BRIGHTNESS, userConfigResponse.screenDown.toString())
         
         // Sync anti-loss setting from watch - enabled if antiLossType > 0
         editor.putBoolean(KEY_ANTI_LOSS_ENABLED, userConfigResponse.antiLossType > 0)

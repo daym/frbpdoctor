@@ -78,6 +78,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetAntiLossCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSGetAllAlarmsCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSModifyAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetAccidentMonitoringCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetDisplayBrightnessCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetDndModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetHeartMonitorCommand
@@ -632,6 +633,10 @@ class WatchCommunicator : IWatchCommunicator {
         
         override fun setRaiseToWake(enabled: Boolean) {
             enqueueCommand(WatchSSetRaiseScreenCommand(enabled))
+        }
+        
+        override fun setDisplayBrightness(level: Byte) {
+            enqueueCommand(WatchSSetDisplayBrightnessCommand(level))
         }
 
         override fun setAntiLoss(enabled: Boolean) {
