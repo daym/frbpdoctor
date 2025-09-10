@@ -27,17 +27,13 @@ abstract class BaseActivity : AppCompatActivity() {
         // Register broadcast receiver
         val filter = IntentFilter(WatchCommunicationService.ACTION_SERVICE_STATUS)
         
-        // Android 14+ requires specifying if receiver is exported
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.registerReceiver(
-                this,
-                serviceStatusReceiver,
-                filter,
-                ContextCompat.RECEIVER_EXPORTED
-            )
-        } else {
-            registerReceiver(serviceStatusReceiver, filter)
-        }
+        // Always use ContextCompat.registerReceiver to be compatible with all Android versions
+        ContextCompat.registerReceiver(
+            this,
+            serviceStatusReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         
         // Set initial subtitle based on current state
         updateSubtitle(WatchCommunicationService.isRunning)
