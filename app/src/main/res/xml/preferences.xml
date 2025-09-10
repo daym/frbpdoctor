@@ -302,6 +302,11 @@
             android:key="get_device_files"
             android:title="Show files that are on the device"
             app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:key="factory_reset_watch"
+            android:title="Factory Reset Watch"
+            android:summary="Reset watch to factory settings. All data will be lost!"
+            android:icon="@android:drawable/ic_dialog_alert" />
     </PreferenceCategory>
 
 </PreferenceScreen>
