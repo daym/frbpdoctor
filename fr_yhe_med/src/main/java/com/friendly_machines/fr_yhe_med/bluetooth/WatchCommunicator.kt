@@ -880,6 +880,14 @@ public class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.SetTakePhotoMode -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
             }
         }
 
@@ -910,6 +918,7 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun getComprehensiveHistoryData() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun deleteBloodOxygenHistory() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun restoreFactorySettings() = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
     }
 
     override val binder = WatchCommunicationServiceBinder()

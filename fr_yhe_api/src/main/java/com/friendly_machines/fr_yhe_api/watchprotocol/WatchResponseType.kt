@@ -31,4 +31,5 @@ enum class WatchResponseType {
     SetTemperatureMonitoring,
     SetSportMode,
     RestoreFactory,
+    SetTakePhotoMode,
 }

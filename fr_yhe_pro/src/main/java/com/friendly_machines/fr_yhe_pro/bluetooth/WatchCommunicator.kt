@@ -24,6 +24,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchAGetRealData
 import com.friendly_machines.fr_yhe_pro.command.WatchANotificationPushCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAPushMessageCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetSportModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetTakePhotoModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchASetTodayWeatherCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileCountCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCGetFileListCommand
@@ -916,6 +917,14 @@ class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.SetTakePhotoMode -> {
+                    return if (response is WatchASetTakePhotoModeCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
 
                 else -> {
                     TODO("Not implemented")
@@ -944,6 +953,8 @@ class WatchCommunicator : IWatchCommunicator {
         override fun getComprehensiveHistoryData() = enqueueCommand(WatchHGetComprehensiveHistoryCommand())
 
         override fun restoreFactorySettings() = enqueueCommand(WatchSRestoreFactoryCommand())
+        
+        override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchASetTakePhotoModeCommand(if (enabled) 1.toByte() else 0.toByte()))
     }
 
     override val binder = WatchCommunicationServiceBinder()

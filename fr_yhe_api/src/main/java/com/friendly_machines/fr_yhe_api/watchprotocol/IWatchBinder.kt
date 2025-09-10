@@ -111,4 +111,6 @@ interface IWatchBinder : IBinder {
     fun getComprehensiveHistoryData()
 
     fun restoreFactorySettings()
+    
+    fun setTakePhotoMode(enabled: Boolean)
 }
