@@ -17,7 +17,7 @@ You can download the latest APK from GitHub Actions:
 1. Go to the [Actions tab](https://github.com/daym/frbpdoctor/actions) in the repository
 2. Click on the most recent successful workflow run
 3. Scroll down to the "Artifacts" section
-4. Download the `app-debug` artifact, which contains the APK file
+4. Download the `app-debug` artifact (a ZIP file), which contains the APK file
 
 ### Official Releases
 
