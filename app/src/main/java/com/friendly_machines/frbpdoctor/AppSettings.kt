@@ -72,6 +72,11 @@ object AppSettings {
     private const val KEY_ANTI_LOSS_ENABLED = "antiLossEnabled"
     
     private const val KEY_EVENT_REMINDER_MODE_ENABLED = "eventReminderModeEnabled"
+    
+    // Temperature Alarm: Watch UserConfig only provides enabled/disabled state via temperatureSwitch
+    // The temperature threshold must be configured separately by the user (default: 40°C)
+    private const val KEY_TEMPERATURE_ALARM_ENABLED = "temperatureAlarmEnabled"
+    private const val KEY_TEMPERATURE_ALARM_THRESHOLD = "temperatureAlarmThreshold"
 
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
@@ -471,6 +476,18 @@ object AppSettings {
         return sharedPreferences.getBoolean(KEY_EVENT_REMINDER_MODE_ENABLED, false)
     }
 
+    fun isTemperatureAlarmSetting(key: String): Boolean {
+        return key == KEY_TEMPERATURE_ALARM_ENABLED || key == KEY_TEMPERATURE_ALARM_THRESHOLD
+    }
+
+    fun isTemperatureAlarmEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_TEMPERATURE_ALARM_ENABLED, false)
+    }
+
+    fun getTemperatureAlarmThreshold(sharedPreferences: SharedPreferences): UByte {
+        return sharedPreferences.getInt(KEY_TEMPERATURE_ALARM_THRESHOLD, 40).toUByte() // Default: 40°C
+    }
+
     fun syncUnitsFromWatchUserConfig(sharedPreferences: SharedPreferences, userConfigResponse: com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand.Response) {
         val editor = sharedPreferences.edit()
         
@@ -494,6 +511,9 @@ object AppSettings {
         
         // Sync event reminder mode setting from watch - enabled if eventSwitch > 0
         editor.putBoolean(KEY_EVENT_REMINDER_MODE_ENABLED, userConfigResponse.eventSwitch > 0)
+        
+        // Sync temperature alarm setting from watch - enabled if temperatureSwitch > 0
+        editor.putBoolean(KEY_TEMPERATURE_ALARM_ENABLED, userConfigResponse.temperatureSwitch > 0)
         
         editor.apply()
     }

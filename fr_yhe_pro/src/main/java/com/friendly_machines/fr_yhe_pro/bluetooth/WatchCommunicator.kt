@@ -648,6 +648,10 @@ class WatchCommunicator : IWatchCommunicator {
             enqueueCommand(WatchSSetEventReminderModeCommand(enabled))
         }
 
+        override fun setTemperatureAlarm(enabled: Boolean, temperature: UByte) {
+            enqueueCommand(WatchSSetTemperatureAlarmCommand(enabled, if (enabled) temperature else 0u))
+        }
+
         override fun setDndSettings(mode: Byte, startTimeHour: Byte, startTimeMin: Byte, endTimeHour: Byte, endTimeMin: Byte) = enqueueCommand(WatchSSetDndModeCommand(mode, startTimeHour, startTimeMin, endTimeHour, endTimeMin))
 
         override fun setRegularReminder(startHour: Byte, startMinute: Byte, endHour: Byte, endMinute: Byte, dayOfWeekPattern: Set<DayOfWeekPattern>, intervalInMinutes: Byte, message: String?) = enqueueCommand(WatchSSetRegularReminderCommand(1, startHour, startMinute, endHour, endMinute, dayOfWeekPattern, intervalInMinutes, message))

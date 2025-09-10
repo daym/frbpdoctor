@@ -358,6 +358,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetEventReminderMode) {
                     it.setEventReminderMode(enabled)
                 }
+            } else if (AppSettings.isTemperatureAlarmSetting(key)) {
+                val enabled = AppSettings.isTemperatureAlarmEnabled(sharedPreferences)
+                val threshold = AppSettings.getTemperatureAlarmThreshold(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetTemperatureAlarm) {
+                    it.setTemperatureAlarm(enabled, threshold)
+                }
             } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
                 val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetTemperatureMonitoring) {
