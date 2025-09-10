@@ -541,16 +541,18 @@ object AppSettings {
         val endHour2 = endTimeParts2[0].toByte()
         val endMinute2 = endTimeParts2[1].toByte()
 
-        var repeats = 0
-        // FIXME test
-        for (key in arrayOf(KEY_USER_LONG_SITTING_MONDAYS, KEY_USER_LONG_SITTING_TUESDAYS, KEY_USER_LONG_SITTING_WEDNESDAYS, KEY_USER_LONG_SITTING_THURSDAYS, KEY_USER_LONG_SITTING_FRIDAYS, KEY_USER_LONG_SITTING_SATURDAYS, KEY_USER_LONG_SITTING_SUNDAYS)) {
-            val s = sharedPreferences.getBoolean(key, false)
-            repeats = repeats * 2 + when (s) {
-                true -> 1
-                false -> 0
+        // Build week string in Monday-Sunday order
+        val weekString = buildString {
+            for (key in arrayOf(KEY_USER_LONG_SITTING_MONDAYS, KEY_USER_LONG_SITTING_TUESDAYS, KEY_USER_LONG_SITTING_WEDNESDAYS, KEY_USER_LONG_SITTING_THURSDAYS, KEY_USER_LONG_SITTING_FRIDAYS, KEY_USER_LONG_SITTING_SATURDAYS, KEY_USER_LONG_SITTING_SUNDAYS)) {
+                append(if (sharedPreferences.getBoolean(key, false)) "1" else "0")
             }
         }
-        repeats = repeats * 2 + 1 // warn // FIXME setting
+        
+        // Add enable bit and reverse
+        val anyDayEnabled = weekString.contains("1")
+        val binaryString = weekString + if (anyDayEnabled) "1" else "0"
+        val reversed = binaryString.reversed()
+        val repeats = reversed.toInt(2)
 
         return UserLongSitting(startHour1 = startHour1, startMinute1 = startMinute1, endHour1 = endHour1, endMinute1 = endMinute1, startHour2 = startHour2, startMinute2 = startMinute2, endHour2 = endHour2, endMinute2 = endMinute2,  interval = interval, repeats = repeats.toUByte())
     }

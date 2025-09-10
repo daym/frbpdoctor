@@ -655,7 +655,7 @@ class WatchCommunicator : IWatchCommunicator {
             enqueueCommand((WatchSSetTemperatureMonitorCommand(1, interval)))
         }
 
-        override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, repeats, interval))
+        override fun setLongSitting(startHour1: Byte, startMinute1: Byte, endHour1: Byte, endMinute1: Byte, startHour2: Byte, startMinute2: Byte, endHour2: Byte, endMinute2: Byte, repeats: UByte, interval: Byte) = enqueueCommand(WatchSSetLongSittingCommand(startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2, interval, repeats))
         override fun setScreenTimeLit(screenTimeLit: Byte) = enqueueCommand(WatchSSetScreenLitTimeCommand(screenTimeLit))
         override fun getChipScheme() = enqueueCommand(WatchGGetChipSchemeCommand())
         override fun setSportMode(sportState: com.friendly_machines.fr_yhe_api.commondata.SportState, sportType: com.friendly_machines.fr_yhe_api.commondata.SportType) = enqueueCommand(WatchASetSportModeCommand(sportState, sportType))
