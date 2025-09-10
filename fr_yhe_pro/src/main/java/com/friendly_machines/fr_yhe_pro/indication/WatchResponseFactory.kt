@@ -41,6 +41,13 @@ import com.friendly_machines.fr_yhe_pro.command.WatchATriggerBloodTestCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchATriggerMeasurementCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAUpgradeNotificationCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchAUricAcidCalibCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchAFindDeviceCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchASetTakePhotoModeCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCStartCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchCSyncCheckResultCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSGoalCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSRestoreFactoryCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetSosModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCDeleteByIndexCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCDeleteByTimestampCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchCFileSyncCommand
@@ -217,15 +224,17 @@ object WatchResponseFactory {
             WatchOperation.SSetTemperatureAlarm -> WatchSSetTemperatureAlarmCommand.Response.parse(buf)
             WatchOperation.SSetTemperatureMonitor -> WatchSSetTemperatureMonitorCommand.Response.parse(buf)
             WatchOperation.SUnit -> WatchSSetUnitCommand.Response.parse(buf)
-            WatchOperation.GGetChipScheme -> WatchGGetChipSchemeCommand.Response.parse(buf)
+            WatchOperation.SGoal -> WatchSGoalCommand.Response.parse(buf)
+            WatchOperation.SRestoreFactory -> WatchSRestoreFactoryCommand.Response.parse(buf)
+            WatchOperation.SSetSosMode -> WatchSSetSosModeCommand.Response.parse(buf)
 
             // "Get" section
 
+            WatchOperation.GGetChipScheme -> WatchGGetChipSchemeCommand.Response.parse(buf)
             WatchOperation.GGetDeviceName -> WatchGGetDeviceNameCommand.Response.parse(buf)
             WatchOperation.GGetRealTemperature -> WatchGGetRealTemperatureCommand.Response.parse(buf)
             WatchOperation.GGetMainTheme -> WatchGGetMainThemeCommand.Response.parse(buf)
             WatchOperation.GGetDeviceScreenInfo -> WatchGGetDeviceScreenInfoCommand.Response.parse(buf)
-
             WatchOperation.GGetDeviceInfo -> WatchGGetDeviceInfoCommand.Response.parse(buf)
 //            WatchOperation.GGetDeviceName -> WatchGGetDeviceNameCommand.Response.parse(buf)
             WatchOperation.GGetScreenInfo -> WatchGGetScreenInfoCommand.Response.parse(buf)
@@ -356,6 +365,8 @@ object WatchResponseFactory {
             WatchOperation.APushMessage -> WatchAPushMessageCommand.Response.parse(buf)
             WatchOperation.ARealData -> WatchAGetRealData.Response.parse(buf)
             WatchOperation.AShutdown -> WatchAShutdown.Response.parse(buf)
+            WatchOperation.AFindDevice -> WatchAFindDeviceCommand.Response.parse(buf)
+            WatchOperation.ATakePhotoMode -> WatchASetTakePhotoModeCommand.Response.parse(buf)
 
             // "Others" section
 
@@ -369,6 +380,8 @@ object WatchResponseFactory {
             WatchOperation.CVerifyFile -> WatchCVerifyFileCommand.Response.parse(buf)
             WatchOperation.CDeleteByIndex -> WatchCDeleteByIndexCommand.Response.parse(buf)
             WatchOperation.CDeleteByTimestamp -> WatchCDeleteByTimestampCommand.Response.parse(buf)
+            WatchOperation.CStart -> WatchCStartCommand.Response.parse(buf)
+            WatchOperation.CSyncCheckResult -> WatchCSyncCheckResultCommand.Response.parse(buf)
             // 16: data block. 23: block. 39: send 0x727 (content: 0) to verify.
 
             else -> { // TODO remove
