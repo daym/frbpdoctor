@@ -58,6 +58,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             //it.unbindWatch()
             it.bindWatch(userId, key)
         }
+        
+        // After binding, sync unit preferences from watch to app
+        WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.GetWatchDials) { binder ->
+            binder.getGDeviceInfo() // This will trigger UserConfig response and unit sync
+        }
     }
 
     private fun setTime() {
@@ -327,6 +332,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val unitPreferences = AppSettings.getUnitPreferences(sharedPreferences)
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetUnits) {
                     it.setUnits(unitPreferences.distance, unitPreferences.weight, unitPreferences.temperature, unitPreferences.timeFormat, unitPreferences.bloodSugar, unitPreferences.uricAcid)
+                }
+            } else if (AppSettings.isLanguageSetting(key)) {
+                val language = AppSettings.getLanguage(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetLanguage) {
+                    it.setLanguage(language)
                 }
             } else if (AppSettings.isUserTemperatureMonitoringSetting(key)) {
                 val temperatureMonitoring = AppSettings.getUserTemperatureMonitoring(sharedPreferences)

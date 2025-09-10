@@ -827,6 +827,30 @@ class WatchCommunicator : IWatchCommunicator {
                     }
                 }
 
+                WatchResponseType.SetHeartAlarm -> {
+                    return if (response is WatchSSetHeartAlarmCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetUnits -> {
+                    return if (response is WatchSSetUnitCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
+                WatchResponseType.SetLanguage -> {
+                    return if (response is WatchSSetLanguageCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
                 WatchResponseType.SetTemperatureMonitoring -> {
                     return if (response is WatchSSetTemperatureMonitorCommand.Response) { // FIXME what about SSetTemperatureAlarmCommand ?
                         WatchResponseAnalysisResult.Ok

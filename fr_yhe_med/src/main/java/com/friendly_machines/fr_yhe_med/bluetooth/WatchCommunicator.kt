@@ -796,6 +796,14 @@ public class WatchCommunicator : IWatchCommunicator {
                     }
                 }
 
+                WatchResponseType.SetLanguage -> {
+                    return if (response is WatchGetBatteryStateCommand.Response) { // dummy
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
+
                 WatchResponseType.SetTemperatureMonitoring -> {
                     return if (response is WatchGetBatteryStateCommand.Response) { // dummy
                         WatchResponseAnalysisResult.Ok

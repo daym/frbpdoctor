@@ -271,6 +271,17 @@
         <CheckBoxPreference android:title="Sundays" android:key="userLongSittingSundays" android:summary="Sundays" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:key="general" android:title="General">
+        <ListPreference
+            android:key="language"
+            android:title="Language"
+            android:summary="Watch display language"
+            android:entries="@array/language_options"
+            android:entryValues="@array/language_values"
+            android:defaultValue="0"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:key="watch_actions" android:title="Actions">
         <Preference
             android:key="clear_preferences"

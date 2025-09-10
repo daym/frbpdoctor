@@ -64,6 +64,8 @@ object AppSettings {
     private const val KEY_UNITS_BLOOD_SUGAR = "unitsBloodSugar"
     private const val KEY_UNITS_URIC_ACID = "unitsUricAcid"
 
+    private const val KEY_LANGUAGE = "language"
+
     private const val KEY_USER_TEMPERATURE_MONITORING_ENABLED = "userTemperatureMonitoringEnabled"
     private const val KEY_USER_TEMPERATURE_MONITORING_INTERVAL = "userTemperatureMonitoringInterval"
     private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
@@ -422,6 +424,14 @@ object AppSettings {
         return setOf(KEY_UNITS_DISTANCE, KEY_UNITS_WEIGHT, KEY_UNITS_TEMPERATURE, KEY_UNITS_TIME_FORMAT, KEY_UNITS_BLOOD_SUGAR, KEY_UNITS_URIC_ACID).contains(key)
     }
 
+    fun isLanguageSetting(key: String): Boolean {
+        return key == KEY_LANGUAGE
+    }
+
+    fun getLanguage(sharedPreferences: SharedPreferences): Byte {
+        return sharedPreferences.getString(KEY_LANGUAGE, "0")?.toByte() ?: 0
+    }
+
     fun syncUnitsFromWatchUserConfig(sharedPreferences: SharedPreferences, userConfigResponse: com.friendly_machines.fr_yhe_pro.command.WatchGGetUserConfigCommand.Response) {
         val editor = sharedPreferences.edit()
         
@@ -430,6 +440,9 @@ object AppSettings {
         editor.putString(KEY_UNITS_WEIGHT, userConfigResponse.weightUnit.toString())
         editor.putString(KEY_UNITS_TEMPERATURE, userConfigResponse.temperatureUnit.toString())
         editor.putString(KEY_UNITS_TIME_FORMAT, userConfigResponse.timeUnit.toString())
+        
+        // Sync language setting from watch
+        editor.putString(KEY_LANGUAGE, userConfigResponse.language.toString())
         
         editor.apply()
     }
