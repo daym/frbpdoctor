@@ -409,6 +409,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetAccidentMonitoringEnabled) {
                     it.setAccidentMonitoringEnabled(enabled)
                 }
+            } else if (AppSettings.isUserSosModeEnabledSetting(key)) {
+                val enabled = AppSettings.isUserSosModeEnabled(sharedPreferences)
+                WatchCommunicationClientShorthand.bindExecOneCommandUnbind(requireContext(), WatchResponseType.SetSosMode) {
+                    it.setSosMode(enabled)
+                }
             } else if (AppSettings.isWatchTimeLayout(key)) {
                 val timePosition = AppSettings.getWatchTimePosition(sharedPreferences)
                 val rgb565Color = AppSettings.getWatchTimeColor(sharedPreferences)

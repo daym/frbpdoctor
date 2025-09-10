@@ -113,4 +113,6 @@ interface IWatchBinder : IBinder {
     fun restoreFactorySettings()
     
     fun setTakePhotoMode(enabled: Boolean)
+    
+    fun setSosMode(enabled: Boolean)
 }

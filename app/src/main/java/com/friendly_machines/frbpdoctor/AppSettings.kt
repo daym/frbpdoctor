@@ -83,6 +83,7 @@ object AppSettings {
     private const val KEY_USER_TEMPERATURE_MONITORING_MAX_VALUE = "userTemperatureMonitoringMaxValue"
 
     private const val KEY_USER_ACCIDENT_MONITORING_ENABLED = "userAccidentMonitoringEnabled"
+    private const val KEY_USER_SOS_MODE_ENABLED = "userSosModeEnabled"
 
     private const val KEY_USER_LONG_SITTING_1_START_TIME = "userLongSitting1StartTime"
     private const val KEY_USER_LONG_SITTING_1_END_TIME = "userLongSitting1EndTime"
@@ -554,6 +555,14 @@ object AppSettings {
 
     fun isUserAccidentMonitoringEnabledSetting(key: String): Boolean {
         return key == KEY_USER_ACCIDENT_MONITORING_ENABLED
+    }
+
+    fun isUserSosModeEnabled(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(KEY_USER_SOS_MODE_ENABLED, false)
+    }
+
+    fun isUserSosModeEnabledSetting(key: String): Boolean {
+        return key == KEY_USER_SOS_MODE_ENABLED
     }
 
     fun isUserLongSittingSetting(key: String): Boolean {

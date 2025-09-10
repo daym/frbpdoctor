@@ -93,6 +93,7 @@ import com.friendly_machines.fr_yhe_pro.command.WatchSSetRegularReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScheduleSwitchCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetScreenLitTimeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetSkinColorCommand
+import com.friendly_machines.fr_yhe_pro.command.WatchSSetSosModeCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetSleepReminderCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureAlarmCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchSSetTemperatureMonitorCommand
@@ -925,6 +926,14 @@ class WatchCommunicator : IWatchCommunicator {
                         WatchResponseAnalysisResult.Mismatch
                     }
                 }
+                
+                WatchResponseType.SetSosMode -> {
+                    return if (response is WatchSSetSosModeCommand.Response) {
+                        WatchResponseAnalysisResult.Ok
+                    } else {
+                        WatchResponseAnalysisResult.Mismatch
+                    }
+                }
 
                 else -> {
                     TODO("Not implemented")
@@ -955,6 +964,8 @@ class WatchCommunicator : IWatchCommunicator {
         override fun restoreFactorySettings() = enqueueCommand(WatchSRestoreFactoryCommand())
         
         override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchASetTakePhotoModeCommand(if (enabled) 1.toByte() else 0.toByte()))
+
+        override fun setSosMode(enabled: Boolean) = enqueueCommand(WatchSSetSosModeCommand(if (enabled) 1.toByte() else 0.toByte()))
     }
 
     override val binder = WatchCommunicationServiceBinder()

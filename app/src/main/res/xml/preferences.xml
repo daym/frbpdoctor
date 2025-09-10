@@ -13,6 +13,21 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="emergency_features"
+        android:title="Emergency Features">
+
+        <CheckBoxPreference 
+            android:title="SOS Mode Enabled" 
+            android:key="userSosModeEnabled" 
+            android:summary="Enable SOS mode on watch" />
+            
+        <CheckBoxPreference 
+            android:title="Accident Monitoring Enabled" 
+            android:key="userAccidentMonitoringEnabled" 
+            android:summary="Accident Monitoring Enable" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="user_profile"
         android:title="User info">
         <EditTextPreference
@@ -134,7 +149,6 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <CheckBoxPreference android:title="Accident Monitoring Enabled" android:key="userAccidentMonitoringEnabled" android:summary="Accident Monitoring Enable" />
     <CheckBoxPreference android:title="Schedule Enabled" android:key="watchScheduleEnabled" android:summary="Schedule Enabled" />
 
     <PreferenceCategory
