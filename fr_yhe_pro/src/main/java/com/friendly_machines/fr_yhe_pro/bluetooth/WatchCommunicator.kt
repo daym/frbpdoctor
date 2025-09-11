@@ -300,7 +300,7 @@ class WatchCommunicator : IWatchCommunicator {
             } else if (response is DUpgradeResult) {
                 it.onWatchUpgradeResult()
             } else {
-                return
+                false
             }
         }.any { x -> x }
         enqueueCommand(
