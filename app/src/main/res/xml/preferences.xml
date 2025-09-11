@@ -125,15 +125,14 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
-        android:inputType="number"
-        android:key="watchScreenLitTime"
-        android:title="Watch screen: Time lit"
-        app:unit="FIXME" />
-
     <PreferenceCategory
         android:key="watch_time_layout"
-        android:title="Watch Time Layout">
+        android:title="Watch Time Layout">        
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="watchScreenLitTime"
+            android:title="Watch screen: Time lit"
+            app:unit="FIXME" />
 
         <ListPreference
             android:dialogTitle="Select where the time goes on the watch"
@@ -148,8 +147,6 @@
             android:title="Watch time color"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
-
-    <CheckBoxPreference android:title="Schedule Enabled" android:key="watchScheduleEnabled" android:summary="Schedule Enabled" />
 
     <PreferenceCategory
         android:key="watch_do_not_disturb"
@@ -181,6 +178,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:key="user_regular_reminder" android:title="Regular Reminder">
+        <CheckBoxPreference android:title="Schedule Enabled" android:key="watchScheduleEnabled" android:summary="Enable scheduled reminders" />
         <com.friendly_machines.frbpdoctor.ui.settings.TimePreference
             android:key="userRegularReminderStartTime"
             android:title="Reminder: start time"
