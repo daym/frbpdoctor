@@ -33,6 +33,7 @@ object WatchCommunicationClientShorthand {
             private var currentListener: IWatchListener? = null
             private val timeoutHandler = Handler(Looper.getMainLooper())
             private var timeoutRunnable: Runnable? = null
+            private var commandSent = false
             
             private fun cleanup() {
                 // Cancel timeout
@@ -49,7 +50,11 @@ object WatchCommunicationClientShorthand {
                 disconnector = null
                 
                 // Unbind service
-                context.unbindService(this)
+                try {
+                    context.unbindService(this)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error unbinding service: ${e.message}")
+                }
             }
             
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -62,6 +67,9 @@ object WatchCommunicationClientShorthand {
                 
                 val listener = object : IWatchListener {
                     override fun onWatchResponse(response: WatchResponse) {
+                        // Only process responses if we've actually sent a command
+                        if (!commandSent) return
+                        
                         when (binder.analyzeResponse(response, expectedResponseType)) {
                             WatchResponseAnalysisResult.Ok -> {
                                 cleanup()
@@ -71,6 +79,7 @@ object WatchCommunicationClientShorthand {
 
                             WatchResponseAnalysisResult.Mismatch -> {
                                 // Ignore the ones that have the wrong type, assuming that we will eventually get our response.
+                                Log.d(TAG, "Ignoring mismatched response: $response, expected type: $expectedResponseType")
                             }
 
                             WatchResponseAnalysisResult.Err -> {
@@ -81,18 +90,29 @@ object WatchCommunicationClientShorthand {
                             }
                         }
                     }
+                    
+                    override fun onException(exception: Throwable) {
+                        if (commandSent) {
+                            Log.e(TAG, "Exception during command execution: ${exception.message}")
+                            cleanup()
+                        }
+                    }
                 }
                 currentListener = listener
                 disconnector = binder.addListener(listener)
                 
-                // Set up timeout - 3 second timeout for watch response
+                // Set up timeout
                 timeoutRunnable = Runnable {
-                    cleanup()
-                    Log.e(TAG, "Command timed out after 3 seconds, unbinding service")
-                    Toast.makeText(context, "Watch command timed out", Toast.LENGTH_SHORT).show()
+                    if (commandSent) {
+                        cleanup()
+                        Log.e(TAG, "Command timed out, unbinding service")
+                        Toast.makeText(context, "Watch command timed out", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                timeoutHandler.postDelayed(timeoutRunnable!!, 3000)
+                timeoutHandler.postDelayed(timeoutRunnable!!, 2000)
                 
+                // Mark that we've sent the command
+                commandSent = true
                 callback(binder)
             }
 
