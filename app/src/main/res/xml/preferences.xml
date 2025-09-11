@@ -214,6 +214,11 @@
             android:key="userHeartMonitoringInterval"
             android:title="Heart monitoring: Interval"
             app:unit="FIXME" />
+        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
+            android:inputType="number"
+            android:key="userHeartMonitoringMaxValue2"
+            android:title="Heart monitoring: Max value"
+            app:unit="FIXME" />
         <CheckBoxPreference android:title="Heart Alarm Enabled" android:key="userHeartAlarmEnabled" android:summary="Heart Alarm Enable" />
         <Preference
             android:key="userHeartAlarmMinValue"
@@ -225,11 +230,6 @@
             android:key="userHeartAlarmMaxValue"
             android:title="Heart alarm: Max value"
             app:unit="BPM" />
-        <com.friendly_machines.frbpdoctor.ui.settings.MeasurementTextPreference
-            android:inputType="number"
-            android:key="userHeartMonitoringMaxValue2"
-            android:title="Heart monitoring: Max value"
-            app:unit="FIXME" />
     </PreferenceCategory>
 
     <PreferenceCategory android:key="user_temperature_monitoring" android:title="Temperature Monitoring">
