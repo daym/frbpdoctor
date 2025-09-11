@@ -1,5 +1,6 @@
 package com.friendly_machines.fr_yhe_pro.bluetooth
 
+import android.bluetooth.BluetoothGatt
 import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
@@ -423,7 +424,8 @@ class WatchCommunicator : IWatchCommunicator {
                 .retryWhen { errors ->
                     errors.flatMap { error ->
                         if (error is BleDisconnectedException) {
-                            Observable.timer(1, TimeUnit.SECONDS) // TODO: check
+                            Log.d(TAG, "BLE disconnected, retrying soon")
+                            Observable.timer(500, TimeUnit.MILLISECONDS)
                         } else {
                             Observable.error(error)
                         }
@@ -434,6 +436,24 @@ class WatchCommunicator : IWatchCommunicator {
                         Log.d(TAG, "Connection established")
                         this.connecting = false
                         this.connection = connection
+                        
+                        // Set connection priority to low power mode to save battery
+                        try {
+                            // The delay parameter only affects when the Completable completes, not the actual connection parameters.
+                            // It exists because Android doesn't provide a callback for when connection parameter changes take effect.
+                            // LOW_POWER sets parameters to: ~100-125ms connection interval, slave latency of 2 connection events
+                            // (meaning the peripheral can skip 2 connection intervals if it has no data to send).
+                            val connectionPriorityRequest = connection.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER, 1000, TimeUnit.MILLISECONDS)
+                                .subscribeOn(Schedulers.io())
+                                .subscribe(
+                                    { Log.d(TAG, "Connection priority set to low power") },
+                                    { throwable -> Log.e(TAG, "Failed to set connection priority: $throwable") }
+                                )
+                            bleDisposables.add(connectionPriorityRequest)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Exception setting connection priority: ${e.message}")
+                        }
+                        
                         //listeners.forEach { it.onConnected() }
                         setupIndications(indicationPortCharacteristic) { input ->
                             Log.d(TAG, "indication received: ${input.contentToString()}")
