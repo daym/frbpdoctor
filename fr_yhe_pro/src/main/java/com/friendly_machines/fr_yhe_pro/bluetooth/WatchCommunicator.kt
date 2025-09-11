@@ -390,10 +390,12 @@ class WatchCommunicator : IWatchCommunicator {
     }
 
     private fun requestMtu(connection: RxBleConnection) {
-        val disposable = connection.requestMtu(256).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ mtu ->
+        // Use 500 as MTU to match the original YuCheng SDK implementation
+        val disposable = connection.requestMtu(500).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ mtu ->
             run {
-                // mtu: 251
+                // The negotiated MTU might be lower than requested (e.g., 251)
                 this.mtu = mtu
+                Log.d(TAG, "MTU negotiated: $mtu (requested 500)") // we get 185
 
                 listeners.forEach {
                     it.onMtuResponse(mtu)
@@ -1007,6 +1009,14 @@ class WatchCommunicator : IWatchCommunicator {
         override fun setSosMode(enabled: Boolean) = enqueueCommand(WatchSSetSosModeCommand(if (enabled) 1.toByte() else 0.toByte()))
 
         override fun findDevice(duration: Byte, intensity: Byte, pattern: Byte) = enqueueCommand(WatchAFindDeviceCommand(duration, intensity, pattern))
+        
+        /**
+         * Get the current negotiated MTU value for the Bluetooth connection
+         * @return The current MTU value in bytes
+         */
+        override fun getMtu(): Int {
+            return this@WatchCommunicator.mtu
+        }
     }
 
     override val binder = WatchCommunicationServiceBinder()

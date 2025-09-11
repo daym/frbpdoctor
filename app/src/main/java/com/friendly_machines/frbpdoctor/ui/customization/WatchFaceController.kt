@@ -1,6 +1,7 @@
 package com.friendly_machines.frbpdoctor.ui.customization
 
 import android.util.Log
+import androidx.core.view.MotionEventCompat
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchBinder
 import com.friendly_machines.fr_yhe_api.watchprotocol.IWatchListener
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
@@ -8,13 +9,13 @@ import com.friendly_machines.fr_yhe_pro.Crc16
 import com.friendly_machines.fr_yhe_pro.command.WatchWControlDownloadCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWDeleteWatchDialCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWGetWatchDialInfoCommand
-import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWNextDownloadChunkMetaCommand
 import com.friendly_machines.fr_yhe_pro.command.WatchWSetCurrentWatchDialCommand
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlin.reflect.KClass
+
 
 // TODO: Progress private val _progress = MutableStateFlow<DownloadProgress>()
 //val progress = _progress.asStateFlow()
@@ -90,9 +91,11 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
     }
 
     /** Give the specified watchface BODY to the watch */
-    suspend fun downloadWatchface(mtu: Int, dialPlateId: Int, blockNumber: Short, version: Short, body: ByteArray) = coroutineScope {
+    suspend fun downloadWatchface(dialPlateId: Int, blockNumber: Short, version: Short, body: ByteArray) = coroutineScope {
         val metaChunkSize = 4096 // Byte
         val totalSize = body.size
+
+        val mtu = binder.getMtu()
         
         setProgress(0f, "Starting download...")
         val startResponse = startWatchFaceDownload(body.size.toUInt(), dialPlateId, blockNumber, version, Crc16.crc16(body).toUShort())
@@ -122,9 +125,11 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
             
             // Use actual chunk size, not fixed metaChunkSize
             val actualChunkSize = chunk.size
-            
+
+            val chunkBytes = chunk.toByteArray()
+
             setProgress(overallProgress.toFloat(), "Verifying chunk ${chunkIndex + 1}...")
-            val verifyResponse = nextWatchFaceDownloadChunkMeta(actualChunkSize, packageCount, Crc16.crc16(chunk.toByteArray()).toUShort())
+            val verifyResponse = nextWatchFaceDownloadChunkMeta(actualChunkSize, packageCount, Crc16.crc16(chunkBytes).toUShort())
             if (verifyResponse !is WatchWNextDownloadChunkMetaCommand.Response || verifyResponse.status != 0.toByte()) {
                 throw Exception("Watch did not accept chunk ${chunkIndex + 1}")
             }

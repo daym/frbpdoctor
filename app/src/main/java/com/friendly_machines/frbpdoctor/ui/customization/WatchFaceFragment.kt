@@ -164,12 +164,11 @@ class WatchFaceFragment : Fragment() {
         
         uploadJob = lifecycleScope.launch {
             try {
-                val mtu = 235 // Standard BLE MTU - 9 bytes overhead = 235 // FIXME
                 val dialPlateId = watchface.getDialPlateIdInt()
-                val blockNumber = 0.toShort() // Default for new uploads
-                val version = 1.toShort() // Default version
+                val blockNumber = 0.toShort() // Default for new uploads; FIXME!!!!
+                val version = 1.toShort() // Default version; FIXME!!!
                 
-                watchFaceController?.downloadWatchface(mtu, dialPlateId, blockNumber, version, binData)
+                watchFaceController?.downloadWatchface(dialPlateId, blockNumber, version, binData)
                 watchFaceController?.listWatchFaces()
                 watchFaceController?.selectWatchFace(dialPlateId)
                 

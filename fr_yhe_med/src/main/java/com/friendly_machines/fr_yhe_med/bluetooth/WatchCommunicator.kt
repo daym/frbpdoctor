@@ -964,6 +964,14 @@ public class WatchCommunicator : IWatchCommunicator {
         override fun setTakePhotoMode(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun setSosMode(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
         override fun findDevice(duration: Byte, intensity: Byte, pattern: Byte) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
+        
+        /**
+         * Get the current negotiated MTU value for the Bluetooth connection
+         * @return The current MTU value in bytes
+         */
+        override fun getMtu(): Int {
+            return this@WatchCommunicator.mtu
+        }
     }
 
     override val binder = WatchCommunicationServiceBinder()

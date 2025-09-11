@@ -117,4 +117,10 @@ interface IWatchBinder : IBinder {
     fun setSosMode(enabled: Boolean)
     
     fun findDevice(duration: Byte = 1, intensity: Byte = 5, pattern: Byte = 2)
+    
+    /**
+     * Get the current negotiated MTU value for the Bluetooth connection
+     * @return The current MTU value in bytes
+     */
+    fun getMtu(): Int
 }
