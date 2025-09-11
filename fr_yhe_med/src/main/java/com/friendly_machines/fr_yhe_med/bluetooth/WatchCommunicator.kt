@@ -62,6 +62,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.ReplaySubject
 import io.reactivex.rxjava3.subjects.Subject
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
@@ -113,7 +114,15 @@ public class WatchCommunicator : IWatchCommunicator {
         val cipher: Cipher = Cipher.getInstance("AES/CBC/NoPadding")
     }
 
-    private val commandQueue = PublishSubject.create<WatchCommand>().toSerialized()
+    // Using ReplaySubject instead of PublishSubject to ensure commands are not lost if they're sent before
+    // the Bluetooth connection is established. ReplaySubject caches all emitted items and replays them
+    // to new subscribers, which fixes scenarios like:
+    // 1. Service starts
+    // 2. App sends a command (e.g., setLanguage) immediately after binding
+    // 3. Bluetooth connection isn't ready yet
+    // 4. With PublishSubject, this command would be lost since there's no subscriber
+    // 5. With ReplaySubject, the command is cached and sent once the connection is established
+    private val commandQueue = ReplaySubject.create<WatchCommand>().toSerialized()
 
     private fun enqueueCommand(
         command: WatchCommand,
