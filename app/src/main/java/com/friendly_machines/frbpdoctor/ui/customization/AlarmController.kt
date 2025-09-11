@@ -11,7 +11,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class AlarmController(val binder: IWatchBinder) : IWatchListener, MedBigResponseBuffer.IBigResponseListener {
     private val TAG: String = "AlarmController"
-    private val bigResponseChannel = Channel<WatchBigResponseMed>()
+    private val bigResponseChannel = Channel<WatchBigResponseMed>(Channel.CONFLATED) // buffers only most recent message; replacing stuff
     
     override fun onWatchResponse(response: WatchResponse) {
         // Handle regular alarm responses if needed (like addAlarm confirmations)

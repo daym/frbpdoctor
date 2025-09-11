@@ -25,7 +25,7 @@ abstract class HistoryController<T>(
     val onComplete: () -> Unit,
     val onError: (error: Exception) -> Unit
 ) : IWatchListener, MedBigResponseBuffer.IBigResponseListener {
-    protected val responseChannel = Channel<Any>()
+    protected val responseChannel = Channel<Any>(Channel.CONFLATED) // buffers only most recent message; replacing stuff
     protected val collectedItems = mutableListOf<T>()
     protected val healthClient by lazy { HealthConnectClient.getOrCreate(context) }
 

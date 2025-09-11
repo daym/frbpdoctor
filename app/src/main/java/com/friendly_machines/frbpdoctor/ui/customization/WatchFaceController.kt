@@ -25,7 +25,8 @@ import kotlin.reflect.KClass
 // YHE Pro; it's important that there's only one instance live of this because otherwise we could misinterpret responses meant for others as responses meant for us.
 class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, String) -> Unit) : IWatchListener {
     private val TAG: String = "WatchFaceController"
-    private val responseChannel = Channel<WatchResponse>()
+    // Using buffered channel to ensure responses aren't lost if they arrive before a receiver is ready
+    private val responseChannel = Channel<WatchResponse>(Channel.CONFLATED) // buffers only most recent message; replacing stuff
     override fun onWatchResponse(response: WatchResponse) {
         // ONLY handle responses of class 9 (W); those are very few
         if (response is WatchWControlDownloadCommand.Response || response is WatchWDeleteWatchDialCommand.Response || response is WatchWGetWatchDialInfoCommand.Response || response is WatchWNextDownloadChunkMetaCommand.Response || response is WatchWSetCurrentWatchDialCommand.Response) {
@@ -42,7 +43,7 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
     private suspend fun <T : WatchResponse> receive(clazz: KClass<T>): WatchResponse {
         while (true) {
             val result = responseChannel.receive()
-            if (result.javaClass == clazz) {
+            if (result::class == clazz) {
                 return result
             }
         }
@@ -89,7 +90,7 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
     }
 
     /** Give the specified watchface BODY to the watch */
-    suspend fun downloadWatchface(mtu: Byte, dialPlateId: Int, blockNumber: Short, version: Short, body: ByteArray) = coroutineScope {
+    suspend fun downloadWatchface(mtu: Int, dialPlateId: Int, blockNumber: Short, version: Short, body: ByteArray) = coroutineScope {
         val metaChunkSize = 4096 // Byte
         val totalSize = body.size
         
@@ -101,8 +102,9 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
             throw Exception("Starting download failed: control=${startResponse.control}, error=${startResponse.errorCode}")
         }
         
-        val chunks = body.iterator().asSequence().chunked(metaChunkSize)
-        val totalChunks = chunks.count()
+        // Break the byte array into chunks, converting to a list to avoid sequence consumption
+        val chunks = body.asIterable().chunked(metaChunkSize)
+        val totalChunks = chunks.size
         var bytesTransferred = 0
         
         chunks.forEachIndexed { chunkIndex, chunk ->
@@ -112,7 +114,7 @@ class WatchFaceController(val binder: IWatchBinder, val progresser: (Float, Stri
             // Send MTU chunks
             // MTU chunking: Protocol overhead (6 bytes) + ATT overhead (3 bytes) = 9 bytes total
             var packageCount: UShort = 0U
-            chunk.chunked(mtu.toInt() - 9).forEach { packageChunk ->
+            chunk.chunked(mtu - 9).forEach { packageChunk ->
                 binder.sendWatchFaceDownloadChunk(packageChunk.toByteArray())
                 ++packageCount
                 delay(10) // Small delay of 10ms between chunks

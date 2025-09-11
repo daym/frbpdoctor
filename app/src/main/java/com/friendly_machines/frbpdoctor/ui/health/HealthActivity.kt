@@ -69,7 +69,7 @@ class HealthActivity : BaseActivity(), IWatchListener, MedBigResponseBuffer.IBig
     private val healthConnectChannelScope = CoroutineScope(Dispatchers.Main + Job())
 
     // Channel for queuing health records that need to be inserted
-    private val recordsChannel = Channel<List<Record>>(Channel.BUFFERED)
+    private val recordsChannel = Channel<List<Record>>(Channel.CONFLATED)  // buffers only most recent message; replacing stuff
 
     override fun onStart() {
         super.onStart()
