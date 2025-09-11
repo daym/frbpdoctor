@@ -109,7 +109,7 @@ object WatchCommunicationClientShorthand {
                         Toast.makeText(context, "Watch command timed out", Toast.LENGTH_SHORT).show()
                     }
                 }
-                timeoutHandler.postDelayed(timeoutRunnable!!, 2000)
+                timeoutHandler.postDelayed(timeoutRunnable!!, 4000)
                 
                 // Mark that we've sent the command
                 commandSent = true
