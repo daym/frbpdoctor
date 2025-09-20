@@ -150,8 +150,11 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.ZonedDateTime
 import java.util.UUID
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import android.os.Handler
+import android.os.Looper
 
 /**
  * We only ever see the Data Channel Payload. The Preamble, Access Address, Data Channel PDU header and BLE CRC are done by RxAndroidBle internally and do not count to the MTU.
@@ -200,31 +203,40 @@ class WatchCommunicator : IWatchCommunicator {
             val disposable = indicationObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(callback) { throwable ->
                 run {
                     Log.e(TAG, "Indication error: $throwable")
-                    notifyListenersOfException(throwable)
+                    notifyListenersOfException(throwable)  // Already on main thread due to observeOn
                 }
             }
 
             bleDisposables.add(disposable)
         } catch (e: BleCharacteristicNotFoundException) {
             Log.e(TAG, "Characteristic not found: $characteristicUuid")
-            notifyListenersOfException(e)
+            mainHandler.post { notifyListenersOfException(e) }
             throw e
         } catch (e: BleConflictingNotificationAlreadySetException) {
             Log.e(
                 TAG, "Conflicting indication already set for characteristic: $characteristicUuid"
             )
-            notifyListenersOfException(e)
+            mainHandler.post { notifyListenersOfException(e) }
             throw e
         } catch (e: BleGattException) {
             Log.e(TAG, "Gatt error: $e")/*if (e.type == BleGattOperationType.NOTIFICATION) {
                 Log.e(TAG, "Notification setup error for characteristic: $characteristicUuid")
             }*/
-            notifyListenersOfException(e)
+            mainHandler.post { notifyListenersOfException(e) }
             throw e
         }
     }
 
-    private var listeners = HashSet<IWatchListener>()
+    /**
+ * Thread-safe collection of listeners.
+ * CopyOnWriteArraySet prevents ConcurrentModificationException during iteration.
+ */
+private var listeners = CopyOnWriteArraySet<IWatchListener>()
+
+/**
+ * Main thread handler for ensuring callbacks happen on the main thread.
+ */
+private val mainHandler = Handler(Looper.getMainLooper())
 
     private var sendingSequenceNumber = AtomicInteger(1) // verified; our first packet after the reset packet needs to be with sendingSequenceNumber > 0
 
@@ -385,7 +397,7 @@ class WatchCommunicator : IWatchCommunicator {
                 Log.e(
                     TAG, "Write characteristic error: $throwable"
                 )
-                notifyListenersOfException(throwable)
+                notifyListenersOfException(throwable)  // Already on main thread due to observeOn
             })
     }
 
@@ -404,7 +416,7 @@ class WatchCommunicator : IWatchCommunicator {
         }, { throwable ->
             run {
                 Log.e(TAG, "MTU request failed: $throwable")
-                notifyListenersOfException(throwable)
+                notifyListenersOfException(throwable)  // Already on main thread due to observeOn
             }
         })
         bleDisposables.add(disposable)
@@ -454,6 +466,7 @@ class WatchCommunicator : IWatchCommunicator {
                             bleDisposables.add(connectionPriorityRequest)
                         } catch (e: Exception) {
                             Log.e(TAG, "Exception setting connection priority: ${e.message}")
+                            mainHandler.post { notifyListenersOfException(e) }
                         }
                         
                         //listeners.forEach { it.onConnected() }
@@ -463,10 +476,10 @@ class WatchCommunicator : IWatchCommunicator {
                             try {
                                 onIndicationReceived(buf)
                             } catch (e: BufferUnderflowException) {
-                                notifyListenersOfException(e)
+                                notifyListenersOfException(e)  // Already on main thread due to observeOn
                                 Log.e(TAG, "Exception: $e")
                             } catch (e: WatchMessageDecodingException) {
-                                notifyListenersOfException(e)
+                                notifyListenersOfException(e)  // Already on main thread due to observeOn
                                 Log.e(TAG, "Exception: $e")
                             }
                         }
@@ -476,10 +489,10 @@ class WatchCommunicator : IWatchCommunicator {
                             try {
                                 onIndicationReceived(buf)
                             } catch (e: BufferUnderflowException) {
-                                notifyListenersOfException(e)
+                                notifyListenersOfException(e)  // Already on main thread due to observeOn
                                 Log.e(TAG, "Exception: $e")
                             } catch (e: WatchMessageDecodingException) {
-                                notifyListenersOfException(e)
+                                notifyListenersOfException(e)  // Already on main thread due to observeOn
                                 Log.e(TAG, "Exception: $e")
                             }
                         }
@@ -490,7 +503,7 @@ class WatchCommunicator : IWatchCommunicator {
                     run {
                         this.connecting = false
                         Log.e(TAG, "Connection error: $throwable")
-                        notifyListenersOfException(throwable)
+                        notifyListenersOfException(throwable)  // Already on main thread due to observeOn
                     }
                 })
         )
@@ -521,7 +534,15 @@ class WatchCommunicator : IWatchCommunicator {
         return this.binder
     }
 
+    /**
+     * Notifies all registered listeners about an exception that occurred.
+     *
+     * NOTE: This method must be called from the main thread.
+     *
+     * @param exception The exception to notify listeners about
+     */
     private fun notifyListenersOfException(exception: Throwable) {
+        // Safe to iterate with CopyOnWriteArraySet
         this.listeners.forEach {
             it.onException(exception)
         }
