@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothGatt
 import android.os.Binder
 import android.util.Log
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
+import com.friendly_machines.fr_yhe_api.commondata.MessageType
+import com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed
 import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.commondata.SkinColor
 import com.friendly_machines.fr_yhe_api.commondata.WatchWearingArm
@@ -430,6 +432,7 @@ private val mainHandler = Handler(Looper.getMainLooper())
     }
 
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
+    @MainThread
     override fun start(bleDevice: RxBleDevice, keyDigest: ByteArray) {
         assert(!this.connecting)
         this.connecting = true
@@ -522,14 +525,17 @@ private val mainHandler = Handler(Looper.getMainLooper())
         )
     }
 
+    @MainThread
     override fun stop() {
         bleDisposables.clear()
     }
 
+    @MainThread
     override fun removeListener(listener: IWatchListener) {
         this.listeners.remove(listener)
     }
 
+    @MainThread
     override fun addListener(listener: IWatchListener): IWatchBinder {
         this.listeners.add(listener)
         return this.binder
@@ -580,12 +586,23 @@ private val mainHandler = Handler(Looper.getMainLooper())
             weatherType: Int, temp: Byte, maxTemp: Byte, minTemp: Byte, dummy: Byte/*0*/, month: Byte, dayOfMonth: Byte, dayOfWeekMondayBased: Byte, location: String
         ) = enqueueCommand(WatchASetTodayWeatherCommand("1FIXME", "2FIXME", "3FIXME", WatchASetTodayWeatherCommand.WeatherCode.Cloudy /* FIXME weatherType.toShort()*//*FIXME*/))
 
-        override fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
-            WatchANotificationPushCommand(type.code /* FIXME */, title, content)
-        )
-
-        override fun setMessage2(type: Byte, time: Int, title: String, content: String) = enqueueCommand(
-            WatchANotificationPushCommand(type /* FIXME */, title, content)
+        override fun setMessage(type: MessageTypeMed, time: Int, title: String, content: String) = enqueueCommand(
+            WatchANotificationPushCommand(when(type) {
+                MessageTypeMed.Wechat -> MessageType.WeChat
+                MessageTypeMed.Qq -> MessageType.QQ
+                MessageTypeMed.Sms -> MessageType.SMS
+                MessageTypeMed.NewCall -> MessageType.PhoneCall
+                MessageTypeMed.MissedCall -> MessageType.PhoneCall
+                MessageTypeMed.HungUpCall -> MessageType.PhoneCall
+                MessageTypeMed.Facebook -> MessageType.Facebook
+                MessageTypeMed.Instagram -> MessageType.Instagram
+                MessageTypeMed.Line -> MessageType.Line
+                MessageTypeMed.Messenger -> MessageType.Messenger
+                MessageTypeMed.Snapchat -> MessageType.Snapchat
+                MessageTypeMed.Twitter -> MessageType.Twitter
+                MessageTypeMed.Viber -> MessageType.Viber
+                MessageTypeMed.Whatsapp -> MessageType.WhatsApp
+            }, title, content)
         )
 
         override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(
@@ -742,11 +759,13 @@ private val mainHandler = Handler(Looper.getMainLooper())
         // Note: WatchSGoalCommand also handles sleepQuality (goalType=3) - both use the same command and response class
         override fun setStepGoal(steps: Int) = enqueueCommand(WatchSGoalCommand(0, steps))
 
+        @MainThread
         override fun addListener(that: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(that)
             return this@WatchCommunicator.binder // FIXME is that right?
         }
 
+        @MainThread
         override fun removeListener(listener: IWatchListener) {
             listeners.remove(listener)
         }

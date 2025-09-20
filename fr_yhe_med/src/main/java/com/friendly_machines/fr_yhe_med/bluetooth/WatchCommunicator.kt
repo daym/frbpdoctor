@@ -450,6 +450,7 @@ private val mainHandler = Handler(Looper.getMainLooper())
     }
 
     /** Connect to bleDevice and start sending commandQueue entries as needed. Also register for notifications and call listeners as necessary. */
+    @MainThread
     override fun start(bleDevice: RxBleDevice, keyDigest: ByteArray) {
         this.keyDigest = keyDigest
         assert(!this.connecting)
@@ -528,14 +529,17 @@ private val mainHandler = Handler(Looper.getMainLooper())
         )
     }
 
+    @MainThread
     override fun stop() {
         bleDisposables.clear()
     }
 
+    @MainThread
     override fun removeListener(listener: IWatchListener) {
         this.listeners.remove(listener)
     }
 
+    @MainThread
     override fun addListener(listener: IWatchListener): IWatchBinder {
         this.listeners.add(listener)
         return this.binder
@@ -574,11 +578,6 @@ private val mainHandler = Handler(Looper.getMainLooper())
             )
         )
 
-        override fun setMessage2(type: Byte, time: Int, title: String, content: String) = enqueueCommand(
-            WatchSetMessageCommand(
-                type, time, WatchCharacteristic.encodeWatchString(title), WatchCharacteristic.encodeWatchString(content) // FIXME
-            )
-        )
 
         override fun pushMessage(pushMessageType: PushMessageType, message: String) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
@@ -650,11 +649,13 @@ private val mainHandler = Handler(Looper.getMainLooper())
 
         override fun setAccidentMonitoringEnabled(enabled: Boolean) = enqueueCommand(WatchGetBatteryStateCommand()) // dummy
 
+        @MainThread
         override fun addListener(watchListener: IWatchListener): IWatchBinder {
             this@WatchCommunicator.addListener(watchListener)
             return this@WatchCommunicator.binder
         }
 
+        @MainThread
         override fun removeListener(listener: IWatchListener) {
             listeners.remove(listener)
         }

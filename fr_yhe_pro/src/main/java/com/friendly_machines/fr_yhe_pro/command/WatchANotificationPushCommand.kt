@@ -1,16 +1,17 @@
 package com.friendly_machines.fr_yhe_pro.command
 
+import com.friendly_machines.fr_yhe_api.commondata.MessageType
 import com.friendly_machines.fr_yhe_api.watchprotocol.WatchResponse
 import com.friendly_machines.fr_yhe_pro.WatchOperation
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-class WatchANotificationPushCommand(type: Byte, title: String, str2: String) : WatchCommand(WatchOperation.ANotificationPush, run {
+class WatchANotificationPushCommand(type: MessageType, title: String, str2: String) : WatchCommand(WatchOperation.ANotificationPush, run {
     val titleBytes = title.toByteArray(StandardCharsets.UTF_8)
     val str2Bytes = str2.toByteArray(StandardCharsets.UTF_8)
     val output = ByteArrayOutputStream()
-    output.write(byteArrayOf(type))
+    output.write(byteArrayOf(type.code))
     output.write(titleBytes)
     output.write(byteArrayOf(0))
     output.write(str2Bytes)

@@ -1,6 +1,7 @@
 package com.friendly_machines.fr_yhe_api.watchprotocol
 
 import android.os.IBinder
+import androidx.annotation.MainThread
 import com.friendly_machines.fr_yhe_api.commondata.DayOfWeekPattern
 import com.friendly_machines.fr_yhe_api.commondata.PushMessageType
 import com.friendly_machines.fr_yhe_api.commondata.RealDataMeasureType
@@ -17,7 +18,6 @@ interface IWatchBinder : IBinder {
     )
 
     fun setMessage(type: com.friendly_machines.fr_yhe_api.commondata.MessageTypeMed, time: Int, title: String, content: String)
-    fun setMessage2(type: Byte, time: Int, title: String, content: String) // FIXME remove
     fun pushMessage(pushMessageType: PushMessageType, message: String)
     fun setTime()
     fun getBatteryState()
@@ -45,7 +45,10 @@ interface IWatchBinder : IBinder {
     fun deleteWatchDial(id: Int)
     fun getSportData()
     fun setStepGoal(steps: Int)
+    @MainThread
     fun addListener(watchListener: IWatchListener): IWatchBinder
+
+    @MainThread
     fun removeListener(listener: IWatchListener)
     fun resetSequenceNumbers()
     fun analyzeResponse(response: WatchResponse, expectedResponseType: WatchResponseType): WatchResponseAnalysisResult
