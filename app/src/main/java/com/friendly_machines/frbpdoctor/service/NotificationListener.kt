@@ -29,7 +29,7 @@ class NotificationListener : NotificationListenerService() {
             if (notification.category == Notification.CATEGORY_SERVICE || notification.category == Notification.CATEGORY_ERROR || notification.category == Notification.CATEGORY_PROGRESS || notification.category == Notification.CATEGORY_PROMO || notification.category == Notification.CATEGORY_RECOMMENDATION || notification.category == Notification.CATEGORY_STATUS) {
                 return
             }
-            if (notification.flags and Notification.FLAG_LOCAL_ONLY != 0) {
+            if (notification.flags and Notification.FLAG_LOCAL_ONLY != 0 && notification.category != Notification.CATEGORY_NAVIGATION) {
                 return
             }
             if (notification.visibility != Notification.VISIBILITY_SECRET) {
