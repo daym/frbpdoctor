@@ -155,6 +155,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.MainThread
 
 /**
  * We only ever see the Data Channel Payload. The Preamble, Access Address, Data Channel PDU header and BLE CRC are done by RxAndroidBle internally and do not count to the MTU.
@@ -541,6 +542,7 @@ private val mainHandler = Handler(Looper.getMainLooper())
      *
      * @param exception The exception to notify listeners about
      */
+    @MainThread
     private fun notifyListenersOfException(exception: Throwable) {
         // Safe to iterate with CopyOnWriteArraySet
         this.listeners.forEach {

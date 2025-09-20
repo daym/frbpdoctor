@@ -79,6 +79,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.MainThread
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
@@ -547,6 +548,7 @@ private val mainHandler = Handler(Looper.getMainLooper())
      *
      * @param exception The exception to notify listeners about
      */
+    @MainThread
     private fun notifyListenersOfException(exception: Throwable) {
         // Safe to iterate with CopyOnWriteArraySet
         this.listeners.forEach {
